@@ -1,0 +1,28 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(COMP_345_Project)
+
+include(ExternalProject)
+
+# Set install directory
+set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/dist CACHE PATH ${CMAKE_SOURCE_DIR}/dist FORCE)
+if(WIN32)
+    set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Debug;Release" FORCE)
+endif()
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
+# COMP_345_Project
+set(EXEC COMP_345_Project)
+
+file(GLOB SRC src/*)
+include_directories(${SRC})
+add_executable(${EXEC} "src/project.cpp")
+
+target_include_directories(${EXEC} PUBLIC include)
+
+list(APPEND BIN ${EXEC})
+# end COMP_345_Project
+
+# install files to install location
+install(TARGETS ${BIN} DESTINATION ${CMAKE_INSTALL_PREFIX})
