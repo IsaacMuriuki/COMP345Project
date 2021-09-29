@@ -15,10 +15,12 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 # COMP_345_Project
 set(EXEC COMP_345_Project)
 
-file(GLOB SRC src/*)
-include_directories(${SRC})
-add_executable(${EXEC} "src/project.cpp")
+file(GLOB_RECURSE SRC src/*.cpp)
+file(GLOB_RECURSE INSTALL include/*.h)
+include_directories(${INSTALL})
+add_executable(${EXEC} ${SRC})
 
+#target_sources(${EXEC} PRIVATE ${SRC})
 target_include_directories(${EXEC} PUBLIC include)
 
 list(APPEND BIN ${EXEC})
