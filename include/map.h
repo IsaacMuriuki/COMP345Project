@@ -85,3 +85,24 @@ class Map
         bool isMapConnected();
         friend std::ostream& operator <<(std::ostream& stream, Map& map);
 };
+
+class MapLoader
+{
+    private:
+        string fileName;
+        vector<Node>* nodes;
+        Map* map;
+        vector<Continent*>* continents;
+        bool error;
+    public:
+        //Constructors
+        MapLoader();
+        MapLoader(string fileName);
+        vector<string> readLines();
+        Map* getMap();
+	    vector<Continent*>* getContinents();
+
+        template<typename Out>
+        void split(const std::string &s, char delim, Out result);
+        vector<string> split(const string &s, char delim);
+}             
