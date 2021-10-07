@@ -15,19 +15,25 @@ class Card {
 	public:
 		//The default constructor is for the arrays of cards for the cards and hands
 		Card();
+		Card(const Card &card);
 		Card(CardType cardType);
 		//Standard getter and setters
 		void setCardType(CardType cardType);
 		CardType getCardType();
+		CardType play();
 };
 
 
 class Deck {
 	//Need to add getter and setters
 	private:
-	public:
 		Card deck[35];
+	public:
 		Deck();
+		Deck(const Deck &deck);
+		CardType draw();
+		void reshuffleIntoDeck(CardType cardType);
+
 		
 };
 
@@ -35,15 +41,12 @@ class Hand {
 
 private:
 	//Hand size is limited to 5 at the moment
-
-public:
 	Card hand[5];
+public:
 	Hand();
-	//The hand draws and plays cards
-	//Need to add getter and setters and a maybe a display function
-	CardType play(Deck deck, int handPosition);
-	void Draw(Deck deck);
-
+	Hand(const Hand& hand);
+	Card getHand(int index);
+	void setHand(int index, CardType cardType);
 };
 
 #endif

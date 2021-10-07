@@ -7,12 +7,12 @@ using namespace std;
 
 Card::Card()
 {
-	this->cardType = unassigned;
+	this->setCardType(unassigned);
 }
 
 Card::Card(CardType cardType)
 {
-	this->cardType = cardType;
+	this->setCardType(cardType);
 }
 
 
@@ -24,6 +24,20 @@ void Card::setCardType(CardType cardType)
 CardType Card::getCardType()
 {
 	return this->cardType;
+}
+
+Card::Card(const Card &card)
+{
+
+	this->cardType = card.cardType;
+
+}
+
+CardType Card::play()
+{
+	CardType temporaryCardTypeHolder = this->getCardType();
+	this->setCardType(unassigned);
+	return temporaryCardTypeHolder;
 }
 
 Deck::Deck()
@@ -47,6 +61,74 @@ Deck::Deck()
 
 }
 
+void Deck::reshuffleIntoDeck(CardType cardType)
+{
+	int randomCard;
+	bool cardShuffledIn = false;
+	int countAssigned = 0;
+
+	//Check to see if all the cards in the deck already exist, if so it will skip the loop to reassign the card
+	for (int i = 0; i < 35; i++) {
+		if (this->deck[i].getCardType() != unassigned) {
+			countAssigned = countAssigned + 1;
+		}
+	}
+
+	if (countAssigned == 35) {
+		cardShuffledIn = true;
+	}
+
+	//This section randomly shuffles the card back into the deck
+	while (cardShuffledIn == false) {
+		randomCard = rand() % 35;
+		//Check for a card that hasn't been removed from the deck
+		if (this->deck[randomCard].getCardType() == unassigned) {			
+			this->deck[randomCard].setCardType(cardType);
+			cardShuffledIn = true;
+		}
+	}
+}
+
+CardType Deck::draw()
+{
+	//Generate random number and check if it's in the deck, if not new number
+	//Add card to hand and remove from the deck
+	int randomCard;
+	bool cardDrawn = false;
+	int countUnassigned = 0;
+	CardType drawnCard = unassigned;
+	//Check to see if all the cards in the deck already exist, if so it will skip the loop to reassign the card
+	for (int i = 0; i < 35; i++) {
+		if (this->deck[i].getCardType() == unassigned) {
+			countUnassigned = countUnassigned + 1;
+		}
+	}
+
+	if (countUnassigned == 35) {
+		cardDrawn = true;
+	}
+
+	while (cardDrawn == false) {
+		randomCard = rand() % 35;
+		//Check for a card that hasn't been removed from the deck
+		if (this->deck[randomCard].getCardType() != unassigned) {
+			drawnCard = this->deck[randomCard].getCardType();
+			this->deck[randomCard].setCardType(unassigned);
+			cardDrawn = true;
+		}
+		
+	}
+	return drawnCard;
+}
+
+Deck::Deck(const Deck& deck)
+{
+	for (int i = 0; i < 35; i++) {
+		this->deck[i] = deck.deck[i];
+	}
+	
+}
+
 
 Hand::Hand()
 {
@@ -56,42 +138,27 @@ Hand::Hand()
 	}
 }
 
-CardType Hand::play(Deck deck, int handPosition)
+Card Hand::getHand(int index)
 {
-	CardType temporaryCardTypeHolder = this->hand[handPosition].getCardType();
-	this->hand[handPosition].setCardType(unassigned);
-	for (int i = 0; i < 35; i++) {
-		bool cardInsertedIntoDeck = false;
-		if (deck.deck[i].getCardType() == unassigned && cardInsertedIntoDeck == false) {
-			deck.deck[i].setCardType(temporaryCardTypeHolder);
-			cardInsertedIntoDeck = true;
-		}
-	}
-	return temporaryCardTypeHolder;
+	return this->hand[index];
 }
 
-void Hand::Draw(Deck deck)
+void Hand::setHand(int index, CardType cardType)
 {
-	//Generate random number and check if it's in the deck, if not new number
-	//Add card to hand and remove from the deck
-	int randomCard;
-	bool cardDrawn = false;
-	while (cardDrawn == false) {
-		randomCard = rand() % 35;
-		//Check for a card that hasn't been removed from the deck
-		if (deck.deck[randomCard].getCardType() != unassigned) {
-			bool cardAddedtoHand = false;
-			for (int i = 0; i < 5; i++) {
-				if (cardAddedtoHand == false && this->hand[i].getCardType() == unassigned) {
-					this->hand[i].setCardType(deck.deck[randomCard].getCardType());
-					cardAddedtoHand = true;
-				}
-			}
-			cardDrawn = true;
-			deck.deck[randomCard].setCardType(unassigned);
-		}
+	this->hand[index].setCardType(cardType);
+}
+
+
+Hand::Hand(const Hand& hand)
+{
+	for (int i = 0; i < 5; i++) {
+		this->hand[i] = hand.hand[i];
 	}
 }
+
+
+
+
 
 
 
