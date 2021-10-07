@@ -57,13 +57,15 @@ int main() {
                 //Creating a deck and a hand
                 Deck deck;
                 Hand hand;
+                CardType temp;
                 //Drawing the cards from the deck into the hand and playing the cards
                 for (int i = 0; i < 5; i++) {
-                    hand.Draw(deck);
+                    temp = deck.draw();
+                    hand.setHand(i,temp);
                 }
                 for (int i = 0; i < 5; i++) {
                     //Using an array of strings to print out the text value of the cards
-                    cout << cardTypesText[hand.play(deck, i)];
+                    cout << cardTypesText[hand.getHand(i).play()];
                     cout << endl;
                 }
             }
