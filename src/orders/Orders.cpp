@@ -1,22 +1,47 @@
 #include "Orders.h"
 
-bool Order::cancel() {
-    if (!_cancelled && onCancel()) {
-        _cancelled = true;
-    }
-    return _cancelled;
-}
 
 // Order class definition
+Order::Order() {
+    _executed = false;
+}
+
+Order::~Order() {
+
+}
+
+Order& Order::operator=(Order&& order) {
+    if (this != &order) {
+        
+    }
+    return *this;
+}
+
+Order::Order(const Order& order) {
+    _executed = order._executed;
+}
+
 void Order::execute() {
-    std::cout << "Order::execute(): base class execution." << std::endl;
+    // TODO: maybe validate before execute?
+    onExecute();
+    _executed = true;
+}
+
+bool Order::isExecuted() {
+    return _executed;
 }
 
 bool Order::validate() {
-    return false;
+    return !_executed && !onValidate();
+}
+
+std::ostream& Order::operator<<(std::ostream &out) {
+    out << getDescription() + (_executed ? " - " + getEffectApplied() : "");
+    return out;
 }
 
 
+// CardOrder class definition
 CardOrder::CardOrder() {
 
 }
@@ -25,17 +50,15 @@ CardOrder::~CardOrder() {
 
 }
 
-void CardOrder::execute() {
-
+CardOrder& CardOrder::operator=(CardOrder&& order) {
+    if (this != &order) {
+        
+    }
+    return *this;
 }
 
-bool CardOrder::validate() {
-    return false;
-}
+CardOrder::CardOrder(const CardOrder& order) {
 
-bool CardOrder::onCancel() {
-    // TODO: return card to player.
-    return true;
 }
 
 
@@ -48,18 +71,32 @@ Deploy::~Deploy() {
     // TODO: delete both territories.
 }
 
-void Deploy::execute() {
-    Order::execute();
-    std::cout << "Deploy the army!" << std::endl;
+Deploy& Deploy::operator=(Deploy&& order) {
+    if (this != &order) {
+        order._units = _units;
+    }
+    return *this;
 }
 
-bool Deploy::onCancel() {
-    return true;
+Deploy::Deploy(const Deploy& deploy) {
+
 }
 
-bool Deploy::validate() {
+std::string Deploy::getDescription() {
+    return "Deploy units to a territory you own.";
+}
+
+std::string Deploy::getEffectApplied() {
+    return "Placed " + std::to_string(_units) + " units on ";
+}
+
+void Deploy::onExecute() {
+    std::cout << "Deploy the army of " << _units << " units!" << std::endl;
+}
+
+bool Deploy::onValidate() {
     // TODO: ensure territory is in player's team.
-    return true;
+    return _units <= 0;
 }
 
 
@@ -72,15 +109,31 @@ Advance::~Advance() {
     // TODO: delete territory.
 }
 
-void Advance::execute() {
+Advance& Advance::operator=(Advance&& order) {
+    if (this != &order) {
+        order._units = _units;
+    }
+    return *this;
+}
+
+Advance::Advance(const Advance& advance) {
+
+}
+
+std::string Advance::getDescription() {
+    return "";
+}
+
+std::string Advance::getEffectApplied() {
+    return "";
+}
+
+void Advance::onExecute() {
     std::cout << "Advance, army!" << std::endl;
 }
 
-bool Advance::onCancel() {
-    return true;
-}
-
-bool Advance::validate() {
+bool Advance::onValidate() {
+    // TODO: make sure there are more units on the territory than, or equal to, advancing.
     return true;
 }
 
@@ -94,11 +147,30 @@ Bomb::~Bomb() {
 
 }
 
-void Bomb::execute() {
+Bomb& Bomb::operator=(Bomb&& order) {
+    if (this != &order) {
+        
+    }
+    return *this;
+}
+
+Bomb::Bomb(const Bomb& bomb) {
+
+}
+
+std::string Bomb::getDescription() {
+    return "";
+}
+
+std::string Bomb::getEffectApplied() {
+    return "";
+}
+
+void Bomb::onExecute() {
     std::cout << "Bomb ourselves!" << std::endl;
 }
 
-bool Bomb::validate() {
+bool Bomb::onValidate() {
     return true;
 }
 
@@ -112,11 +184,30 @@ Blockade::~Blockade() {
 
 }
 
-void Blockade::execute() {
+Blockade& Blockade::operator=(Blockade&& order) {
+    if (this != &order) {
+
+    }
+    return *this;
+}
+
+Blockade::Blockade(const Blockade& blockade) {
+
+}
+
+std::string Blockade::getDescription() {
+    return "";
+}
+
+std::string Blockade::getEffectApplied() {
+    return "";
+}
+
+void Blockade::onExecute() {
     std::cout << "Block every hit!" << std::endl;
 }
 
-bool Blockade::validate() {
+bool Blockade::onValidate() {
     return true;
 }
 
@@ -130,11 +221,30 @@ Airlift::~Airlift() {
 
 }
 
-void Airlift::execute() {
+Airlift& Airlift::operator=(Airlift&& order) {
+    if (this != &order) {
+        
+    }
+    return *this;
+}
+
+Airlift::Airlift(const Airlift& airlift) {
+
+}
+
+std::string Airlift::getDescription() {
+    return "";
+}
+
+std::string Airlift::getEffectApplied() {
+    return "";
+}
+
+void Airlift::onExecute() {
     std::cout << "We have liftoff." << std::endl;
 }
 
-bool Airlift::validate() {
+bool Airlift::onValidate() {
     return true;
 }
 
@@ -148,14 +258,29 @@ Negotiate::~Negotiate() {
 
 }
 
-void Negotiate::execute() {
+Negotiate& Negotiate::operator=(Negotiate&& order) {
+    if (this != &order) {
+
+    }
+    return *this;
+}
+
+Negotiate::Negotiate(const Negotiate& negotiate) {
+
+}
+
+std::string Negotiate::getDescription() {
+    return "";
+}
+
+std::string Negotiate::getEffectApplied() {
+    return "";
+}
+
+void Negotiate::onExecute() {
     std::cout << "Negotiate with the enemy's army!" << std::endl;
 }
 
-bool Negotiate::onCancel() {
-    return true;
-}
-
-bool Negotiate::validate() {
+bool Negotiate::onValidate() {
     return true;
 }
