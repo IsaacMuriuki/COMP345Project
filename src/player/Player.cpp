@@ -56,12 +56,29 @@ void Player::issueOrder(){
 
 }
 
-std::ostream& Player::operator<<(std::ostream &out){
+/**
+ * incomplete
+ */
 
+std::ostream& Player::operator<<(std::ostream &out){
+    std::cout << "Player name: " << this->getName() << std::endl <<
+    "Territories owned " ;
 }
 
-Player& Player::operator=(const Player player){
+Player& Player::operator=(const Player& player){
+    this->name = name;
 
+    /**
+     * will change this once copy constructor for territories is created
+     */
+    for (int i = 0; i < territories.size(); ++i) {
+        this->territories[i] = new Territory(player.territories[i]->getName(), player.territories[i]->getContinent(), player.territories[i]->getNumArmies());
+    }
+
+    this->ordersList = new OrdersList(*ordersList);
+    this->handOfCards = new Hand(*handOfCards);
+
+    return *this;
 }
 
 void Player::addOrder(Order *order) {
@@ -76,6 +93,10 @@ vector<Territory *> Player::getTerritories() {
     return vector<Territory *>();
 }
 
+string Player::getTerritoriesInfo() {
+
+}
+
 OrdersList* Player::getOrdersList() {
     return ordersList;
 }
@@ -85,14 +106,23 @@ Hand* Player::getHandOfCards() {
 }
 
 void Player::setTerritories(vector<Territory *> territories) {
-
+    /**
+    * will change this once copy constructor for territories is created
+    */
+    for (int i = 0; i < territories.size(); ++i) {
+        this->territories[i] = new Territory(territories[i]->getName(),territories[i]->getContinent(), territories[i]->getNumArmies());
+    }
 }
 
-void Player::setOrders(vector<Order *> territories) {
-
+void Player::setOrders(OrdersList* ordersList) {
+    this->ordersList = new OrdersList(*ordersList);
 }
 
-void Player::setHandOfCards(Hand * handOfCards) {
+void Player::setHandOfCards(Hand* handOfCards) {
+    this->handOfCards = new Hand(*handOfCards);
+}
 
+string Player::getName() {
+    return this->name;
 }
 

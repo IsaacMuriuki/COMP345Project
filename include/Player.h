@@ -31,13 +31,15 @@ public:
     vector<Territory*> getTerritories();
     OrdersList* getOrdersList();
     Hand* getHandOfCards();
+    string getName();
+    string getTerritoriesInfo();
 
     void setHandOfCards(Hand* );
     void setTerritories(vector<Territory*> );
-    void setOrders(vector<Order*> );
+    void setOrders(OrdersList* );
 
     std::ostream& operator<<(std::ostream &out);
-    Player& operator=(const Player player);
+    Player& operator=(const Player& player);
 private:
     string name;
     vector<Territory*> territories;
