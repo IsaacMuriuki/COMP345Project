@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../include/map.h"
+#include "map.h"
 
 // ***TERRITORY***
 
