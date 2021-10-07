@@ -266,33 +266,15 @@ MapLoader::MapLoader() : fileName(""){}
 MapLoader::MapLoader(string fileName) : fileName(fileName) {}
 
 vector<string> MapLoader::readLines() {
-	ifstream input;
-	input.open(fileName.c_str());
-
-	if (!input) {
-		cout << "File " << fileName << " could not be opened." << endl;
-		return std::vector<string>();
-	}
-
 	vector<string> lines;
-	string line;
-
-	while (getline(input, line)) {
-        line.erase(
-                std::remove_if(line.begin(), line.end(),
-                               [](char c) -> bool
-                               {
-                                   return std::isspace<char>(c, std::locale::classic());
-                               }),
-                line.end());
-		if (line.empty()) {
-			continue;
-		}
-		cout << line;
-		lines.push_back(line);
-	}
-
 	return lines;
+}
+
+void MapLoader::loadMap(vector<string> lines) {
+	for (int i = 0; i < lines.size(); i++)
+	{
+		cout << lines[i] << endl;
+	}
 }
 
 // ACCESSOR METHODS

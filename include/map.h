@@ -99,10 +99,13 @@ class MapLoader
         MapLoader();
         MapLoader(string fileName);
         vector<string> readLines();
+        void loadMap(vector<string> lines);
         Map* getMap();
 	    vector<Continent*>* getContinents();
+};
 
-        template<typename Out>
-        void split(const std::string &s, char delim, Out result);
-        vector<string> split(const string &s, char delim);
-}             
+// create map in object   
+// Territy owned by player
+// add validate method to Map class 
+// do driver
+// destructor
