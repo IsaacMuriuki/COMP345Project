@@ -1,6 +1,8 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
+#include "../Cards/Cards.h"
+
 
 int main() {
     std::cout << "Menu - COMP 345 Project - Part 1" << std::endl;
@@ -28,24 +30,51 @@ int main() {
         option = (char) toupper(option);
 
         switch (option) {
-            case 'A':
+            case 'A': {
                 // MapDriver
-                break;
-            case 'B':
+            }
+                    break;
+            case 'B': {
                 // PlayerDriver
-                break;
-            case 'C':
+            }
+                    break;
+            case 'C': {
                 // OrdersDriver
-                break;
-            case 'D':
-                // CardsDriver
-                break;
-            case 'E':
+            }
+                    break;
+            case 'D': {
+                //String values of Card Types
+                //bomb, reinforcement, blockade, airlift, diplomacy, unassigned
+                char* cardTypesText[] =
+                {
+                    "bomb",
+                    "reinforcement",
+                    "blockade",
+                    "airlift",
+                    "diplomacy",
+                    "unassigned"
+                };
+                //Creating a deck and a hand
+                Deck deck;
+                Hand hand;
+                //Drawing the cards from the deck into the hand and playing the cards
+                for (int i = 0; i < 5; i++) {
+                    hand.Draw(deck);
+                }
+                for (int i = 0; i < 5; i++) {
+                    //Using an array of strings to print out the text value of the cards
+                    cout << cardTypesText[hand.play(deck, i)];
+                    cout << endl;
+                }
+            }
+                    break;
+            case 'E': {
                 // GameEngineDriver
-                
-                break;
-            case 'F':
-                // Ignore.
+            }
+                    break;
+            case 'F': {
+                    // Ignore.
+            }
                 break;
             default:
                 std::cout << "Please double check your selection." << std::endl;
