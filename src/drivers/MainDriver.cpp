@@ -3,7 +3,7 @@
 #include <string>
 
 int main() {
-    std::cout << "Menu - COMP 345 Project - Part 1" << std::endl;
+    std::cout << "Menu - COMP 345 Project - Part 1 - Team DN7" << std::endl;
     std::cout << "Here are the driver options for execution:" << std::endl;
     std::cout << "" << std::endl;
 
@@ -42,7 +42,6 @@ int main() {
                 break;
             case 'E':
                 // GameEngineDriver
-                
                 break;
             case 'F':
                 // Ignore.
