@@ -1,17 +1,26 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 
 class Order {
-    protected:
-    bool _cancelled;
+    private:
+    bool _executed;
     // TODO: might need team reference here.
     public:
-    bool cancel();
-    virtual void execute()=0;
-    virtual bool onCancel()=0;
-    virtual bool validate()=0;
-    friend std::ostream& operator<<(std::ostream &out, const Order &order);
+    Order();
+    ~Order();
+    Order(const Order& order);
+    virtual Order& operator=(Order&& order);
+    void execute();
+    bool isExecuted();
+    bool validate();
+    std::ostream& operator<<(std::ostream &out);
+    protected:
+    virtual std::string getDescription()=0;
+    virtual std::string getEffectApplied()=0;
+    virtual void onExecute()=0;
+    virtual bool onValidate()=0;
 };
 
 /**
@@ -23,9 +32,13 @@ class CardOrder : public Order {
     public:
     CardOrder();
     ~CardOrder();
-    virtual void execute()=0;
-    bool onCancel();
-    virtual bool validate()=0;
+    virtual CardOrder& operator=(CardOrder&& order);
+    CardOrder(const CardOrder& order);
+    protected:
+    virtual std::string getDescription()=0;
+    virtual std::string getEffectApplied()=0;
+    virtual void onExecute()=0;
+    virtual bool onValidate()=0;
 };
 
 class Deploy : public Order {
@@ -35,9 +48,13 @@ class Deploy : public Order {
     public:
     Deploy(int units); // Add territory to constructor.
     ~Deploy();
-    void execute();
-    bool onCancel();
-    bool validate();
+    Deploy& operator=(Deploy&& order);
+    Deploy(const Deploy& order);
+    protected:
+    std::string getDescription();
+    std::string getEffectApplied();
+    void onExecute();
+    bool onValidate();
 };
 
 class Advance : public Order {
@@ -48,9 +65,13 @@ class Advance : public Order {
     public:
     Advance(int units); // Add territories to constructor.
     ~Advance();
-    void execute();
-    bool onCancel();
-    bool validate();
+    Advance& operator=(Advance&& order);
+    Advance(const Advance& order);
+    protected:
+    std::string getDescription();
+    std::string getEffectApplied();
+    void onExecute();
+    bool onValidate();
 };
 
 /**
@@ -60,8 +81,13 @@ class Bomb : public CardOrder {
     public:
     Bomb();
     ~Bomb();
-    void execute();
-    bool validate();
+    Bomb& operator=(Bomb&& order);
+    Bomb(const Bomb& order);
+    protected:
+    std::string getDescription();
+    std::string getEffectApplied();
+    void onExecute();
+    bool onValidate();
 };
 
 /**
@@ -71,8 +97,13 @@ class Blockade : public CardOrder {
     public:
     Blockade();
     ~Blockade();
-    void execute();
-    bool validate();
+    Blockade& operator=(Blockade&& order);
+    Blockade(const Blockade& order);
+    protected:
+    std::string getDescription();
+    std::string getEffectApplied();
+    void onExecute();
+    bool onValidate();
 };
 
 /**
@@ -82,15 +113,24 @@ class Airlift : public CardOrder {
     public:
     Airlift();
     ~Airlift();
-    void execute();
-    bool validate();
+    Airlift& operator=(Airlift&& order);
+    Airlift(const Airlift& order);
+    protected:
+    std::string getDescription();
+    std::string getEffectApplied();
+    void onExecute();
+    bool onValidate();
 };
 
 class Negotiate : public Order {
     public:
     Negotiate();
     ~Negotiate();
-    void execute();
-    bool onCancel();
-    bool validate();
+    Negotiate& operator=(Negotiate&& order);
+    Negotiate(const Negotiate& order);
+    protected:
+    std::string getDescription();
+    std::string getEffectApplied();
+    void onExecute();
+    bool onValidate();
 };
