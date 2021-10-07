@@ -4,27 +4,45 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <string>
 
 #include "map.h"
 #include "Cards.h"
-#include "Orders.h"
+#include "OrdersList.h"
 
 class Player{
 public:
+    /*
+     * Constructors, destructor and copy constructor
+     */
     Player();
-    Player(vector<Territory> territories);
+    Player(string, vector<Territory*> , OrdersList*, Hand* );
     ~Player();
     Player(const Player& player);
-    Vector<Territory> toDefend();
-    Vector<Territory> toAttack();
-    void issueOrder();
-    friend std::ostream& operator<<(std::ostream &out);
-    Player& operator=(const Player player);
 
+
+    vector<Territory*> toDefend();
+    vector<Territory*> toAttack();
+    void issueOrder();
+
+    void addOrder(Order* );
+    void addTerritory(Territory* );
+
+    vector<Territory*> getTerritories();
+    OrdersList* getOrdersList();
+    Hand* getHandOfCards();
+
+    void setHandOfCards(Hand* );
+    void setTerritories(vector<Territory*> );
+    void setOrders(vector<Order*> );
+
+    std::ostream& operator<<(std::ostream &out);
+    Player& operator=(const Player player);
 private:
+    string name;
     vector<Territory*> territories;
     Hand* handOfCards;
-    vector<Order*> orders;
+    OrdersList* ordersList;
 };
 
 #endif //COMP_345_PROJECT_PLAYER_H
