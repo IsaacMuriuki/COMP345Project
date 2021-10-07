@@ -1,11 +1,12 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
+#include "Drivers.h"
 
 int main() {
     std::cout << "Menu - COMP 345 Project - Part 1 - Team DN7" << std::endl;
     std::cout << "Here are the driver options for execution:" << std::endl;
-    std::cout << "" << std::endl;
+    std::cout << std::endl;
 
     char option = ' '; // Initial value must not be an option.
     std::string options = "ABCDEF";
@@ -36,6 +37,7 @@ int main() {
                 break;
             case 'C':
                 // OrdersDriver
+                OrdersDriver::demo();
                 break;
             case 'D':
                 // CardsDriver
