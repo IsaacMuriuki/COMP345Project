@@ -51,4 +51,11 @@ class OrdersList {
      * @return true if the order was removed; false otherwise.
      **/
     bool remove(int index);
+
+    /**
+     * Gets the size of the orders list.
+     * 
+     * @return number of orders in orders list.
+     **/
+    int size();
 };

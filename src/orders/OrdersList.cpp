@@ -19,6 +19,7 @@ OrdersList::~OrdersList() {
  * @param order order to add to the list.
  **/
 void OrdersList::add(Order* order) {
+    // Vectors add by reference of a copy.
     _orders.push_back(order);
 }
 
@@ -47,6 +48,10 @@ bool OrdersList::move(int from, int to) {
     Order* temp = _orders[from];
     _orders[from] = _orders[to];
     _orders[to] = temp;
+
+    delete temp;
+    temp = NULL;
+    
     return true;
 }
 
@@ -69,7 +74,7 @@ Order* OrdersList::pop() {
  * @return true if the order was removed; false otherwise.
  **/
 bool OrdersList::remove(int index) {
-    if (_orders.size() < 0 || _orders.size() >= index) {
+    if (index < 0 || _orders.size() <= index) {
         return false;
     }
     
@@ -77,4 +82,13 @@ bool OrdersList::remove(int index) {
     _orders[index] = NULL;
     _orders.erase(_orders.begin() + index);
     return true;
+}
+
+/**
+ * Gets the size of the orders list.
+ * 
+ * @return number of orders in orders list.
+ **/
+int OrdersList::size() {
+    return _orders.size();
 }

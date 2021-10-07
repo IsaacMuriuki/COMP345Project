@@ -22,24 +22,19 @@ Order::Order(const Order& order) {
 }
 
 void Order::execute() {
-    // TODO: maybe validate before execute?
-    onExecute();
-    _executed = true;
+    if (validate()) {
+        onExecute();
+        _executed = true;
+    }
 }
 
-bool Order::isExecuted() {
+bool Order::isExecuted() const {
     return _executed;
 }
 
-bool Order::validate() {
-    return !_executed && !onValidate();
+bool Order::validate() const {
+    return !_executed && onValidate();
 }
-
-std::ostream& Order::operator<<(std::ostream &out) {
-    out << getDescription() + (_executed ? " - " + getEffectApplied() : "");
-    return out;
-}
-
 
 // CardOrder class definition
 CardOrder::CardOrder() {
@@ -82,11 +77,11 @@ Deploy::Deploy(const Deploy& deploy) {
 
 }
 
-std::string Deploy::getDescription() {
-    return "Deploy units to a territory you own.";
+std::string Deploy::getDescription() const {
+    return "Place units on your territories.";
 }
 
-std::string Deploy::getEffectApplied() {
+std::string Deploy::getEffectApplied() const {
     return "Placed " + std::to_string(_units) + " units on ";
 }
 
@@ -94,15 +89,15 @@ void Deploy::onExecute() {
     std::cout << "Deploy the army of " << _units << " units!" << std::endl;
 }
 
-bool Deploy::onValidate() {
+bool Deploy::onValidate() const {
     // TODO: ensure territory is in player's team.
-    return _units <= 0;
+    return _units > 0;
 }
 
 
 // Advance class definition
 Advance::Advance(int units) {
-
+    _units = units;
 }
 
 Advance::~Advance() {
@@ -120,21 +115,21 @@ Advance::Advance(const Advance& advance) {
 
 }
 
-std::string Advance::getDescription() {
-    return "";
+std::string Advance::getDescription() const {
+    return "Move some of your units to another, adjacent territory.";
 }
 
-std::string Advance::getEffectApplied() {
-    return "";
+std::string Advance::getEffectApplied() const {
+    return "Moved " + std::to_string(_units) + " units to ";
 }
 
 void Advance::onExecute() {
     std::cout << "Advance, army!" << std::endl;
 }
 
-bool Advance::onValidate() {
+bool Advance::onValidate() const {
     // TODO: make sure there are more units on the territory than, or equal to, advancing.
-    return true;
+    return _units > 0;
 }
 
 
@@ -158,19 +153,19 @@ Bomb::Bomb(const Bomb& bomb) {
 
 }
 
-std::string Bomb::getDescription() {
-    return "";
+std::string Bomb::getDescription() const {
+    return "Kill half of the army on an opponent's territory, adjacent to one of your territory.";
 }
 
-std::string Bomb::getEffectApplied() {
-    return "";
+std::string Bomb::getEffectApplied() const {
+    return "Kill x units located on ";
 }
 
 void Bomb::onExecute() {
-    std::cout << "Bomb ourselves!" << std::endl;
+    std::cout << "Bomb yourselves!" << std::endl;
 }
 
-bool Bomb::onValidate() {
+bool Bomb::onValidate() const {
     return true;
 }
 
@@ -195,19 +190,19 @@ Blockade::Blockade(const Blockade& blockade) {
 
 }
 
-std::string Blockade::getDescription() {
-    return "";
+std::string Blockade::getDescription() const {
+    return "Triple the number of units on your territory and makes it neutral.";
 }
 
-std::string Blockade::getEffectApplied() {
-    return "";
+std::string Blockade::getEffectApplied() const {
+    return "A blockade setup on ... of size ...";
 }
 
 void Blockade::onExecute() {
-    std::cout << "Block every hit!" << std::endl;
+    std::cout << "Run for your life!" << std::endl;
 }
 
-bool Blockade::onValidate() {
+bool Blockade::onValidate() const {
     return true;
 }
 
@@ -232,19 +227,19 @@ Airlift::Airlift(const Airlift& airlift) {
 
 }
 
-std::string Airlift::getDescription() {
-    return "";
+std::string Airlift::getDescription() const {
+    return "Advance units from one territory to another, unoccupied territory or territory that you own.";
 }
 
-std::string Airlift::getEffectApplied() {
-    return "";
+std::string Airlift::getEffectApplied() const {
+    return "Moving ... units from ... to ....";
 }
 
 void Airlift::onExecute() {
     std::cout << "We have liftoff." << std::endl;
 }
 
-bool Airlift::onValidate() {
+bool Airlift::onValidate() const {
     return true;
 }
 
@@ -269,18 +264,18 @@ Negotiate::Negotiate(const Negotiate& negotiate) {
 
 }
 
-std::string Negotiate::getDescription() {
-    return "";
+std::string Negotiate::getDescription() const {
+    return "Peace for a single turn between you and another player.";
 }
 
-std::string Negotiate::getEffectApplied() {
-    return "";
+std::string Negotiate::getEffectApplied() const {
+    return "Attacks prevented with ...";
 }
 
 void Negotiate::onExecute() {
     std::cout << "Negotiate with the enemy's army!" << std::endl;
 }
 
-bool Negotiate::onValidate() {
+bool Negotiate::onValidate() const {
     return true;
 }
