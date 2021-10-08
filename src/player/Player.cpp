@@ -49,7 +49,6 @@ Player::Player(const Player& player){
     this->handOfCards = new Hand(*handOfCards);
 }
 
-
 /**
  * Overloading the assignment operator
  *
@@ -84,6 +83,9 @@ std::ostream& operator<<(std::ostream &strm, const Player& player){
     for (int i = 0; i < player.ordersList->size(); ++i) {
         strm << player.ordersList->get(i);
     }
+    /**
+     * will need to change this once hand is a vector
+     */
     strm << "Cards \n";
     for (int i =0; i <sizeof(player.handOfCards->hand)/sizeof (player.handOfCards->hand[0]); ++i){
         strm << player.handOfCards->hand[i].getCardType() << "\n";
