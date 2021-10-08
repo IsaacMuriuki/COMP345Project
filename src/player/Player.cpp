@@ -130,11 +130,11 @@ vector<Territory*> Player::toAttack(){
 // Asks the user for input on which order to create, and creates the corresponding order objects and adds it to the player's ordersList
 void Player::issueOrder() {
     string orders = "List of possible orders to be made: \n 1. Deploy\n 2. Advance\n 3. Bomb\n 4. Blockade\n 5. Airlift\n 6. Negotiate\n 7. Stop issuing orders\n ";
-    std::cout << orders << std::endl;
     int orderNumber;
 
     while(orderNumber != 7) {
-        std::cout << "Enter the number of the order you want to execute:" << std::endl;
+        std::cout << orders << std::endl;
+        std::cout << "Enter the number of the next order you want to execute:" << std::endl;
         // Asking player for which order and validates choice
         while (true) {
             std::cin >> orderNumber;
@@ -160,6 +160,7 @@ void Player::issueOrder() {
                     } else break;
                 }
 
+                std::cout << "Creating a deployment order" << std::endl;
                 Deploy *deploy = new Deploy(numberOfDeployments);
                 ordersList->add(deploy);
                 break;
@@ -177,32 +178,37 @@ void Player::issueOrder() {
                     } else break;
                 }
 
+                std::cout << "Creating an advance order" << std::endl;
                 Advance *advance = new Advance(numberOfAdvancements);
                 ordersList->add(advance);
                 break;
             }
             case 3: {
+                std::cout << "Creating a bomb order" << std::endl;
                 Bomb *bomb = new Bomb();
                 ordersList->add(bomb);
                 break;
             }
             case 4: {
+                std::cout << "Creating a blockade order" << std::endl;
                 Blockade *blockade = new Blockade();
                 ordersList->add(blockade);
                 break;
             }
             case 5: {
+                std::cout << "Creating an airlift order" << std::endl;
                 Airlift *airlift = new Airlift();
                 ordersList->add(airlift);
                 break;
             }
             case 6: {
+                std::cout << "Creating a negotiate order" << std::endl;
                 Negotiate *negotiate = new Negotiate();
                 ordersList->add(negotiate);
                 break;
             }
             case 7: {
-                std::cout << "Done Creating Orders" << std::endl;
+                std::cout << "Done Creating Orders\n" << std::endl;
                 break;
             }
         }
