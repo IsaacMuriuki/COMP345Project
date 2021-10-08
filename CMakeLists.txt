@@ -24,6 +24,7 @@ add_executable(${EXEC} ${SRC})
 target_include_directories(${EXEC} PUBLIC include)
 
 list(APPEND BIN ${EXEC})
+set_property(TARGET ${BIN} PROPERTY CXX_STANDARD 17)
 # end COMP_345_Project
 
 # install files to install location
