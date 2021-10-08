@@ -1,5 +1,5 @@
-#ifndef GAMEENGINE_H
-#define GAMEENGINE_H
+#ifndef GAME_ENGINE_H
+#define GAME_ENGINE_H
 
 #include <iostream>
 #include <stdio.h>
@@ -7,6 +7,13 @@
 #include <map>
 #include <vector>
 #include <functional>
+
+class GameEngine
+{
+    public:
+    static bool ExecuteCmd(std::string);
+    static void TransitionTo(GameState*);
+};
 
 class GameState
 {
@@ -43,11 +50,5 @@ class TransitionCommand : public Command {
     void Execute();
 };
 
-class GameEngine
-{
-    public:
-    static bool ExecuteCmd(std::string);
-    static void TransitionTo(GameState*);
-};
 
 #endif

@@ -52,6 +52,8 @@ class GameEngine
         winState = &WinState("win", {&playCmd, &endCmd});
         endState = &EndState("end", {});
 
+        std::cout << "Game Engine init" << std::endl;
+
         TransitionTo(startState);
 
         /*
