@@ -8,12 +8,12 @@ int main() {
     std::cout << "Here are the driver options for execution:" << std::endl;
     std::cout << std::endl;
 
-    char option = ' '; // Initial value must not be an option.
+    char option = 'A'; // Initial value must be an option.
     std::string options = "ABCDEF";
 
     while (option != 'F') {
         std::cout << std::endl;
-        if (options.find(option) != std::string::npos) {
+        if (options.find(option) != options.npos) {
             std::cout << "Enter a driver to execute." << std::endl;
             std::cout << "A- Map (Chris + Henry)" << std::endl;
             std::cout << "B- Player (Isaac)" << std::endl;

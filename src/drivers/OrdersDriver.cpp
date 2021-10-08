@@ -24,6 +24,7 @@ void OrdersDriver::demo() {
     OrdersList* list = new OrdersList();
 
     std::cout << std::endl;
+    std::cout << "Adding to OrdersList " << std::endl;
     std::cout << "Adding Deploy order (" << (deploy->validate() ? "valid" : "invalid" ) << ")." << std::endl;
     list->add(deploy);
     std::cout << "Adding Advance order (" << (advance->validate() ? "valid" : "invalid" ) << ")." << std::endl;
@@ -45,6 +46,7 @@ void OrdersDriver::demo() {
     std::cout << "OrdersList has " << list->size() << " orders." << std::endl;
 
     std::cout << std::endl;
+    std::cout << "Execute " << std::endl;
     std::cout << "Executing deploy order." << std::endl;
     deploy->execute();
     std::cout << "Executing advance order." << std::endl;
@@ -53,6 +55,7 @@ void OrdersDriver::demo() {
     invalid->execute();
 
     std::cout << std::endl;
+    std::cout << "Stream operator " << std::endl;
     std::cout << "Print out the advance order." << std::endl;
     std::cout << *list->get(1) << std::endl;
     std::cout << "Print out the bomb order." << std::endl;
@@ -64,8 +67,6 @@ void OrdersDriver::demo() {
 
     std::cout << std::endl;
     std::cout << "Output " << std::endl;
-
-    std::cout << std::endl;
     std::cout << "Remove advance order (index = 1)." << std::endl;
     list->remove(1);
     std::cout << "OrdersList is now size " << list->size() << std::endl;
