@@ -39,8 +39,80 @@ vector<Territory*> Player::toAttack(){
     return territories;
 }
 
-void Player::issueOrder(){
+void Player::issueOrder() {
+    string orders = "List of possible orders to be made: \n 1. Deploy\n 2. Advance\n 3. Bomb\n 4. Blockade\n 5. Airlift\n ^6. Negotiate\n Enter the number of the order you want to execute: ";
+    int orderNumber;
 
+    while (true)
+    {
+        std::cin >> orderNumber;
+        if (!std::cin || orderNumber < 1 || orderNumber > 6)
+        {
+            std::cout << "Wrong Choice. Enter again " << endl;
+            std::cin.clear();
+            std::cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
+        }
+        else break;
+    }
+
+
+    switch (orderNumber) {
+        case 1: {
+            int numberOfDeployments;
+            std::cout << "Enter how many troops(?) you want to deploy: ";
+            while (true) {
+                std::cin >> numberOfDeployments;
+                if (!cin || numberOfDeployments < 0) {
+                    cout << "Enter a non-negative number: " << endl;
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    continue;
+                } else break;
+            }
+
+            Deploy *deploy = new Deploy(numberOfDeployments);
+            ordersList->add(deploy);
+            break;
+        }
+        case 2: {
+            int numberOfAdvancements;
+            std::cout << "Enter how many troops(?) you want to advance: ";
+            while (true) {
+                std::cin >> numberOfAdvancements;
+                if (!cin || numberOfAdvancements < 0) {
+                    cout << "Enter a non-negative number: " << endl;
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    continue;
+                } else break;
+            }
+
+            Advance *advance = new Advance(numberOfAdvancements);
+            ordersList->add(advance);
+            break;
+        }
+        case 3: {
+            Bomb *bomb = new Bomb();
+            ordersList->add(bomb);
+            break;
+        }
+        case 4: {
+            Blockade* blockade = new Blockade();
+            ordersList->add(blockade);
+            break;
+        }
+        case 5: {
+            Airlift* airlift = new Airlift();
+            ordersList->add(airlift);
+            break;
+        }
+        case 6: {
+            Negotiate* negotiate = new Negotiate();
+            ordersList->add(negotiate);
+            break;
+        }
+    }
 }
 
 std::ostream& operator<<(std::ostream &strm, const Player& player){
