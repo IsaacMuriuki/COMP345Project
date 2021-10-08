@@ -16,10 +16,6 @@ class GameEngine
     const std::string WIN_CMD = "win";
     const std::string END_CMD = "end";
 
-    //static map<string, Command*> cmds;
-    
-    static GameState* currentState;
-
     StartState* startState;
     MapLoadedState* mapLoadedState;
     MapValidatedState* mapValidatedState;
@@ -29,6 +25,8 @@ class GameEngine
     ExecuteOrdersState* executeOrdersState;
     WinState* winState;
     EndState* endState;
+
+    static GameState* currentState;
 
     GameEngine(){
         
@@ -54,6 +52,8 @@ class GameEngine
         winState = &WinState("win", {&playCmd, &endCmd});
         endState = &EndState("end", {});
 
+        TransitionTo(startState);
+
         /*
         cmds[playCmd.id]= &playCmd;
         cmds[loadmapCmd.id]= &(loadmapCmd);
@@ -77,16 +77,18 @@ class GameEngine
 
         std::map<std::string, Command*>::iterator cmd = (*currentState).cmds.find(cmdID);
         if (cmd != (*currentState).cmds.end()){
+            //std::cout << "Command '" << cmdID << "' not found." << std::endl;
             cmd->second->Execute();
             return true;
         } else
+            std::cout << "Command '" << cmdID << "' not found." << std::endl;
             return NULL;
     }
 
     static void TransitionTo(GameState* nextState){
-        (*currentState).OnStateExit();
+        if(currentState != NULL) currentState->OnStateExit();
         currentState = nextState;
-        (*currentState).OnStateEnter();
+        if(currentState != NULL) currentState->OnStateEnter();
     }
 };
 
@@ -95,7 +97,6 @@ class GameState
     public:
 
     std::string name;
-
     std::map<std::string, Command*> cmds;
 
     GameState(std::string _name, std::vector<Command*> _cmds){
@@ -105,11 +106,11 @@ class GameState
     }
 
     virtual void OnStateEnter(){
-        
+        std::cout << "Entered gamestate " << name << "." << std::endl;
     }
 
     virtual void OnStateExit(){
-        
+        std::cout << "Exited gamestate " << name << "." << std::endl;
     }
 };
 
@@ -120,13 +121,14 @@ class StartState : public GameState
     StartState(std::string _name, std::vector<Command*> _cmds) : GameState(_name, _cmds) {
     }
 
+    /*
     void OnStateEnter(){
         GameState::OnStateEnter();
     }
 
     void OnStateExit(){
         GameState::OnStateExit();
-    }
+    }*/
 };
 
 class MapLoadedState : public GameState
@@ -209,6 +211,7 @@ class Command
 
     Command(const std::string _id){
         id = _id;
+
     }
 
     virtual void Execute() = 0;
