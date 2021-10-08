@@ -44,19 +44,19 @@ Deck::Deck()
 {
 	//Deck has 4 reinforcment, 1 diplomacy, 19 blockade, 5 airlift and 6 bomb
 	for (int i = 0; i < 4; i++) {
-		this->deck[i].setCardType(reinforcement);
+		this->deck.push_back(Card(reinforcement));
 	}
 	for (int i = 4; i < 5; i++) {
-		this->deck[i].setCardType(diplomacy);
+		this->deck.push_back(Card(diplomacy));
 	}
 	for (int i = 5; i < 24; i++) {
-		this->deck[i].setCardType(blockade);
+		this->deck.push_back(Card(blockade));
 	}
 	for (int i = 24; i < 29; i++) {
-		this->deck[i].setCardType(airlift);
+		this->deck.push_back(Card(airlift));
 	}
 	for (int i = 29; i < 35; i++) {
-		this->deck[i].setCardType(bomb);
+		this->deck.push_back(Card(bomb));
 	}
 
 }
@@ -134,7 +134,7 @@ Hand::Hand()
 {
 	//set hand to being unassigned
 	for (int i = 0; i < 5; i++) {
-		this->hand[i].setCardType(unassigned);
+		this->hand.push_back(Card(unassigned));
 	}
 }
 
@@ -156,10 +156,15 @@ Hand::Hand(const Hand& hand)
 	}
 }
 
+ostream& operator<<(ostream& out, const Card& c)
+{
+	out << c.cardType;
+	return out;
+}
 
-
-
-
-
-
-
+istream& operator>>(istream& in, const Card& c)
+{
+	std::cout << "Choose a card type";
+	in >> c.cardType;
+	return in;
+}

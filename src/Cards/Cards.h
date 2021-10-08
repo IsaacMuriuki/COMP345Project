@@ -1,8 +1,9 @@
 #ifndef CARDS_H
 #define CARDS_H
-#define GRANDPARENT_H
 
 #include <iostream>
+#include <vector>
+
 using namespace std;
 
 //Declaring the CardType enum, values are stored as ints for now
@@ -21,13 +22,15 @@ class Card {
 		void setCardType(CardType cardType);
 		CardType getCardType();
 		CardType play();
+		friend ostream& operator << (ostream& out, const Card& c);
+		friend istream& operator >> (istream& in, const Card& c);
 };
 
 
 class Deck {
 	//Need to add getter and setters
 	private:
-		Card deck[35];
+		vector<Card> deck;
 	public:
 		Deck();
 		Deck(const Deck &deck);
@@ -41,7 +44,8 @@ class Hand {
 
 private:
 	//Hand size is limited to 5 at the moment
-	Card hand[5];
+
+	vector<Card> hand;
 public:
 	Hand();
 	Hand(const Hand& hand);
