@@ -9,14 +9,7 @@ Player::Player() {
 
 Player::Player(string name, vector<Territory*> territories, OrdersList* ordersList, Hand* handOfCards){
     this->name = name;
-
-    /**
-    * will change this once copy constructor for territories is created
-    */
-    for (int i = 0; i < territories.size(); ++i) {
-        this->territories[i] = new Territory(territories[i]->getName(), territories[i]->getContinent(), territories[i]->getNumArmies());
-    }
-
+    this->territories = territories;
     this->ordersList = new OrdersList(*ordersList);
     this->handOfCards = new Hand(*handOfCards);
 }
@@ -24,22 +17,16 @@ Player::Player(string name, vector<Territory*> territories, OrdersList* ordersLi
 Player::~Player(){
     delete handOfCards; handOfCards = NULL;
     delete ordersList; ordersList = NULL;
+
+    // territories are not deleted because they are unique and therefore the vector of territories is a shallow copy
     for (int i = 0; i < territories.size(); ++i) {
-        delete territories[i];
         territories[i] = NULL;
     }
 }
 
 Player::Player(const Player& player){
     this->name = name;
-
-    /**
-     * will change this once copy constructor for territories is created
-     */
-    for (int i = 0; i < territories.size(); ++i) {
-        this->territories[i] = new Territory(player.territories[i]->getName(), player.territories[i]->getContinent(), player.territories[i]->getNumArmies());
-    }
-
+    this->territories = territories;
     this->ordersList = new OrdersList(*ordersList);
     this->handOfCards = new Hand(*handOfCards);
 }
@@ -56,25 +43,30 @@ void Player::issueOrder(){
 
 }
 
-/**
- * incomplete
- */
+std::ostream& operator<<(std::ostream &strm, const Player& player){
 
-std::ostream& Player::operator<<(std::ostream &out){
-    std::cout << "Player name: " << this->getName() << std::endl <<
-    "Territories owned " ;
+    strm << "Player Object Data:\n";
+    strm << "Name :" << player.name << "\n";
+    strm << "Territories \n";
+    for (int i = 0; i < player.territories.size(); ++i) {
+        strm << *player.territories[i];
+    }
+    strm << "Orders \n";
+    for (int i = 0; i < player.ordersList->size(); ++i) {
+        strm << player.ordersList->get(i);
+    }
+    strm << "Cards \n";
+    for (int i =0; i <sizeof(player.handOfCards->hand)/sizeof (player.handOfCards->hand[0]); ++i){
+        strm << player.handOfCards->hand[i].getCardType() << "\n";
+    }
+
+    return strm;
 }
+
 
 Player& Player::operator=(const Player& player){
     this->name = name;
-
-    /**
-     * will change this once copy constructor for territories is created
-     */
-    for (int i = 0; i < territories.size(); ++i) {
-        this->territories[i] = new Territory(player.territories[i]->getName(), player.territories[i]->getContinent(), player.territories[i]->getNumArmies());
-    }
-
+    this->territories = territories;
     this->ordersList = new OrdersList(*ordersList);
     this->handOfCards = new Hand(*handOfCards);
 
@@ -94,7 +86,11 @@ vector<Territory *> Player::getTerritories() {
 }
 
 string Player::getTerritoriesInfo() {
-
+    string output = "";
+    for (int i = 0; i < territories.size(); ++i) {
+        output += "name : " + territories[i]->getName() + ", in the continent : " + territories[i]->getContinent() + ", with " + std::to_string(territories[i]->getNumArmies()) + " armies.\n";
+    }
+    return output;
 }
 
 OrdersList* Player::getOrdersList() {
@@ -106,12 +102,7 @@ Hand* Player::getHandOfCards() {
 }
 
 void Player::setTerritories(vector<Territory *> territories) {
-    /**
-    * will change this once copy constructor for territories is created
-    */
-    for (int i = 0; i < territories.size(); ++i) {
-        this->territories[i] = new Territory(territories[i]->getName(),territories[i]->getContinent(), territories[i]->getNumArmies());
-    }
+    this->territories = territories;
 }
 
 void Player::setOrders(OrdersList* ordersList) {
@@ -122,7 +113,8 @@ void Player::setHandOfCards(Hand* handOfCards) {
     this->handOfCards = new Hand(*handOfCards);
 }
 
-string Player::getName() {
+string Player::getName()  {
     return this->name;
 }
+
 

@@ -38,7 +38,7 @@ public:
     void setTerritories(vector<Territory*> );
     void setOrders(OrdersList* );
 
-    std::ostream& operator<<(std::ostream &out);
+    friend std::ostream& operator<<(std::ostream &, const Player& );
     Player& operator=(const Player& player);
 private:
     string name;

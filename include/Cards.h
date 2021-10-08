@@ -40,9 +40,14 @@ class Deck {
 class Hand {
 
 private:
+    /*moved this to public so i can access it from player easier - see card channel on discord
+     *
 	//Hand size is limited to 5 at the moment
 	Card hand[5];
+*/
 public:
+    //Hand size is limited to 5 at the moment
+    Card hand[5];
 	Hand();
 	Hand(const Hand& hand);
 	Card getHand(int index);
