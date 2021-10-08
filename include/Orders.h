@@ -6,20 +6,60 @@
 class Order {
     private:
     bool _executed;
-    // TODO: might need team reference here.
+    // TODO: might need Player* here.
     public:
     Order();
     ~Order();
     Order(const Order& order);
     virtual Order& operator=(Order&& order);
+
+    /**
+     * The order is executed if it is valid.
+     **/
     void execute();
+
+    /**
+     * Check if the order has been executed previously.
+     * 
+     * @return true if executed previously; false otherwise.
+     **/
     bool isExecuted() const;
+
+    /**
+     * Checks if the order is valid.
+     * 
+     * @return true if not execute and valid; false otherwise.
+     **/
     bool validate() const;
+
+    /**
+     * Outputs a description and the effects of the order after the order is executed.
+     **/
     friend std::ostream& operator<<(std::ostream &out, const Order& order);
+
     protected:
+    /**
+     * Gets the description of the order.
+     * 
+     * @return description of the order.
+     **/
     virtual std::string getDescription() const = 0;
+
+    /**
+     * Gets the results of the order when it executed.
+     * 
+     * @return results of the order.
+     **/
     virtual std::string getEffectApplied() const = 0;
+
+    /**
+     * Additional actions taken for when the order gets executed.
+     **/
     virtual void onExecute() = 0;
+
+    /**
+     * Additional checks for validation of the order.
+     **/
     virtual bool onValidate() const = 0;
 };
 
@@ -28,16 +68,39 @@ class Order {
  **/
 class CardOrder : public Order {
     protected:
-    // TODO: add Player* and/or Card* as class reference.
+    // TODO: add Player* and/or Card* as class field.
     public:
     CardOrder();
     ~CardOrder();
     virtual CardOrder& operator=(CardOrder&& order);
     CardOrder(const CardOrder& order);
     protected:
+    /**
+     * Gets the description of the order.
+     * Used for stream operator.
+     * 
+     * @return description of the order.
+     **/
     virtual std::string getDescription() const = 0;
+
+    /**
+     * Gets the results of the order when it executed.
+     * Used for stream operator.
+     * 
+     * @return results of the order.
+     **/
     virtual std::string getEffectApplied() const = 0;
+
+    /**
+     * Additional actions taken for when the order gets executed.
+     **/
     virtual void onExecute() = 0;
+
+    /**
+     * Additional checks for validation of the order.
+     * 
+     * @return true if the additional validations pass; false otherwise.
+     **/
     virtual bool onValidate() const = 0;
 };
 
@@ -51,11 +114,33 @@ class Deploy : public Order {
     Deploy& operator=(Deploy&& order);
     Deploy(const Deploy& order);
     protected:
-    // Used for stream operator
-    std::string getDescription() const;
-    std::string getEffectApplied() const;
-    void onExecute();
-    bool onValidate() const;
+    /**
+     * Gets the description of the order.
+     * Used for stream operator.
+     * 
+     * @return description of the order.
+     **/
+    virtual std::string getDescription() const = 0;
+
+    /**
+     * Gets the results of the order when it executed.
+     * Used for stream operator.
+     * 
+     * @return results of the order.
+     **/
+    virtual std::string getEffectApplied() const = 0;
+
+    /**
+     * Additional actions taken for when the order gets executed.
+     **/
+    virtual void onExecute() = 0;
+
+    /**
+     * Additional checks for validation of the order.
+     * 
+     * @return true if the additional validations pass; false otherwise.
+     **/
+    virtual bool onValidate() const = 0;
 };
 
 class Advance : public Order {
@@ -69,11 +154,33 @@ class Advance : public Order {
     Advance& operator=(Advance&& order);
     Advance(const Advance& order);
     protected:
-    // Used for stream operator.
-    std::string getDescription() const;
-    std::string getEffectApplied() const;
-    void onExecute();
-    bool onValidate() const;
+    /**
+     * Gets the description of the order.
+     * Used for stream operator.
+     * 
+     * @return description of the order.
+     **/
+    virtual std::string getDescription() const = 0;
+
+    /**
+     * Gets the results of the order when it executed.
+     * Used for stream operator.
+     * 
+     * @return results of the order.
+     **/
+    virtual std::string getEffectApplied() const = 0;
+
+    /**
+     * Additional actions taken for when the order gets executed.
+     **/
+    virtual void onExecute() = 0;
+
+    /**
+     * Additional checks for validation of the order.
+     * 
+     * @return true if the additional validations pass; false otherwise.
+     **/
+    virtual bool onValidate() const = 0;
 };
 
 /**
@@ -86,10 +193,33 @@ class Bomb : public CardOrder {
     Bomb& operator=(Bomb&& order);
     Bomb(const Bomb& order);
     protected:
-    std::string getDescription() const;
-    std::string getEffectApplied() const;
-    void onExecute();
-    bool onValidate() const;
+    /**
+     * Gets the description of the order.
+     * Used for stream operator.
+     * 
+     * @return description of the order.
+     **/
+    virtual std::string getDescription() const = 0;
+
+    /**
+     * Gets the results of the order when it executed.
+     * Used for stream operator.
+     * 
+     * @return results of the order.
+     **/
+    virtual std::string getEffectApplied() const = 0;
+
+    /**
+     * Additional actions taken for when the order gets executed.
+     **/
+    virtual void onExecute() = 0;
+
+    /**
+     * Additional checks for validation of the order.
+     * 
+     * @return true if the additional validations pass; false otherwise.
+     **/
+    virtual bool onValidate() const = 0;
 };
 
 /**
@@ -102,10 +232,33 @@ class Blockade : public CardOrder {
     Blockade& operator=(Blockade&& order);
     Blockade(const Blockade& order);
     protected:
-    std::string getDescription() const;
-    std::string getEffectApplied() const;
-    void onExecute();
-    bool onValidate() const;
+    /**
+     * Gets the description of the order.
+     * Used for stream operator.
+     * 
+     * @return description of the order.
+     **/
+    virtual std::string getDescription() const = 0;
+
+    /**
+     * Gets the results of the order when it executed.
+     * Used for stream operator.
+     * 
+     * @return results of the order.
+     **/
+    virtual std::string getEffectApplied() const = 0;
+
+    /**
+     * Additional actions taken for when the order gets executed.
+     **/
+    virtual void onExecute() = 0;
+
+    /**
+     * Additional checks for validation of the order.
+     * 
+     * @return true if the additional validations pass; false otherwise.
+     **/
+    virtual bool onValidate() const = 0;
 };
 
 /**
@@ -118,10 +271,33 @@ class Airlift : public CardOrder {
     Airlift& operator=(Airlift&& order);
     Airlift(const Airlift& order);
     protected:
-    std::string getDescription() const;
-    std::string getEffectApplied() const;
-    void onExecute();
-    bool onValidate() const;
+    /**
+     * Gets the description of the order.
+     * Used for stream operator.
+     * 
+     * @return description of the order.
+     **/
+    virtual std::string getDescription() const = 0;
+
+    /**
+     * Gets the results of the order when it executed.
+     * Used for stream operator.
+     * 
+     * @return results of the order.
+     **/
+    virtual std::string getEffectApplied() const = 0;
+
+    /**
+     * Additional actions taken for when the order gets executed.
+     **/
+    virtual void onExecute() = 0;
+
+    /**
+     * Additional checks for validation of the order.
+     * 
+     * @return true if the additional validations pass; false otherwise.
+     **/
+    virtual bool onValidate() const = 0;
 };
 
 class Negotiate : public Order {
@@ -131,8 +307,31 @@ class Negotiate : public Order {
     Negotiate& operator=(Negotiate&& order);
     Negotiate(const Negotiate& order);
     protected:
-    std::string getDescription() const;
-    std::string getEffectApplied() const;
-    void onExecute();
-    bool onValidate() const;
+    /**
+     * Gets the description of the order.
+     * Used for stream operator.
+     * 
+     * @return description of the order.
+     **/
+    virtual std::string getDescription() const = 0;
+
+    /**
+     * Gets the results of the order when it executed.
+     * Used for stream operator.
+     * 
+     * @return results of the order.
+     **/
+    virtual std::string getEffectApplied() const = 0;
+
+    /**
+     * Additional actions taken for when the order gets executed.
+     **/
+    virtual void onExecute() = 0;
+
+    /**
+     * Additional checks for validation of the order.
+     * 
+     * @return true if the additional validations pass; false otherwise.
+     **/
+    virtual bool onValidate() const = 0;
 };

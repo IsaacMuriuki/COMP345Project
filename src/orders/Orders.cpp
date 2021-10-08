@@ -12,15 +12,17 @@ Order::~Order() {
 
 Order& Order::operator=(Order&& order) {
     if (this != &order) {
-        
+        _executed = order._executed;
     }
     return *this;
 }
 
-Order::Order(const Order& order) {
-    _executed = order._executed;
+Order::Order(const Order& order) : _executed(order._executed) {
 }
 
+/**
+ * The order is executed if it is valid.
+ **/
 void Order::execute() {
     if (validate()) {
         onExecute();
@@ -28,10 +30,20 @@ void Order::execute() {
     }
 }
 
+/**
+ * Check if the order has been executed previously.
+ * 
+ * @return true if executed previously; false otherwise.
+ **/
 bool Order::isExecuted() const {
     return _executed;
 }
 
+/**
+ * Checks if the order is valid.
+ * 
+ * @return true if not execute and valid; false otherwise.
+ **/
 bool Order::validate() const {
     return !_executed && onValidate();
 }
@@ -77,18 +89,36 @@ Deploy::Deploy(const Deploy& deploy) {
 
 }
 
+/**
+ * Gets the description of the order.
+ * 
+ * @return description of the order.
+ **/
 std::string Deploy::getDescription() const {
     return "Place units on your territories.";
 }
 
+/**
+ * Gets the results of the order when it executed.
+ * 
+ * @return results of the order.
+ **/
 std::string Deploy::getEffectApplied() const {
     return "Placed " + std::to_string(_units) + " units on ";
 }
 
+/**
+ * Additional actions taken for when the order gets executed.
+ **/
 void Deploy::onExecute() {
     std::cout << "Deploy the army of " << _units << " units!" << std::endl;
 }
 
+/**
+ * Additional checks for validation of the order.
+ * 
+ * @return true if the additional validations pass; false otherwise.
+ **/
 bool Deploy::onValidate() const {
     // TODO: ensure territory is in player's team.
     return _units > 0;
@@ -115,18 +145,36 @@ Advance::Advance(const Advance& advance) {
 
 }
 
+/**
+ * Gets the description of the order.
+ * 
+ * @return description of the order.
+ **/
 std::string Advance::getDescription() const {
     return "Move some of your units to another, adjacent territory.";
 }
 
+/**
+ * Gets the results of the order when it executed.
+ * 
+ * @return results of the order.
+ **/
 std::string Advance::getEffectApplied() const {
     return "Moved " + std::to_string(_units) + " units to ";
 }
 
+/**
+ * Additional actions taken for when the order gets executed.
+ **/
 void Advance::onExecute() {
     std::cout << "Advance, army!" << std::endl;
 }
 
+/**
+ * Additional checks for validation of the order.
+ * 
+ * @return true if the additional validations pass; false otherwise.
+ **/
 bool Advance::onValidate() const {
     // TODO: make sure there are more units on the territory than, or equal to, advancing.
     return _units > 0;
@@ -153,18 +201,36 @@ Bomb::Bomb(const Bomb& bomb) {
 
 }
 
+/**
+ * Gets the description of the order.
+ * 
+ * @return description of the order.
+ **/
 std::string Bomb::getDescription() const {
     return "Kill half of the army on an opponent's territory, adjacent to one of your territory.";
 }
 
+/**
+ * Gets the results of the order when it executed.
+ * 
+ * @return results of the order.
+ **/
 std::string Bomb::getEffectApplied() const {
     return "Kill x units located on ";
 }
 
+/**
+ * Additional actions taken for when the order gets executed.
+ **/
 void Bomb::onExecute() {
     std::cout << "Bomb yourselves!" << std::endl;
 }
 
+/**
+ * Additional checks for validation of the order.
+ * 
+ * @return true if the additional validations pass; false otherwise.
+ **/
 bool Bomb::onValidate() const {
     return true;
 }
@@ -190,18 +256,36 @@ Blockade::Blockade(const Blockade& blockade) {
 
 }
 
+/**
+ * Gets the description of the order.
+ * 
+ * @return description of the order.
+ **/
 std::string Blockade::getDescription() const {
     return "Triple the number of units on your territory and makes it neutral.";
 }
 
+/**
+ * Gets the results of the order when it executed.
+ * 
+ * @return results of the order.
+ **/
 std::string Blockade::getEffectApplied() const {
     return "A blockade setup on ... of size ...";
 }
 
+/**
+ * Additional actions taken for when the order gets executed.
+ **/
 void Blockade::onExecute() {
     std::cout << "Run for your life!" << std::endl;
 }
 
+/**
+ * Additional checks for validation of the order.
+ * 
+ * @return true if the additional validations pass; false otherwise.
+ **/
 bool Blockade::onValidate() const {
     return true;
 }
@@ -227,18 +311,36 @@ Airlift::Airlift(const Airlift& airlift) {
 
 }
 
+/**
+ * Gets the description of the order.
+ * 
+ * @return description of the order.
+ **/
 std::string Airlift::getDescription() const {
     return "Advance units from one territory to another, unoccupied territory or territory that you own.";
 }
 
+/**
+ * Gets the results of the order when it executed.
+ * 
+ * @return results of the order.
+ **/
 std::string Airlift::getEffectApplied() const {
     return "Moving ... units from ... to ....";
 }
 
+/**
+ * Additional actions taken for when the order gets executed.
+ **/
 void Airlift::onExecute() {
     std::cout << "We have liftoff." << std::endl;
 }
 
+/**
+ * Additional checks for validation of the order.
+ * 
+ * @return true if the additional validations pass; false otherwise.
+ **/
 bool Airlift::onValidate() const {
     return true;
 }
@@ -264,18 +366,36 @@ Negotiate::Negotiate(const Negotiate& negotiate) {
 
 }
 
+/**
+ * Gets the description of the order.
+ * 
+ * @return description of the order.
+ **/
 std::string Negotiate::getDescription() const {
     return "Peace for a single turn between you and another player.";
 }
 
+/**
+ * Gets the results of the order when it executed.
+ * 
+ * @return results of the order.
+ **/
 std::string Negotiate::getEffectApplied() const {
     return "Attacks prevented with ...";
 }
 
+/**
+ * Additional actions taken for when the order gets executed.
+ **/
 void Negotiate::onExecute() {
     std::cout << "Negotiate with the enemy's army!" << std::endl;
 }
 
+/**
+ * Additional checks for validation of the order.
+ * 
+ * @return true if the additional validations pass; false otherwise.
+ **/
 bool Negotiate::onValidate() const {
     return true;
 }
