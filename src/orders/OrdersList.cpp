@@ -6,23 +6,29 @@ OrdersList::OrdersList() {
 }
 
 OrdersList::~OrdersList() {
-    // std::vector handles destructor.
-    // Info fetched from https://stackoverflow.com/questions/3510662/vectors-within-classes-handling-copy-constructor-and-destructor-c
+    for ( int i = 0; i < _orders.size(); i++ ) {
+        delete _orders[i];
+    }
+    _orders.clear();
 }
 
 OrdersList& OrdersList::operator=(OrdersList&& orders) {
     if (this != &orders) {
-        // std::vector handles move assignment.
-        _orders = orders._orders;
+        // we want the copy constructor.
+        _orders = std::vector<Order*>();
+        for (auto order : orders._orders) {
+            _orders.push_back(order->clone());
+        }
     }
     return *this;
 }
 
 OrdersList::OrdersList(const OrdersList& orders) : OrdersList() {
-    // std::vector handles the copy  constructor.
-    _orders = std::vector<Order*>(orders._orders);
+    _orders = std::vector<Order*>();
+    for (auto order : orders._orders) {
+        _orders.push_back(order->clone());
+    }
 }
-
 
 /**
  * Inserts an order at the end of the list.

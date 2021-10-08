@@ -14,6 +14,13 @@ class Order {
     virtual Order& operator=(Order&& order);
 
     /**
+     * Gets a deep copy of the order itself.
+     * 
+     * @return deep copy of the order.
+     **/
+    virtual Order* clone() = 0;
+
+    /**
      * The order is executed if it is valid.
      **/
     void execute();
@@ -74,6 +81,14 @@ class CardOrder : public Order {
     ~CardOrder();
     virtual CardOrder& operator=(CardOrder&& order);
     CardOrder(const CardOrder& order);
+
+    /**
+     * Gets a deep copy of the order itself.
+     * 
+     * @return deep copy of the order.
+     **/
+    virtual Order* clone() = 0;
+
     protected:
     /**
      * Gets the description of the order.
@@ -113,6 +128,14 @@ class Deploy : public Order {
     ~Deploy();
     Deploy& operator=(Deploy&& order);
     Deploy(const Deploy& order);
+
+    /**
+     * Gets a deep copy of the order itself.
+     * 
+     * @return deep copy of the order.
+     **/
+    Order* clone();
+
     protected:
     /**
      * Gets the description of the order.
@@ -120,7 +143,7 @@ class Deploy : public Order {
      * 
      * @return description of the order.
      **/
-    virtual std::string getDescription() const = 0;
+    std::string getDescription() const;
 
     /**
      * Gets the results of the order when it executed.
@@ -128,19 +151,19 @@ class Deploy : public Order {
      * 
      * @return results of the order.
      **/
-    virtual std::string getEffectApplied() const = 0;
+    std::string getEffectApplied() const;
 
     /**
      * Additional actions taken for when the order gets executed.
      **/
-    virtual void onExecute() = 0;
+    void onExecute();
 
     /**
      * Additional checks for validation of the order.
      * 
      * @return true if the additional validations pass; false otherwise.
      **/
-    virtual bool onValidate() const = 0;
+    bool onValidate() const;
 };
 
 class Advance : public Order {
@@ -153,6 +176,14 @@ class Advance : public Order {
     ~Advance();
     Advance& operator=(Advance&& order);
     Advance(const Advance& order);
+
+    /**
+     * Gets a deep copy of the order itself.
+     * 
+     * @return deep copy of the order.
+     **/
+    Order* clone();
+
     protected:
     /**
      * Gets the description of the order.
@@ -160,7 +191,7 @@ class Advance : public Order {
      * 
      * @return description of the order.
      **/
-    virtual std::string getDescription() const = 0;
+    std::string getDescription() const;
 
     /**
      * Gets the results of the order when it executed.
@@ -168,19 +199,19 @@ class Advance : public Order {
      * 
      * @return results of the order.
      **/
-    virtual std::string getEffectApplied() const = 0;
+    std::string getEffectApplied() const;
 
     /**
      * Additional actions taken for when the order gets executed.
      **/
-    virtual void onExecute() = 0;
+    void onExecute();
 
     /**
      * Additional checks for validation of the order.
      * 
      * @return true if the additional validations pass; false otherwise.
      **/
-    virtual bool onValidate() const = 0;
+    bool onValidate() const;
 };
 
 /**
@@ -192,6 +223,14 @@ class Bomb : public CardOrder {
     ~Bomb();
     Bomb& operator=(Bomb&& order);
     Bomb(const Bomb& order);
+
+    /**
+     * Gets a deep copy of the order itself.
+     * 
+     * @return deep copy of the order.
+     **/
+    Order* clone();
+
     protected:
     /**
      * Gets the description of the order.
@@ -199,7 +238,7 @@ class Bomb : public CardOrder {
      * 
      * @return description of the order.
      **/
-    virtual std::string getDescription() const = 0;
+    std::string getDescription() const;
 
     /**
      * Gets the results of the order when it executed.
@@ -207,19 +246,19 @@ class Bomb : public CardOrder {
      * 
      * @return results of the order.
      **/
-    virtual std::string getEffectApplied() const = 0;
+    std::string getEffectApplied() const;
 
     /**
      * Additional actions taken for when the order gets executed.
      **/
-    virtual void onExecute() = 0;
+    void onExecute();
 
     /**
      * Additional checks for validation of the order.
      * 
      * @return true if the additional validations pass; false otherwise.
      **/
-    virtual bool onValidate() const = 0;
+    bool onValidate() const;
 };
 
 /**
@@ -231,6 +270,14 @@ class Blockade : public CardOrder {
     ~Blockade();
     Blockade& operator=(Blockade&& order);
     Blockade(const Blockade& order);
+
+    /**
+     * Gets a deep copy of the order itself.
+     * 
+     * @return deep copy of the order.
+     **/
+    Order* clone();
+
     protected:
     /**
      * Gets the description of the order.
@@ -238,7 +285,7 @@ class Blockade : public CardOrder {
      * 
      * @return description of the order.
      **/
-    virtual std::string getDescription() const = 0;
+    std::string getDescription() const;
 
     /**
      * Gets the results of the order when it executed.
@@ -246,19 +293,19 @@ class Blockade : public CardOrder {
      * 
      * @return results of the order.
      **/
-    virtual std::string getEffectApplied() const = 0;
+    std::string getEffectApplied() const;
 
     /**
      * Additional actions taken for when the order gets executed.
      **/
-    virtual void onExecute() = 0;
+    void onExecute();
 
     /**
      * Additional checks for validation of the order.
      * 
      * @return true if the additional validations pass; false otherwise.
      **/
-    virtual bool onValidate() const = 0;
+    bool onValidate() const;
 };
 
 /**
@@ -270,6 +317,14 @@ class Airlift : public CardOrder {
     ~Airlift();
     Airlift& operator=(Airlift&& order);
     Airlift(const Airlift& order);
+
+    /**
+     * Gets a deep copy of the order itself.
+     * 
+     * @return deep copy of the order.
+     **/
+    Order* clone();
+
     protected:
     /**
      * Gets the description of the order.
@@ -277,7 +332,7 @@ class Airlift : public CardOrder {
      * 
      * @return description of the order.
      **/
-    virtual std::string getDescription() const = 0;
+    std::string getDescription() const;
 
     /**
      * Gets the results of the order when it executed.
@@ -285,19 +340,19 @@ class Airlift : public CardOrder {
      * 
      * @return results of the order.
      **/
-    virtual std::string getEffectApplied() const = 0;
+    std::string getEffectApplied() const;
 
     /**
      * Additional actions taken for when the order gets executed.
      **/
-    virtual void onExecute() = 0;
+    void onExecute();
 
     /**
      * Additional checks for validation of the order.
      * 
      * @return true if the additional validations pass; false otherwise.
      **/
-    virtual bool onValidate() const = 0;
+    bool onValidate() const;
 };
 
 class Negotiate : public Order {
@@ -306,6 +361,14 @@ class Negotiate : public Order {
     ~Negotiate();
     Negotiate& operator=(Negotiate&& order);
     Negotiate(const Negotiate& order);
+
+    /**
+     * Gets a deep copy of the order itself.
+     * 
+     * @return deep copy of the order.
+     **/
+    Order* clone();
+    
     protected:
     /**
      * Gets the description of the order.
@@ -313,7 +376,7 @@ class Negotiate : public Order {
      * 
      * @return description of the order.
      **/
-    virtual std::string getDescription() const = 0;
+    std::string getDescription() const;
 
     /**
      * Gets the results of the order when it executed.
@@ -321,17 +384,17 @@ class Negotiate : public Order {
      * 
      * @return results of the order.
      **/
-    virtual std::string getEffectApplied() const = 0;
+    std::string getEffectApplied() const;
 
     /**
      * Additional actions taken for when the order gets executed.
      **/
-    virtual void onExecute() = 0;
+    void onExecute();
 
     /**
      * Additional checks for validation of the order.
      * 
      * @return true if the additional validations pass; false otherwise.
      **/
-    virtual bool onValidate() const = 0;
+    bool onValidate() const;
 };
