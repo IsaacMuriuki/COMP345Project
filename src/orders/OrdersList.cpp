@@ -6,10 +6,21 @@ OrdersList::OrdersList() {
 }
 
 OrdersList::~OrdersList() {
-    for ( int i = 0; i < _orders.size(); i++ ) {
-      delete _orders[i];
-   }
-   _orders.clear();
+    // std::vector handles destructor.
+    // Info fetched from https://stackoverflow.com/questions/3510662/vectors-within-classes-handling-copy-constructor-and-destructor-c
+}
+
+OrdersList& OrdersList::operator=(OrdersList&& orders) {
+    if (this != &orders) {
+        // std::vector handles move assignment.
+        _orders = orders._orders;
+    }
+    return *this;
+}
+
+OrdersList::OrdersList(const OrdersList& orders) : OrdersList() {
+    // std::vector handles the copy  constructor.
+    _orders = std::vector<Order*>(orders._orders);
 }
 
 
@@ -19,6 +30,7 @@ OrdersList::~OrdersList() {
  * @param order order to add to the list.
  **/
 void OrdersList::add(Order* order) {
+    // std::vector adds the same reference to the same object.
     _orders.push_back(order);
 }
 
@@ -47,6 +59,10 @@ bool OrdersList::move(int from, int to) {
     Order* temp = _orders[from];
     _orders[from] = _orders[to];
     _orders[to] = temp;
+
+    delete temp;
+    temp = NULL;
+
     return true;
 }
 
@@ -69,7 +85,7 @@ Order* OrdersList::pop() {
  * @return true if the order was removed; false otherwise.
  **/
 bool OrdersList::remove(int index) {
-    if (_orders.size() < 0 || _orders.size() >= index) {
+    if (index < 0 || _orders.size() <= index) {
         return false;
     }
     
@@ -77,4 +93,13 @@ bool OrdersList::remove(int index) {
     _orders[index] = NULL;
     _orders.erase(_orders.begin() + index);
     return true;
+}
+
+/**
+ * Gets the size of the orders list.
+ * 
+ * @return number of orders in orders list.
+ **/
+int OrdersList::size() {
+    return _orders.size();
 }

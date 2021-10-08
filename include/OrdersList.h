@@ -11,6 +11,8 @@ class OrdersList {
     public:
     OrdersList();
     ~OrdersList();
+    OrdersList(const OrdersList& orders);
+    OrdersList& operator=(OrdersList&& orders);
 
     /**
      * Inserts an order at the end of the list.
@@ -51,4 +53,11 @@ class OrdersList {
      * @return true if the order was removed; false otherwise.
      **/
     bool remove(int index);
+
+    /**
+     * Gets the size of the orders list.
+     * 
+     * @return number of orders in orders list.
+     **/
+    int size();
 };
