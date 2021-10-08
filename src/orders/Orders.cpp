@@ -90,6 +90,15 @@ Deploy::Deploy(const Deploy& deploy) {
 }
 
 /**
+ * Gets a deep copy of the order itself.
+ * 
+ * @return deep copy of the order.
+ **/
+Order* Deploy::clone() {
+    return new Deploy(*this);
+}
+
+/**
  * Gets the description of the order.
  * 
  * @return description of the order.
@@ -143,6 +152,15 @@ Advance& Advance::operator=(Advance&& order) {
 
 Advance::Advance(const Advance& advance) {
 
+}
+
+/**
+ * Gets a deep copy of the order itself.
+ * 
+ * @return deep copy of the order.
+ **/
+Order* Advance::clone() {
+    return new Advance(*this);
 }
 
 /**
@@ -202,6 +220,15 @@ Bomb::Bomb(const Bomb& bomb) {
 }
 
 /**
+ * Gets a deep copy of the order itself.
+ * 
+ * @return deep copy of the order.
+ **/
+Order* Bomb::clone() {
+    return new Bomb(*this);
+}
+
+/**
  * Gets the description of the order.
  * 
  * @return description of the order.
@@ -254,6 +281,15 @@ Blockade& Blockade::operator=(Blockade&& order) {
 
 Blockade::Blockade(const Blockade& blockade) {
 
+}
+
+/**
+ * Gets a deep copy of the order itself.
+ * 
+ * @return deep copy of the order.
+ **/
+Order* Blockade::clone() {
+    return new Blockade(*this);
 }
 
 /**
@@ -312,6 +348,15 @@ Airlift::Airlift(const Airlift& airlift) {
 }
 
 /**
+ * Gets a deep copy of the order itself.
+ * 
+ * @return deep copy of the order.
+ **/
+Order* Airlift::clone() {
+    return new Airlift(*this);
+}
+
+/**
  * Gets the description of the order.
  * 
  * @return description of the order.
@@ -364,6 +409,15 @@ Negotiate& Negotiate::operator=(Negotiate&& order) {
 
 Negotiate::Negotiate(const Negotiate& negotiate) {
 
+}
+
+/**
+ * Gets a deep copy of the order itself.
+ * 
+ * @return deep copy of the order.
+ **/
+Order* Negotiate::clone() {
+    return new Negotiate(*this);
 }
 
 /**
