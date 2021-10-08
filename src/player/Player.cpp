@@ -46,10 +46,10 @@ Player::~Player(){
  * @param player
  */
 Player::Player(const Player& player){
-    this->name = name;
-    this->territories = territories;
-    this->ordersList = new OrdersList(*ordersList);
-    this->handOfCards = new Hand(*handOfCards);
+    this->name = player.name;
+    this->territories = player.territories;
+    this->ordersList = new OrdersList(*player.ordersList);
+    this->handOfCards = new Hand(*player.handOfCards);
 }
 
 /**
