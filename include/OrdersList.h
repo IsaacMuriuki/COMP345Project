@@ -11,6 +11,8 @@ class OrdersList {
     public:
     OrdersList();
     ~OrdersList();
+    OrdersList(const OrdersList& orders);
+    OrdersList& operator=(OrdersList&& orders);
 
     /**
      * Inserts an order at the end of the list.
