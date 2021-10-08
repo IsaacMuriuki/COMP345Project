@@ -31,13 +31,9 @@ Player::Player(const Player& player){
     this->handOfCards = new Hand(*handOfCards);
 }
 
-vector<Territory*> Player::toDefend(){
-    return territories;
-}
+vector<Territory*> Player::toDefend(){ return territories;}
 
-vector<Territory*> Player::toAttack(){
-    return territories;
-}
+vector<Territory*> Player::toAttack(){ return territories;}
 
 void Player::issueOrder() {
     string orders = "List of possible orders to be made: \n 1. Deploy\n 2. Advance\n 3. Bomb\n 4. Blockade\n 5. Airlift\n ^6. Negotiate\n Enter the number of the order you want to execute: ";
@@ -117,7 +113,7 @@ void Player::issueOrder() {
 
 std::ostream& operator<<(std::ostream &strm, const Player& player){
 
-    strm << "Player Object Data:\n";
+    strm << "Player Data:\n";
     strm << "Name :" << player.name << "\n";
     strm << "Territories \n";
     for (int i = 0; i < player.territories.size(); ++i) {
@@ -137,56 +133,30 @@ std::ostream& operator<<(std::ostream &strm, const Player& player){
 
 
 Player& Player::operator=(const Player& player){
-    this->name = name;
-    this->territories = territories;
-    this->ordersList = new OrdersList(*ordersList);
-    this->handOfCards = new Hand(*handOfCards);
+    this->name = player.name;
+    this->territories = player.territories;
+    this->ordersList = new OrdersList(*player.ordersList);
+    this->handOfCards = new Hand(*player.handOfCards);
 
     return *this;
 }
 
-void Player::addOrder(Order *order) {
-    ordersList->add(order);
-}
+void Player::addOrder(Order *order) { ordersList->add(order);}
 
-void Player::addTerritory(Territory *territory) {
-    territories.push_back(territory);
-}
+void Player::addTerritory(Territory *territory) { territories.push_back(territory);}
 
-vector<Territory *> Player::getTerritories() {
-    return vector<Territory *>();
-}
+vector<Territory *> Player::getTerritories() { return this->territories;}
 
-string Player::getTerritoriesInfo() {
-    string output = "";
-    for (int i = 0; i < territories.size(); ++i) {
-        output += "name : " + territories[i]->getName() + ", in the continent : " + territories[i]->getContinent() + ", with " + std::to_string(territories[i]->getNumArmies()) + " armies.\n";
-    }
-    return output;
-}
+OrdersList* Player::getOrdersList() { return this->ordersList;}
 
-OrdersList* Player::getOrdersList() {
-    return ordersList;
-}
+Hand* Player::getHandOfCards() { return this->handOfCards;}
 
-Hand* Player::getHandOfCards() {
-    return handOfCards;
-}
+void Player::setTerritories(vector<Territory *> territories) { this->territories = territories;}
 
-void Player::setTerritories(vector<Territory *> territories) {
-    this->territories = territories;
-}
+void Player::setOrders(OrdersList* ordersList) { this->ordersList = new OrdersList(*ordersList);}
 
-void Player::setOrders(OrdersList* ordersList) {
-    this->ordersList = new OrdersList(*ordersList);
-}
+void Player::setHandOfCards(Hand* handOfCards) { this->handOfCards = new Hand(*handOfCards);}
 
-void Player::setHandOfCards(Hand* handOfCards) {
-    this->handOfCards = new Hand(*handOfCards);
-}
-
-string Player::getName()  {
-    return this->name;
-}
+string Player::getName()  { return this->name;}
 
 

@@ -20,7 +20,6 @@ public:
     ~Player();
     Player(const Player& player);
 
-
     vector<Territory*> toDefend();
     vector<Territory*> toAttack();
     void issueOrder();
@@ -32,7 +31,6 @@ public:
     OrdersList* getOrdersList();
     Hand* getHandOfCards();
     string getName();
-    string getTerritoriesInfo();
 
     void setHandOfCards(Hand* );
     void setTerritories(vector<Territory*> );
