@@ -49,4 +49,5 @@ void PlayerDriver::demo(){
         std::cout << *player->getOrdersList()->get(i) << endl;
     }
 
+    delete t1; delete t2; delete t3; delete t4; delete t5; delete t6;
 }
