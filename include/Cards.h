@@ -23,6 +23,7 @@ class Card {
 		CardType play();
 		friend ostream& operator << (ostream& out, const Card& c);
 		friend istream& operator >> (istream& in, const Card& c);
+		string toString();
 };
 
 

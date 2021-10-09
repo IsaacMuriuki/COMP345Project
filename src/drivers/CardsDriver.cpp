@@ -21,7 +21,7 @@ void CardsDriver::demo() {
     //Drawing the cards from the deck into the hand and playing the cards
     cout << "The hand is created and has no cards in yet" << endl;
     for (int i = 0; i < 5; i++) {
-        cout << cardTypesText[hand.getHand(i).getCardType()] << endl;;
+        cout << hand.getHand(i).toString() << endl;;
     }
 
     cout << "Cards are being drawn at random to the hand" << endl;
@@ -33,7 +33,9 @@ void CardsDriver::demo() {
 
     for (int i = 0; i < 5; i++) {
         //Using an array of strings to print out the text value of the cards
-        cout << cardTypesText[hand.getHand(i).play()];
+        temp = hand.getHand(i).play();
+        deck.reshuffleIntoDeck(temp);
+        cout << cardTypesText[temp];
         cout << endl;
     }
 }

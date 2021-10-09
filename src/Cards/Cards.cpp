@@ -40,6 +40,20 @@ CardType Card::play()
 	return temporaryCardTypeHolder;
 }
 
+string Card::toString()
+{
+	char* cardTypesText[] =
+	{
+		"bomb",
+		"reinforcement",
+		"blockade",
+		"airlift",
+		"diplomacy",
+		"unassigned"
+	};
+	return cardTypesText[this->getCardType()];
+}
+
 Deck::Deck()
 {
 	//Deck has 4 reinforcment, 1 diplomacy, 19 blockade, 5 airlift and 6 bomb
