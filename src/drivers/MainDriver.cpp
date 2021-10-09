@@ -41,6 +41,7 @@ int main() {
                 break;
             case 'D':
                 // CardsDriver
+                CardsDriver::demo();
                 break;
             case 'E':
                 // GameEngineDriver

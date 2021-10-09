@@ -123,8 +123,8 @@ CardType Deck::draw()
 
 Deck::Deck(const Deck& deck)
 {
-	for (int i = 0; i < sizeDeck; i++) {
-		this->deck[i] = deck.deck[i];
+	for (int i = 0; i < deck.deck.size(); i++) {
+		this->deck.push_back(deck.deck[i]);
 	}
 	
 }
@@ -151,8 +151,8 @@ void Hand::setHand(int index, CardType cardType)
 
 Hand::Hand(const Hand& hand)
 {
-	for (int i = 0; i < 5; i++) {
-		this->hand[i] = hand.hand[i];
+	for (int i = 0; i < hand.hand.size(); i++) {
+		this->hand.push_back(hand.hand[i]);
 	}
 }
 
