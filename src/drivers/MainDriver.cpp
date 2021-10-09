@@ -3,11 +3,10 @@
 #include <string>
 #include "Drivers.h"
 
-
 int main() {
-    std::cout << "Menu - COMP 345 Project - Part 1" << std::endl;
+    std::cout << "Menu - COMP 345 Project - Part 1 - Team DN7" << std::endl;
     std::cout << "Here are the driver options for execution:" << std::endl;
-    std::cout << "" << std::endl;
+    std::cout << std::endl;
 
     char option = ' '; // Initial value must not be an option.
     std::string options = "ABCDEF";
@@ -30,29 +29,24 @@ int main() {
         option = (char) toupper(option);
 
         switch (option) {
-            case 'A': {
+            case 'A':
                 // MapDriver
-            }
-                    break;
-            case 'B': {
-                // PlayerDriver
-            }
-                    break;
-            case 'C': {
-                // OrdersDriver
-            }
-                    break;
-            case 'D': {
-                CardsDriver::demo();
                 break;
-            }
-            case 'E': {
+            case 'B':
+                // PlayerDriver
+                break;
+            case 'C':
+                // OrdersDriver
+                OrdersDriver::demo();
+                break;
+            case 'D':
+                // CardsDriver
+                break;
+            case 'E':
                 // GameEngineDriver
-            }
-                    break;
-            case 'F': {
-                    // Ignore.
-            }
+                break;
+            case 'F':
+                // Ignore.
                 break;
             default:
                 std::cout << "Please double check your selection." << std::endl;
