@@ -14,11 +14,8 @@ OrdersList::~OrdersList() {
 
 OrdersList& OrdersList::operator=(OrdersList&& orders) {
     if (this != &orders) {
-        // we want the copy constructor.
-        _orders = std::vector<Order*>();
-        for (auto order : orders._orders) {
-            _orders.push_back(order->clone());
-        }
+        // we want the move constructor. copy the pointers over.
+        _orders = std::vector<Order*>(orders._orders);
     }
     return *this;
 }
@@ -65,9 +62,6 @@ bool OrdersList::move(int from, int to) {
     Order* temp = _orders[from];
     _orders[from] = _orders[to];
     _orders[to] = temp;
-
-    delete temp;
-    temp = NULL;
 
     return true;
 }
