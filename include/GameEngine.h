@@ -70,12 +70,6 @@ class WinState : public GameState {
     ~WinState();
 };
 
-class EndState : public GameState { 
-    public:
-    EndState(std::string _stateID, std::vector<std::string> _cmds);
-    ~EndState();
-};
-
 class GameEngine
 {
     public:
@@ -102,7 +96,6 @@ class GameEngine
     IssueOrdersState* issueOrdersState;
     ExecuteOrdersState* executeOrdersState;
     WinState* winState;
-    EndState* endState;
 
     GameState* currentState;
 
