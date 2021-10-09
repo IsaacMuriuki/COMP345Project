@@ -36,3 +36,8 @@
 
 # Builds
 build/*
+cmake-build-debug/
+
+.idea/
+
+src/drivers/MainDriver

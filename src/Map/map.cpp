@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 #include <map>
-#include "../include/map.h"
+#include "map.h"
 
 using namespace std;
 

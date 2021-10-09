@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include "player.h"
+#include "Player.h"
 #include <map>
 
 using namespace std;

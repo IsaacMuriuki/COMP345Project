@@ -1,9 +1,11 @@
 #include "../../include/map.h"
+#include "Drivers.h"
 #include <iostream>
 #include <stdio.h>
-#include <string>
 
-int main()
+using namespace std;
+
+void MapDriver::demo()
 {
     const string MAPS_FOLDER = "../../maps/";
 
@@ -12,14 +14,8 @@ int main()
     loader.loadMap(loader.readLines());
     Map* m = loader.getMap();
     cout << m->validate() << endl;
+    cout << *m << endl;
 }
-
-// TODO
-// MapLoader  
-// Add validate method to Map class 
-// Destructors
-// Copy constructors
-// Driver
 
 
 
