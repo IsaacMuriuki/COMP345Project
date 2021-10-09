@@ -1,5 +1,4 @@
-#ifndef CARDS_H
-#define CARDS_H
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -8,7 +7,7 @@ using namespace std;
 
 //Declaring the CardType enum, values are stored as ints for now
 enum CardType{ bomb, reinforcement, blockade, airlift, diplomacy, unassigned };
-
+static int sizeDeck = 35;
 class Card {
 
 	private:
@@ -44,7 +43,6 @@ class Hand {
 
 private:
 	//Hand size is limited to 5 at the moment
-
 	vector<Card> hand;
 public:
 	Hand();
@@ -53,4 +51,3 @@ public:
 	void setHand(int index, CardType cardType);
 };
 
-#endif

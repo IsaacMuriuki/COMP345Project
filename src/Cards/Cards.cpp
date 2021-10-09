@@ -68,19 +68,19 @@ void Deck::reshuffleIntoDeck(CardType cardType)
 	int countAssigned = 0;
 
 	//Check to see if all the cards in the deck already exist, if so it will skip the loop to reassign the card
-	for (int i = 0; i < 35; i++) {
+	for (int i = 0; i < sizeDeck; i++) {
 		if (this->deck[i].getCardType() != unassigned) {
 			countAssigned = countAssigned + 1;
 		}
 	}
 
-	if (countAssigned == 35) {
+	if (countAssigned == sizeDeck) {
 		cardShuffledIn = true;
 	}
 
 	//This section randomly shuffles the card back into the deck
 	while (cardShuffledIn == false) {
-		randomCard = rand() % 35;
+		randomCard = rand() % sizeDeck;
 		//Check for a card that hasn't been removed from the deck
 		if (this->deck[randomCard].getCardType() == unassigned) {			
 			this->deck[randomCard].setCardType(cardType);
@@ -98,18 +98,18 @@ CardType Deck::draw()
 	int countUnassigned = 0;
 	CardType drawnCard = unassigned;
 	//Check to see if all the cards in the deck already exist, if so it will skip the loop to reassign the card
-	for (int i = 0; i < 35; i++) {
+	for (int i = 0; i < sizeDeck; i++) {
 		if (this->deck[i].getCardType() == unassigned) {
 			countUnassigned = countUnassigned + 1;
 		}
 	}
 
-	if (countUnassigned == 35) {
+	if (countUnassigned == sizeDeck) {
 		cardDrawn = true;
 	}
 
 	while (cardDrawn == false) {
-		randomCard = rand() % 35;
+		randomCard = rand() % sizeDeck;
 		//Check for a card that hasn't been removed from the deck
 		if (this->deck[randomCard].getCardType() != unassigned) {
 			drawnCard = this->deck[randomCard].getCardType();
@@ -123,7 +123,7 @@ CardType Deck::draw()
 
 Deck::Deck(const Deck& deck)
 {
-	for (int i = 0; i < 35; i++) {
+	for (int i = 0; i < sizeDeck; i++) {
 		this->deck[i] = deck.deck[i];
 	}
 	
