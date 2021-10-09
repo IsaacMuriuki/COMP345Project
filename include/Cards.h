@@ -1,13 +1,13 @@
-#ifndef CARDS_H
-#define CARDS_H
-#define GRANDPARENT_H
+#pragma once
 
 #include <iostream>
+#include <vector>
+
 using namespace std;
 
 //Declaring the CardType enum, values are stored as ints for now
 enum CardType{ bomb, reinforcement, blockade, airlift, diplomacy, unassigned };
-
+static int sizeDeck = 35;
 class Card {
 
 	private:
@@ -21,13 +21,15 @@ class Card {
 		void setCardType(CardType cardType);
 		CardType getCardType();
 		CardType play();
+		friend ostream& operator << (ostream& out, const Card& c);
+		friend istream& operator >> (istream& in, const Card& c);
 };
 
 
 class Deck {
 	//Need to add getter and setters
 	private:
-		Card deck[35];
+		vector<Card> deck;
 	public:
 		Deck();
 		Deck(const Deck &deck);
@@ -40,18 +42,12 @@ class Deck {
 class Hand {
 
 private:
-    /*moved this to public so i can access it from player easier - see card channel on discord
-     *
 	//Hand size is limited to 5 at the moment
-	Card hand[5];
-*/
+	vector<Card> hand;
 public:
-    //Hand size is limited to 5 at the moment
-    Card hand[5];
 	Hand();
 	Hand(const Hand& hand);
 	Card getHand(int index);
 	void setHand(int index, CardType cardType);
 };
 
-#endif
