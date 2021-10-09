@@ -14,7 +14,6 @@ GameEngine::GameEngine(){
     issueOrdersState = new IssueOrdersState("issue orders", {ISSUE_ORDER_CMD, END_ISSUE_ORDERS_CMD});
     executeOrdersState = new ExecuteOrdersState("execute orders", {EXEC_ORDER_CMD, END_EXEC_ORDERS_CMD, WIN_CMD});
     winState = new WinState("win", {PLAY_CMD, END_CMD});
-    endState = new EndState("end", {});
 
     //Adding the pair of command strings and a pointer to the state they lead to to a <string, GameState*>
 
@@ -28,7 +27,6 @@ GameEngine::GameEngine(){
     cmds[EXEC_ORDER_CMD] = executeOrdersState;
     cmds[END_EXEC_ORDERS_CMD] = assignReinforcementState;
     cmds[WIN_CMD] = winState;
-    cmds[END_CMD] = endState;
 
     std::cout << "\nGame Engine initialized." << std::endl;
 };
@@ -47,7 +45,6 @@ GameEngine& GameEngine::operator=(GameEngine&& gameEngine) {
         issueOrdersState = gameEngine.issueOrdersState;
         executeOrdersState = gameEngine.executeOrdersState;
         winState = gameEngine.winState;
-        endState = gameEngine.endState;
 
         currentState = gameEngine.currentState;
 
@@ -65,7 +62,7 @@ void GameEngine::Run(){
     //Sets the startState as the current state
     SetState(startState);
 
-    //Program loops until reaching the end state 
+    //Program loops until reaching the end command is executed 
     while(running){
         
         //Take in the user input
@@ -78,9 +75,6 @@ void GameEngine::Run(){
 
         //Validates the command and execute the appropriate state transition
         ExecuteCmd(cmd);
-        
-        //Stops the loop if the current state is the end state
-        running = currentState != endState;
     }
 
     std::cout << "\nEnd of program." << std::endl;
@@ -97,7 +91,13 @@ bool GameEngine::ExecuteCmd(std::string cmdID){
 
     //Check if the current state has a matching command ID
     if(std::find(currentState->cmds.begin(), currentState->cmds.end(), cmdID) != currentState->cmds.end()) {
+        
         //Check if the current state considers the command valid
+        if(cmdID == END_CMD){
+            running = false;
+            return true;
+        }
+        
         std::map<std::string, GameState*>::iterator cmd = cmds.find(cmdID);
         if (cmd != cmds.end()){
             TransitionTo(cmd->second); //If the command is valid, transition to the state the command points to
@@ -195,8 +195,3 @@ ExecuteOrdersState::~ExecuteOrdersState(){};
 
 WinState::WinState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
 WinState::~WinState(){};
-
-// EndState class definition
-
-EndState::EndState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
-EndState::~EndState(){};
