@@ -97,8 +97,8 @@ std::ostream& operator<<(std::ostream &strm, const Player& player){
      * will need to change this once hand is a vector
      */
     strm << "\nCards \n";
-    for (int i =0; i <sizeof(player.handOfCards->hand)/sizeof (player.handOfCards->hand[0]); ++i){
-        strm << CardType(player.handOfCards->hand[i].getCardType()) << "\n";
+    for (int i =0; i <player.handOfCards->size(); ++i){
+        strm << CardType(player.handOfCards->getHand(i).getCardType()) << "\n";
     }
 
     return strm;

@@ -168,3 +168,11 @@ istream& operator>>(istream& in, const Card& c)
 	in >> c.cardType;
 	return in;
 }
+
+int Hand::size() {
+    return hand.size();
+}
+
+int Deck::size() {
+    return deck.size();
+}

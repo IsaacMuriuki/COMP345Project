@@ -35,6 +35,7 @@ class Deck {
 		Deck(const Deck &deck);
 		CardType draw();
 		void reshuffleIntoDeck(CardType cardType);
+		int size();
 
 		
 };
@@ -49,5 +50,6 @@ public:
 	Hand(const Hand& hand);
 	Card getHand(int index);
 	void setHand(int index, CardType cardType);
+	int size();
 };
 

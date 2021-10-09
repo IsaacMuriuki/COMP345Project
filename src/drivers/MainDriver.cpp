@@ -34,10 +34,10 @@ int main() {
             case 'B':{
                 // PlayerDriver
                 PlayerDriver::demo();
-                    break;
+                break;
             }
             case 'C': {
-            
+
                 // OrdersDriver
                 OrdersDriver::demo();
                 break;
