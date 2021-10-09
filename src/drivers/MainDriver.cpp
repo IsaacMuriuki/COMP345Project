@@ -3,7 +3,6 @@
 #include <string>
 #include "Drivers.h"
 
-
 int main() {
     std::cout << "Menu - COMP 345 Project - Part 1 - Team DN7" << std::endl;
     std::cout << "Here are the driver options for execution:" << std::endl;
@@ -29,31 +28,29 @@ int main() {
         option = (char) toupper(option);
 
         switch (option) {
-            case 'A': {
+            case 'A':
                 // MapDriver
-            }
-                    break;
-            case 'B': {
+                break;
+            case 'B':{
                 // PlayerDriver
                 PlayerDriver::demo();
-            }
                     break;
+            }
             case 'C': {
+            
                 // OrdersDriver
                 OrdersDriver::demo();
                 break;
             }
-            case 'D': {
+            case 'D':
+                // CardsDriver
                 CardsDriver::demo();
                 break;
-            }
-            case 'E': {
+            case 'E':
                 // GameEngineDriver
-            }
-                    break;
-            case 'F': {
-                    // Ignore.
-            }
+                break;
+            case 'F':
+                // Ignore.
                 break;
             default:
                 std::cout << "Please double check your selection." << std::endl;
