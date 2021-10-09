@@ -13,8 +13,6 @@ int main() {
     char option = ' '; // Initial value must not be an option.
     std::string options = "ABCDEF";
 
-    GameEngine gameEngine;
-
     while (option != 'F') {
         std::cout << std::endl;
         if (options.find(option) != std::string::npos) {
@@ -48,6 +46,7 @@ int main() {
                 break;
             case 'E':
                 // GameEngineDriver
+                GameEngineDriver::demo();
                 break;
             case 'F':
                 // Ignore.

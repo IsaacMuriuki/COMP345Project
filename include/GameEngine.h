@@ -13,63 +13,66 @@ class GameState
 {
     public:
 
-    std::string name;
+    std::string stateID;
     std::vector<std::string> cmds;
+    bool running;
 
-    GameState(std::string _name, std::vector<std::string> _cmds);
+    GameState(std::string _stateID, std::vector<std::string> _cmds);
     virtual void OnStateEnter();
     virtual void OnStateExit();
 };
 
 class StartState : public GameState { 
     public:
-    StartState::StartState(std::string _name, std::vector<std::string> _cmds);
+    StartState::StartState(std::string _stateID, std::vector<std::string> _cmds);
 };
 
 class MapLoadedState : public GameState { 
     public:
-    MapLoadedState(std::string _name, std::vector<std::string> _cmds);
+    MapLoadedState(std::string _stateID, std::vector<std::string> _cmds);
 };
 
 class MapValidatedState : public GameState { 
     public:
-    MapValidatedState(std::string _name, std::vector<std::string> _cmds);
+    MapValidatedState(std::string _stateID, std::vector<std::string> _cmds);
 };
 
 class PlayersAddedState : public GameState { 
     public:
-    PlayersAddedState(std::string _name, std::vector<std::string> _cmds);
+    PlayersAddedState(std::string _stateID, std::vector<std::string> _cmds);
 };
 
 class AssignReinforcementState : public GameState { 
     public:
-    AssignReinforcementState(std::string _name, std::vector<std::string> _cmds);
+    AssignReinforcementState(std::string _stateID, std::vector<std::string> _cmds);
 };
 
 class IssueOrdersState : public GameState { 
     public:
-    IssueOrdersState(std::string _name, std::vector<std::string> _cmds);
+    IssueOrdersState(std::string _stateID, std::vector<std::string> _cmds);
 };
 
 class ExecuteOrdersState : public GameState { 
     public:
-    ExecuteOrdersState(std::string _name, std::vector<std::string> _cmds);
+    ExecuteOrdersState(std::string _stateID, std::vector<std::string> _cmds);
 };
 
 class WinState : public GameState { 
     public:
-    WinState(std::string _name, std::vector<std::string> _cmds);
+    WinState(std::string _stateID, std::vector<std::string> _cmds);
 };
 
 class EndState : public GameState { 
     public:
-    EndState(std::string _name, std::vector<std::string> _cmds);
+    EndState(std::string _stateID, std::vector<std::string> _cmds);
+    void EndState::OnStateEnter();
 };
-
 
 class GameEngine
 {
     public:
+
+    bool running;
 
     const std::string PLAY_CMD = "play";
     const std::string LOAD_MAP_CMD = "loadmap";
@@ -98,6 +101,8 @@ class GameEngine
     std::map<std::string, GameState*> cmds;
 
     GameEngine();
+    void Run();
+    void ListenForCommand();
     bool ExecuteCmd(std::string);
     void SetState(GameState* );
     void TransitionTo(GameState* );

@@ -2,19 +2,6 @@
 
 GameEngine::GameEngine(){
     
-    /*
-    TransitionCommand playCmd(PLAY_CMD, startState);
-    TransitionCommand loadmapCmd(LOAD_MAP_CMD, mapLoadedState);
-    TransitionCommand validateMapCmd(VALIDATE_MAP_CMD, mapValidatedState);
-    TransitionCommand addPlayerCmd(ADD_PLAYER_CMD, playersAddedState);
-    TransitionCommand assignCountriesCmd(ASSIGN_COUNTRIES_CMD, assignReinforcementState);
-    TransitionCommand issueorderCmd(ISSUE_ORDER_CMD, issueOrdersState);
-    TransitionCommand endissueordersCmd(END_ISSUE_ORDERS_CMD, executeOrdersState);
-    TransitionCommand execorderCmd(EXEC_ORDER_CMD, executeOrdersState);
-    TransitionCommand endexecordersCmd(END_EXEC_ORDERS_CMD, assignReinforcementState);
-    TransitionCommand winCmd(WIN_CMD, winState);
-    TransitionCommand endCmd(END_CMD, endState);*/
-
     startState = &StartState ("start", {LOAD_MAP_CMD});
     mapLoadedState = &MapLoadedState("map loaded", {LOAD_MAP_CMD, VALIDATE_MAP_CMD});
     mapValidatedState = &MapValidatedState("map validated", {ADD_PLAYER_CMD});
@@ -37,10 +24,25 @@ GameEngine::GameEngine(){
     cmds[WIN_CMD] = winState;
     cmds[END_CMD] = endState;
 
-    std::cout << "Game Engine init" << std::endl;
-
-    SetState(startState);
+    std::cout << "Game Engine initialized." << std::endl;
+    std::cout << "Start State: " << startState->stateID << std::endl;
 };
+
+void GameEngine::Run(){
+    
+    SetState(startState);
+    std::cout << "Current state: " << currentState->stateID;
+
+    while(running){
+        
+    }
+
+    std::cout << "End of program." << std::endl;
+}
+
+void GameEngine::ListenForCommand(){
+
+}
 
 bool GameEngine::ExecuteCmd(std::string cmdID){
 
@@ -57,7 +59,7 @@ bool GameEngine::ExecuteCmd(std::string cmdID){
             return NULL;
         }
     } else{
-        std::cout << "State '" << currentState->name << "' doesn't recognize command '" << cmdID << "' found." << std::endl;
+        std::cout << "State '" << currentState->stateID << "' doesn't recognize command '" << cmdID << "' found." << std::endl;
         return NULL;
     }
 }
@@ -72,33 +74,39 @@ void GameEngine::TransitionTo(GameState* nextState){
     SetState(nextState);
 }
 
-GameState::GameState(std::string _name, std::vector<std::string> _cmds){
-    name = _name;
+GameState::GameState(std::string _stateID, std::vector<std::string> _cmds){
+    stateID = _stateID;
     cmds = _cmds;
+    std::cout << "State '"<< stateID << "' initialized" << std::endl;
 }
 
 void GameState::OnStateEnter(){
-    std::cout << "Entered gamestate " << name << "." << std::endl;
+    std::cout << "Entered gamestate '" << stateID << "'." << std::endl;
 }
 
 void GameState::OnStateExit(){
-    std::cout << "Exited gamestate " << name << "." << std::endl;
+    std::cout << "Exited gamestate '" << stateID << "'." << std::endl;
 }
 
-StartState::StartState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
+StartState::StartState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
 
-MapLoadedState::MapLoadedState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
+MapLoadedState::MapLoadedState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
 
-MapValidatedState::MapValidatedState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
+MapValidatedState::MapValidatedState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
 
-PlayersAddedState::PlayersAddedState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
+PlayersAddedState::PlayersAddedState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
 
-AssignReinforcementState::AssignReinforcementState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
+AssignReinforcementState::AssignReinforcementState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
 
-IssueOrdersState::IssueOrdersState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
+IssueOrdersState::IssueOrdersState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
 
-ExecuteOrdersState::ExecuteOrdersState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
+ExecuteOrdersState::ExecuteOrdersState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
 
-WinState::WinState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
+WinState::WinState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
 
-EndState::EndState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
+EndState::EndState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
+
+void EndState::OnStateEnter(){
+    GameState::OnStateEnter();
+    //gameEngine.running = false;
+}
