@@ -17,54 +17,63 @@ class GameState
     bool running;
 
     GameState(std::string _stateID, std::vector<std::string> _cmds);
+    ~GameState();
     virtual void OnStateEnter();
     virtual void OnStateExit();
 };
 
 class StartState : public GameState { 
     public:
-    StartState::StartState(std::string _stateID, std::vector<std::string> _cmds);
+    StartState(std::string _stateID, std::vector<std::string> _cmds);
+    ~StartState();
 };
 
 class MapLoadedState : public GameState { 
     public:
     MapLoadedState(std::string _stateID, std::vector<std::string> _cmds);
+    ~MapLoadedState();
 };
 
 class MapValidatedState : public GameState { 
     public:
     MapValidatedState(std::string _stateID, std::vector<std::string> _cmds);
+    ~MapValidatedState();
 };
 
 class PlayersAddedState : public GameState { 
     public:
     PlayersAddedState(std::string _stateID, std::vector<std::string> _cmds);
+    ~PlayersAddedState();
 };
 
 class AssignReinforcementState : public GameState { 
     public:
     AssignReinforcementState(std::string _stateID, std::vector<std::string> _cmds);
+    ~AssignReinforcementState();
 };
 
 class IssueOrdersState : public GameState { 
     public:
     IssueOrdersState(std::string _stateID, std::vector<std::string> _cmds);
+    ~IssueOrdersState();
 };
 
 class ExecuteOrdersState : public GameState { 
     public:
     ExecuteOrdersState(std::string _stateID, std::vector<std::string> _cmds);
+    ~ExecuteOrdersState();
 };
 
 class WinState : public GameState { 
     public:
     WinState(std::string _stateID, std::vector<std::string> _cmds);
+    ~WinState();
 };
 
 class EndState : public GameState { 
     public:
     EndState(std::string _stateID, std::vector<std::string> _cmds);
-    void EndState::OnStateEnter();
+    ~EndState();
 };
 
 class GameEngine
@@ -100,31 +109,12 @@ class GameEngine
     std::map<std::string, GameState*> cmds;
 
     GameEngine();
+    ~GameEngine();
+    GameEngine& operator=(GameEngine&& gameEngine);
     void Run();
     bool ExecuteCmd(std::string);
     void SetState(GameState* );
     void TransitionTo(GameState* );
 };
-
-/*
-class Command { 
-    
-    public:
-    std::string id;
-
-    Command(const std::string _id);
-
-    virtual void Execute() = 0;
-};
-
-class TransitionCommand : public Command { 
-    
-    private:
-    GameState* state;
-    
-    public:
-    TransitionCommand::TransitionCommand(std::string _id, GameState* _state);
-    void Execute();
-};*/
 
 #endif
