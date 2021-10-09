@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string>
 
-int main() {
+int maintemp() {
     std::cout << "Menu - COMP 345 Project - Part 1 - Team DN7" << std::endl;
     std::cout << "Here are the driver options for execution:" << std::endl;
     std::cout << "" << std::endl;
@@ -52,3 +52,11 @@ int main() {
     }
     return 0;
 }
+
+// TODO
+// create map object   
+// Territy owned by player
+// add validate method to Map class 
+// do driver
+// destructor
+// copy constructors

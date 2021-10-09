@@ -1,17 +1,26 @@
-#define _GLIBCXX_USE_CXX11_ABI 0
 #include "../../include/map.h"
-using namespace std;
+#include <iostream>
+#include <stdio.h>
+#include <string>
 
 int main()
 {
-    // error: undefined reference to `MapLoader::MapLoader()'
-    string fileName = "temp";
+    const string MAPS_FOLDER = "../../maps/";
+
+    string fileName = MAPS_FOLDER + "bigeurope.map";
     MapLoader loader(fileName);
+    loader.loadMap(loader.readLines());
+    Map* m = loader.getMap();
+    cout << m->validate() << endl;
 }
 
 // TODO
-// create map object   
-// Territy owned by player
-// add validate method to Map class 
-// do driver
-// destructor
+// MapLoader  
+// Add validate method to Map class 
+// Destructors
+// Copy constructors
+// Driver
+
+
+
+
