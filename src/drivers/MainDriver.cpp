@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string>
 
+#include "GameEngine.h"
+
 int main() {
     std::cout << "Menu - COMP 345 Project - Part 1" << std::endl;
     std::cout << "Here are the driver options for execution:" << std::endl;
@@ -9,6 +11,8 @@ int main() {
 
     char option = ' '; // Initial value must not be an option.
     std::string options = "ABCDEF";
+
+    GameEngine gameEngine;
 
     while (option != 'F') {
         std::cout << std::endl;
