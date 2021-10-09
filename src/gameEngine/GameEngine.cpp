@@ -2,15 +2,15 @@
 
 GameEngine::GameEngine(){
     
-    startState = &StartState ("start", {LOAD_MAP_CMD});
-    mapLoadedState = &MapLoadedState("map loaded", {LOAD_MAP_CMD, VALIDATE_MAP_CMD});
-    mapValidatedState = &MapValidatedState("map validated", {ADD_PLAYER_CMD});
-    playersAddedState = &PlayersAddedState("players added", {ADD_PLAYER_CMD, ASSIGN_COUNTRIES_CMD});
-    assignReinforcementState = &AssignReinforcementState("assign reinforcement", {ISSUE_ORDER_CMD});
-    issueOrdersState = &IssueOrdersState("issue orders", {ISSUE_ORDER_CMD, END_ISSUE_ORDERS_CMD});
-    executeOrdersState = &ExecuteOrdersState("execute orders", {EXEC_ORDER_CMD, END_EXEC_ORDERS_CMD, WIN_CMD});
-    winState = &WinState("win", {PLAY_CMD, END_CMD});
-    endState = &EndState("end", {});
+    startState = new StartState ("start", {LOAD_MAP_CMD});
+    mapLoadedState = new MapLoadedState("map loaded", {LOAD_MAP_CMD, VALIDATE_MAP_CMD});
+    mapValidatedState = new MapValidatedState("map validated", {ADD_PLAYER_CMD});
+    playersAddedState = new PlayersAddedState("players added", {ADD_PLAYER_CMD, ASSIGN_COUNTRIES_CMD});
+    assignReinforcementState = new AssignReinforcementState("assign reinforcement", {ISSUE_ORDER_CMD});
+    issueOrdersState = new IssueOrdersState("issue orders", {ISSUE_ORDER_CMD, END_ISSUE_ORDERS_CMD});
+    executeOrdersState = new ExecuteOrdersState("execute orders", {EXEC_ORDER_CMD, END_EXEC_ORDERS_CMD, WIN_CMD});
+    winState = new WinState("win", {PLAY_CMD, END_CMD});
+    endState = new EndState("end", {});
 
     cmds[PLAY_CMD] = startState;
     cmds[LOAD_MAP_CMD] = mapLoadedState;
@@ -24,24 +24,30 @@ GameEngine::GameEngine(){
     cmds[WIN_CMD] = winState;
     cmds[END_CMD] = endState;
 
-    std::cout << "Game Engine initialized." << std::endl;
-    std::cout << "Start State: " << startState->stateID << std::endl;
+    std::cout << "\nGame Engine initialized." << std::endl;
 };
 
 void GameEngine::Run(){
     
     SetState(startState);
-    std::cout << "Current state: " << currentState->stateID;
 
     while(running){
         
+        std::string cmd;
+        std::cout << "\nEnter your command: " << std::endl;
+        //std::cout.flush() ;
+        std::cin.clear(); 
+        std::cin.sync();
+        std::cin >> cmd; 
+        std::cout << std::endl;
+
+        //if(cmd != "") 
+        ExecuteCmd(cmd);
+        
+        running = currentState != endState;
     }
 
-    std::cout << "End of program." << std::endl;
-}
-
-void GameEngine::ListenForCommand(){
-
+    std::cout << "\nEnd of program." << std::endl;
 }
 
 bool GameEngine::ExecuteCmd(std::string cmdID){
@@ -59,7 +65,7 @@ bool GameEngine::ExecuteCmd(std::string cmdID){
             return NULL;
         }
     } else{
-        std::cout << "State '" << currentState->stateID << "' doesn't recognize command '" << cmdID << "' found." << std::endl;
+        std::cout << "State '" << currentState->stateID << "' doesn't recognize command '" << cmdID << "'." << std::endl;
         return NULL;
     }
 }
@@ -77,7 +83,6 @@ void GameEngine::TransitionTo(GameState* nextState){
 GameState::GameState(std::string _stateID, std::vector<std::string> _cmds){
     stateID = _stateID;
     cmds = _cmds;
-    std::cout << "State '"<< stateID << "' initialized" << std::endl;
 }
 
 void GameState::OnStateEnter(){

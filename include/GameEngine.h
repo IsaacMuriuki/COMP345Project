@@ -12,7 +12,6 @@
 class GameState
 {
     public:
-
     std::string stateID;
     std::vector<std::string> cmds;
     bool running;
@@ -102,7 +101,6 @@ class GameEngine
 
     GameEngine();
     void Run();
-    void ListenForCommand();
     bool ExecuteCmd(std::string);
     void SetState(GameState* );
     void TransitionTo(GameState* );
