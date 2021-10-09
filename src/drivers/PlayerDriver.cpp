@@ -49,5 +49,9 @@ void PlayerDriver::demo(){
         std::cout << *player->getOrdersList()->get(i) << endl;
     }
 
+    // Player info output
+    std::cout << "\nPlayer data after orders created: " << std::endl;
+    std::cout << *player << std::endl;
+
     delete t1; delete t2; delete t3; delete t4; delete t5; delete t6;
 }

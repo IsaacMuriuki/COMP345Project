@@ -84,13 +84,13 @@ std::ostream& operator<<(std::ostream &strm, const Player& player){
         strm << i+1 << ". " << *player.territories[i] << "\n";
     }
 
-    strm << "Orders :\n";
+    strm << "Orders List:\n";
     if(player.ordersList->size() == 0){
         strm << "Player " << player.name << "'s order list is empty.\n";
     }
     else {
         for (int i = 0; i < player.ordersList->size(); ++i) {
-            strm << player.ordersList->get(i);
+            strm << *player.ordersList->get(i) << "\n";
         }
     }
     /**
