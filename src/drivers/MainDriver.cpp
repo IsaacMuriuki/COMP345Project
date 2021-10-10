@@ -3,7 +3,7 @@
 #include <string>
 #include "Drivers.h"
 
-int maintemp() {
+int main() {
     std::cout << "Menu - COMP 345 Project - Part 1 - Team DN7" << std::endl;
     std::cout << "Here are the driver options for execution:" << std::endl;
 
