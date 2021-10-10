@@ -7,7 +7,14 @@ using namespace std;
 
 //Declaring the CardType enum, values are stored as ints for now
 enum CardType{ bomb, reinforcement, blockade, airlift, diplomacy, unassigned };
-static int sizeDeck = 35;
+//Deck has 4 reinforcment, 1 diplomacy, 19 blockade, 5 airlift and 6 bomb
+static int reinforcementCardAmount = 4;
+static int diplomacyCardAmount = 1;
+static int blockadeCardAmount = 19;
+static int airliftCardAmount = 5;
+static int bombCardAmount = 6;
+static int sizeDeck = reinforcementCardAmount + diplomacyCardAmount + blockadeCardAmount + airliftCardAmount + bombCardAmount;
+
 class Card {
 
 	private:
@@ -23,6 +30,7 @@ class Card {
 		CardType play();
 		friend ostream& operator << (ostream& out, const Card& c);
 		friend istream& operator >> (istream& in, const Card& c);
+		string toString() const;
 };
 
 

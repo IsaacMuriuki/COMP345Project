@@ -40,22 +40,38 @@ CardType Card::play()
 	return temporaryCardTypeHolder;
 }
 
+
+
+string Card::toString() const
+{
+	char* cardTypesText[] =
+	{
+		"bomb",
+		"reinforcement",
+		"blockade",
+		"airlift",
+		"diplomacy",
+		"unassigned"
+	};
+	return cardTypesText[this->cardType];
+}
+
 Deck::Deck()
 {
 	//Deck has 4 reinforcment, 1 diplomacy, 19 blockade, 5 airlift and 6 bomb
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < reinforcementCardAmount; i++) {
 		this->deck.push_back(Card(reinforcement));
 	}
-	for (int i = 4; i < 5; i++) {
+	for (int i = 0; i < diplomacyCardAmount; i++) {
 		this->deck.push_back(Card(diplomacy));
 	}
-	for (int i = 5; i < 24; i++) {
+	for (int i = 0; i < blockadeCardAmount; i++) {
 		this->deck.push_back(Card(blockade));
 	}
-	for (int i = 24; i < 29; i++) {
+	for (int i = 0; i < airliftCardAmount; i++) {
 		this->deck.push_back(Card(airlift));
 	}
-	for (int i = 29; i < 35; i++) {
+	for (int i = 0; i < bombCardAmount; i++) {
 		this->deck.push_back(Card(bomb));
 	}
 
@@ -158,14 +174,14 @@ Hand::Hand(const Hand& hand)
 
 ostream& operator<<(ostream& out, const Card& c)
 {
-	out << c.cardType;
+	out << c.toString();
 	return out;
 }
 
 istream& operator>>(istream& in, const Card& c)
 {
 	std::cout << "Choose a card type";
-	in >> c.cardType;
+	in >> c.toString();
 	return in;
 }
 
