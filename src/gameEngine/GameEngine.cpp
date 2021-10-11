@@ -15,7 +15,72 @@ GameEngine::GameEngine(){
     executeOrdersState = new ExecuteOrdersState("execute orders", {EXEC_ORDER_CMD, END_EXEC_ORDERS_CMD, WIN_CMD});
     winState = new WinState("win", {PLAY_CMD, END_CMD});
 
+    SetCommands();
+
+    std::cout << "\nGame Engine initialized." << std::endl;
+};
+
+GameEngine::~GameEngine(){
+
+    delete startState;
+    delete mapLoadedState;
+    delete mapValidatedState;
+    delete playersAddedState;
+    delete assignReinforcementState;
+    delete issueOrdersState;
+    delete executeOrdersState;
+    delete winState;
+
+    for(std::map<std::string, GameState*>::iterator cmd = cmds.begin(); cmd != cmds.end(); cmd++) {
+        delete (cmd->second);
+    }
+
+    cmds.clear();
+};
+
+GameEngine::GameEngine(const GameEngine& engine) { 
+    running = engine.running;
+
+    startState = (StartState*) engine.startState->clone();
+    mapLoadedState = (MapLoadedState*) engine.mapLoadedState->clone();
+    mapValidatedState = (MapValidatedState*) engine.mapValidatedState->clone();
+    playersAddedState = (PlayersAddedState*) engine.playersAddedState->clone();
+    assignReinforcementState = (AssignReinforcementState*) engine.assignReinforcementState->clone();
+    issueOrdersState = (IssueOrdersState*) engine.issueOrdersState->clone();
+    executeOrdersState = (ExecuteOrdersState*) engine.executeOrdersState->clone();
+    winState = (WinState*) engine.winState->clone();
+
+    SetCommands();
+}
+
+GameEngine& GameEngine::operator=(GameEngine&& engine) {
+    if (this != &engine) {
+        running = engine.running;
+
+        startState = engine.startState;
+        mapLoadedState = engine.mapLoadedState;
+        mapValidatedState = engine.mapValidatedState;
+        playersAddedState = engine.playersAddedState;
+        assignReinforcementState = engine.assignReinforcementState;
+        issueOrdersState = engine.issueOrdersState;
+        executeOrdersState = engine.executeOrdersState;
+        winState = engine.winState;
+
+        currentState = engine.currentState;
+
+        cmds = engine.cmds;
+    }
+    return *this;
+}
+
+/**
+ * Assigns .
+ **/
+
+void GameEngine::SetCommands(){
     //Adding the pair of command strings and a pointer to the state they lead to to a <string, GameState*>
+
+    cmds.clear();
 
     cmds[PLAY_CMD] = startState;
     cmds[LOAD_MAP_CMD] = mapLoadedState;
@@ -27,30 +92,6 @@ GameEngine::GameEngine(){
     cmds[EXEC_ORDER_CMD] = executeOrdersState;
     cmds[END_EXEC_ORDERS_CMD] = assignReinforcementState;
     cmds[WIN_CMD] = winState;
-
-    std::cout << "\nGame Engine initialized." << std::endl;
-};
-
-GameEngine::~GameEngine(){};
-
-GameEngine& GameEngine::operator=(GameEngine&& gameEngine) {
-    if (this != &gameEngine) {
-        running = gameEngine.running;
-
-        startState = gameEngine.startState;
-        mapLoadedState = gameEngine.mapLoadedState;
-        mapValidatedState = gameEngine.mapValidatedState;
-        playersAddedState = gameEngine.playersAddedState;
-        assignReinforcementState = gameEngine.assignReinforcementState;
-        issueOrdersState = gameEngine.issueOrdersState;
-        executeOrdersState = gameEngine.executeOrdersState;
-        winState = gameEngine.winState;
-
-        currentState = gameEngine.currentState;
-
-        cmds = gameEngine.cmds;
-    }
-    return *this;
 }
 
 /**
@@ -108,7 +149,7 @@ bool GameEngine::ExecuteCmd(std::string cmdID){
         }
     } else{
         //If the current state does not consider the command valid, prints an error message
-        std::cout << "State '" << currentState->stateID << "' doesn't recognize command '" << cmdID << "'." << std::endl; 
+        std::cout << "State '" << currentState->name << "' doesn't recognize command '" << cmdID << "'." << std::endl; 
         return false;
     }
 }
@@ -131,67 +172,103 @@ void GameEngine::TransitionTo(GameState* nextState){
     SetState(nextState);
 }
 
+std::ostream& operator<<(std::ostream& os, const GameEngine& engine)
+{
+    os << "Game Engine - current state: " << engine.currentState;
+    return os;
+}
+
 // GameState class definition
 
-GameState::GameState(std::string _stateID, std::vector<std::string> _cmds){
-    stateID = _stateID;
+GameState::GameState(std::string _name = "gamestate"){
+    name = _name;
+}
+
+GameState::GameState(std::string _name, std::vector<std::string> _cmds){
+    name = _name;
     cmds = _cmds;
 }
 
-GameState::~GameState(){};
+GameState::~GameState(){
+    cmds.clear();
+};
+
+GameState::GameState(const GameState& state) : GameState(state.name, state.cmds) { }
+
+GameState& GameState::operator=(GameState&& state){
+    if (this != &state){
+        name = state.name;
+        cmds = state.cmds;
+    }
+    return *this;
+}
 
 /**
  * Method executed upon entering the state. Is meant to be overitten to implement the functionality specific to each game state.
  **/
-
 void GameState::OnStateEnter(){
-    std::cout << "Entered gamestate '" << stateID << "'." << std::endl;
+    std::cout << "Entered gamestate '" << name << "'." << std::endl;
 }
 
 /**
  * Method executed upon exiting the state. Is meant to be overitten to implement the functionality specific to each game state.
  **/
-
 void GameState::OnStateExit(){
-    std::cout << "Exited gamestate '" << stateID << "'." << std::endl;
+    std::cout << "Exited gamestate '" << name << "'." << std::endl;
 }
+
+std::ostream& operator<<(std::ostream& os, const GameState& state)
+{
+    os << state.name << " state";
+    return os;
+}
+
+GameState* GameState::clone() { return new GameState(*this); }
 
 // StartState class definition
 
-StartState::StartState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
+StartState::StartState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
 StartState::~StartState(){};
+StartState::StartState(const StartState& state) : StartState(state.name, state.cmds) { }
 
 // MapLoadedState class definition
 
-MapLoadedState::MapLoadedState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
+MapLoadedState::MapLoadedState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
 MapLoadedState::~MapLoadedState(){};
+MapLoadedState::MapLoadedState(const MapLoadedState& state) : MapLoadedState(state.name, state.cmds) { }
 
 // MapValidatedState class definition
 
-MapValidatedState::MapValidatedState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
+MapValidatedState::MapValidatedState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
 MapValidatedState::~MapValidatedState(){};
+MapValidatedState::MapValidatedState(const MapValidatedState& state) : MapValidatedState(state.name, state.cmds) { }
 
 // PlayersAddedState class definition
 
-PlayersAddedState::PlayersAddedState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
+PlayersAddedState::PlayersAddedState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
 PlayersAddedState::~PlayersAddedState(){};
+PlayersAddedState::PlayersAddedState(const PlayersAddedState& state) : PlayersAddedState(state.name, state.cmds) { }
 
 // AssignReinforcementState class definition
 
-AssignReinforcementState::AssignReinforcementState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
+AssignReinforcementState::AssignReinforcementState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
 AssignReinforcementState::~AssignReinforcementState(){};
+AssignReinforcementState::AssignReinforcementState(const AssignReinforcementState& state) : AssignReinforcementState(state.name, state.cmds) { }
 
 // IssueOrdersState class definition
 
-IssueOrdersState::IssueOrdersState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
+IssueOrdersState::IssueOrdersState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
 IssueOrdersState::~IssueOrdersState(){};
+IssueOrdersState::IssueOrdersState(const IssueOrdersState& state) : IssueOrdersState(state.name, state.cmds) { }
 
 // ExecuteOrdersState class definition
 
-ExecuteOrdersState::ExecuteOrdersState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
+ExecuteOrdersState::ExecuteOrdersState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
 ExecuteOrdersState::~ExecuteOrdersState(){};
+ExecuteOrdersState::ExecuteOrdersState(const ExecuteOrdersState& state) : ExecuteOrdersState(state.name, state.cmds) { }
 
 // WinState class definition
 
-WinState::WinState(std::string _stateID, std::vector<std::string> _cmds) : GameState(_stateID, _cmds) { }
+WinState::WinState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
 WinState::~WinState(){};
+WinState::WinState(const WinState& state) : WinState(state.name, state.cmds) { }
