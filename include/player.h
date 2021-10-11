@@ -6,10 +6,11 @@
 #include <vector>
 #include <string>
 
-#include "map.h"
+#include "map2.h"
 #include "Cards.h"
 #include "OrdersList.h"
 
+class Territory;
 class Player{
 public:
     // Constructors, destructor and copy constructor

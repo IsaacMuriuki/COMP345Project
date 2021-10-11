@@ -1,3 +1,4 @@
+/*
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -419,4 +420,4 @@ void MapLoader::loadMap(vector<string> lines) {
 Map* MapLoader::getMap() { return gameMap; }
 
 vector<Continent*>* MapLoader::getContinents() { return continents; }
-
+*/

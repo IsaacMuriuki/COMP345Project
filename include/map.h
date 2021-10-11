@@ -1,8 +1,9 @@
+/*
 #pragma once
 
 #include <string>
 #include <vector>
-#include "Player.h"
+#include "player.h"
 #include <map>
 
 using namespace std;
@@ -116,3 +117,4 @@ class MapLoader
 template<typename Out>
 void split(const std::string &s, char delim, Out result);
 vector<string> split(const string &s, char delim);
+*/

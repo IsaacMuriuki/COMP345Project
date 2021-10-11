@@ -222,6 +222,8 @@ void Player::addOrder(Order *order) { ordersList->add(order);}
 
 void Player::addTerritory(Territory *territory) { territories.push_back(territory);}
 
+string Player::getName() { return this->name;}
+
 vector<Territory *> Player::getTerritories() { return this->territories;}
 
 OrdersList* Player::getOrdersList() { return this->ordersList;}
@@ -233,7 +235,3 @@ void Player::setTerritories(vector<Territory *> territories) { this->territories
 void Player::setOrders(OrdersList* ordersList) { this->ordersList = new OrdersList(*ordersList);}
 
 void Player::setHandOfCards(Hand* handOfCards) { this->handOfCards = new Hand(*handOfCards);}
-
-string Player::getName()  { return this->name;}
-
-
