@@ -12,61 +12,74 @@
 class GameState
 {
     public:
-    std::string stateID;
+    std::string name;
     std::vector<std::string> cmds;
     bool running;
 
-    GameState(std::string _stateID, std::vector<std::string> _cmds);
+    GameState(std::string _name = "gamestate");
+    GameState(std::string _name, std::vector<std::string> _cmds);
     ~GameState();
+    GameState(const GameState& state);
+    GameState& operator=(GameState&& state);
     virtual void OnStateEnter();
     virtual void OnStateExit();
+    friend std::ostream& operator<<(std::ostream& os, const GameState& state);
+    GameState* clone();
 };
 
 class StartState : public GameState { 
     public:
-    StartState(std::string _stateID, std::vector<std::string> _cmds);
+    StartState(std::string _name, std::vector<std::string> _cmds);
+    StartState(const StartState& state);
     ~StartState();
 };
 
 class MapLoadedState : public GameState { 
     public:
-    MapLoadedState(std::string _stateID, std::vector<std::string> _cmds);
+    MapLoadedState(std::string _name, std::vector<std::string> _cmds);
+    MapLoadedState(const MapLoadedState& state);
     ~MapLoadedState();
 };
 
 class MapValidatedState : public GameState { 
     public:
-    MapValidatedState(std::string _stateID, std::vector<std::string> _cmds);
+    MapValidatedState(std::string _name, std::vector<std::string> _cmds);
+    MapValidatedState(const MapValidatedState& state);
     ~MapValidatedState();
 };
 
 class PlayersAddedState : public GameState { 
     public:
-    PlayersAddedState(std::string _stateID, std::vector<std::string> _cmds);
+    PlayersAddedState(std::string _name, std::vector<std::string> _cmds);
+    PlayersAddedState(const PlayersAddedState& state);
     ~PlayersAddedState();
 };
 
 class AssignReinforcementState : public GameState { 
     public:
-    AssignReinforcementState(std::string _stateID, std::vector<std::string> _cmds);
+    AssignReinforcementState(std::string _name, std::vector<std::string> _cmds);
+    AssignReinforcementState(const AssignReinforcementState& state);
     ~AssignReinforcementState();
 };
 
 class IssueOrdersState : public GameState { 
     public:
-    IssueOrdersState(std::string _stateID, std::vector<std::string> _cmds);
+    IssueOrdersState(std::string _name, std::vector<std::string> _cmds);
+    IssueOrdersState(const IssueOrdersState& state);
     ~IssueOrdersState();
 };
 
 class ExecuteOrdersState : public GameState { 
     public:
-    ExecuteOrdersState(std::string _stateID, std::vector<std::string> _cmds);
+    ExecuteOrdersState(std::string _name, std::vector<std::string> _cmds);
+    ExecuteOrdersState(const ExecuteOrdersState& state);
     ~ExecuteOrdersState();
 };
 
 class WinState : public GameState { 
     public:
-    WinState(std::string _stateID, std::vector<std::string> _cmds);
+    WinState(std::string _name, std::vector<std::string> _cmds);
+    WinState(const WinState& state);
     ~WinState();
 };
 
@@ -103,11 +116,15 @@ class GameEngine
 
     GameEngine();
     ~GameEngine();
+    GameEngine(const GameEngine& engine);
     GameEngine& operator=(GameEngine&& gameEngine);
+    void SetCommands();
     void Run();
     bool ExecuteCmd(std::string);
     void SetState(GameState* );
     void TransitionTo(GameState* );
+    friend std::ostream& operator<<(std::ostream& os, const GameEngine& engine);
+    GameEngine* clone();
 };
 
 #endif
