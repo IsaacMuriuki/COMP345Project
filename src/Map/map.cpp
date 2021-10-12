@@ -421,97 +421,102 @@ Map* MapLoader::loadMap(string filePath){
     // Create Map
     error = lines.empty();
 	if (!error) {
-		int continentId = 0;
-		int continentStart = -1;
-		int territoryStart = -1;
-		int borderStart = -1;
+		try {
+			int continentId = 0;
+			int continentStart = -1;
+			int territoryStart = -1;
+			int borderStart = -1;
 
-		for (int i = 0; i < lines.size(); i++)
-		{
-			if (lines[i].find("[continents]") != string::npos)
+			for (int i = 0; i < lines.size(); i++)
 			{
-				continentStart = (i + 1);
-				break;
+				if (lines[i].find("[continents]") != string::npos)
+				{
+					continentStart = (i + 1);
+					break;
+				}
 			}
-		}
 
-		// if [continents] does not exist, then the file is invalid
-		if (continentStart == -1)
-		{
+			// if [continents] does not exist, then the file is invalid
+			if (continentStart == -1)
+			{
+				return NULL;
+			}
+			
+			for (int i = continentStart; i < lines.size(); i++)
+			{
+				continentId++;
+				if (lines[i].find("[countries]") != string::npos)
+				{
+					territoryStart = (i + 1);
+					break;
+				} 
+				else if(lines[i].empty())
+				{
+					continue;
+				}
+				// create continents
+				vector<string> lineData = split(lines[i], ' ');
+				int id = continentId;
+				string name = lineData[0];
+				int armyValue = stoi(lineData[1]);
+				continents.push_back(new Continent(id, name, armyValue));
+			}
+
+			// if [territories] does not exist, then the file is invalid
+			if (territoryStart == -1)
+			{
+				return NULL;
+			}
+
+			for (int i = territoryStart; i < lines.size(); i++)
+			{
+				if (lines[i].find("[borders]") != string::npos)
+				{
+					borderStart = (i + 1);
+					break;
+				}
+				else if(lines[i].empty())
+				{
+					continue;
+				}
+				// create territories
+				vector<string> lineData = split(lines[i], ' ');
+				int id = stoi(lineData[0]);
+				string name = lineData[1];
+				Continent* continent = continents.at(stoi(lineData[2]) - 1);
+				territories.push_back(new Territory(id, name, continent));
+			}
+
+			// if [borders] does not exist, then the file is invalid
+			if (borderStart == -1)
+			{
+				return NULL;
+			}
+
+			for (int i = borderStart; i < lines.size(); i++)
+			{
+				if(lines[i].empty())
+				{
+					break;
+				}
+				// add adjacent territories to territories
+				vector<string> lineData = split(lines[i], ' ');
+				Territory* territory = territories.at(stoi(lineData[0]) - 1);
+				for(int i = 1; i < lineData.size(); i++){
+					int territoryId = stoi(lineData[i]);
+					Territory* adjacentTerritory = territories.at(territoryId - 1);
+					territory->addAdjacentTerritory(adjacentTerritory);
+				}
+				// add territores to continents
+				continents.at(territory->getContinent()->getId() - 1)->addTerritory(territory);
+			}
+
+			_map = new Map(territories, continents);
+			return _map;
+		}
+		catch( const std::invalid_argument&) {
 			return NULL;
 		}
-		
-		for (int i = continentStart; i < lines.size(); i++)
-		{
-			continentId++;
-			if (lines[i].find("[countries]") != string::npos)
-			{
-				territoryStart = (i + 1);
-				break;
-			} 
-			else if(lines[i].empty())
-			{
-				continue;
-			}
-			// create continents
-			vector<string> lineData = split(lines[i], ' ');
-			int id = continentId;
-			string name = lineData[0];
-			int armyValue = stoi(lineData[1]);
-			continents.push_back(new Continent(id, name, armyValue));
-		}
-
-		// if [territories] does not exist, then the file is invalid
-		if (territoryStart == -1)
-		{
-			return NULL;
-		}
-
-		for (int i = territoryStart; i < lines.size(); i++)
-		{
-			if (lines[i].find("[borders]") != string::npos)
-			{
-				borderStart = (i + 1);
-				break;
-			}
-			else if(lines[i].empty())
-			{
-				continue;
-			}
-            // create territories
-			vector<string> lineData = split(lines[i], ' ');
-            int id = stoi(lineData[0]);
-			string name = lineData[1];
-            Continent* continent = continents.at(stoi(lineData[2]) - 1);
-            territories.push_back(new Territory(id, name, continent));
-		}
-
-		// if [borders] does not exist, then the file is invalid
-		if (borderStart == -1)
-		{
-			return NULL;
-		}
-
-		for (int i = borderStart; i < lines.size(); i++)
-		{
-			if(lines[i].empty())
-			{
-				break;
-			}
-			// add adjacent territories to territories
-			vector<string> lineData = split(lines[i], ' ');
-            Territory* territory = territories.at(stoi(lineData[0]) - 1);
-            for(int i = 1; i < lineData.size(); i++){
-                int territoryId = stoi(lineData[i]);
-                Territory* adjacentTerritory = territories.at(territoryId - 1);
-                territory->addAdjacentTerritory(adjacentTerritory);
-            }
-			// add territores to continents
-			continents.at(territory->getContinent()->getId() - 1)->addTerritory(territory);
-		}
-
-        _map = new Map(territories, continents);
-		return _map;
 	}
 
     return NULL;
