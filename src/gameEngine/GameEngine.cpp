@@ -180,7 +180,7 @@ std::ostream& operator<<(std::ostream& os, const GameEngine& engine)
 
 // GameState class definition
 
-GameState::GameState(std::string _name = "gamestate"){
+GameState::GameState(std::string _name){
     name = _name;
 }
 

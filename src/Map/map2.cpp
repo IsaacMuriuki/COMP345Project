@@ -80,6 +80,8 @@ int Territory::getUnits() { return this->_units; }
 
 Player* Territory::getOwner() { return this->_owner; }
 
+vector<Territory*> Territory::getAdjacentTerritories() { return this->_adjacentTerritories; }
+
 void Territory::setUnits(int units) { this->_units = units; }
 
 void Territory::setOwner(Player* owner) { this->_owner = owner; }
@@ -179,9 +181,11 @@ Map::Map(vector<Territory*> territories, vector<Continent*> continents){
 
 Map::~Map(){
     for ( int i = 0; i < _territories.size(); i++ ) {
+		delete _territories[i];
         _territories[i] = NULL;
     }
 	for ( int i = 0; i < _continents.size(); i++ ) {
+		delete _continents[i];
         _continents[i] = NULL;
     }
 }
@@ -228,9 +232,100 @@ Territory* Map::findTerritory(int id){
 	return NULL;
 }
 
+Territory* Map::findTerritory(int territoryId, int continentId){
+	Continent* continent = findContinent(continentId);
+	if(continent == NULL)
+		return NULL;
+	vector<Territory*> territories = continent->getTerritories();
+	for (size_t i = 0; i < territories.size(); i++)
+	{
+		if ( territories[i]->getId() == territoryId)
+			return territories[i];
+	}
+	return NULL;
+}
+
 bool Map::validate(){
+	// 1) Check if map is connected
+
+	// do for all territories
+	for (size_t i = 0; i < _territories.size(); i++) {
+		// initialize visited
+		vector<bool> visited(_territories.size()); 
+		// start dfs from first territory
+		dfs(i, visited);
+		// if dfs doesn't visit all territories, then map is invalid
+		if (find(visited.begin(), visited.end(), false) != visited.end()) {
+            return false;
+        }
+	}
+
+	// 2) Check if all continents are a connected subgraph
+
+	// do for all continents
+	for (size_t i = 0; i < _continents.size(); i++) {
+		// get subgraph of continent
+		vector<Territory*> subgraph = _continents.at(i)->getTerritories();
+		// do for all territories in subgraph
+		for(size_t j = 0; j < subgraph.size(); j++){
+			// initialize visited
+			vector<bool> visited(subgraph.size()); 
+			// start dfs from first territory
+			dfs(subgraph, j, visited);
+			// if dfs doesn't visit all territories of continent, then map is invalid
+			if (find(visited.begin(), visited.end(), false) != visited.end()) {
+				return false;
+			}
+		}
+	}
+
+	// 3) each territory belongs to one continent
+
+	for (size_t i = 0; i < _territories.size(); i++) {
+		int id = _territories.at(i)->getId();
+		Continent* continentOfTerritory = _territories.at(i)->getContinent();
+		// check if any continent owns this territory other than the one assigned to it
+		for (size_t j = 0; j < _continents.size(); j++){
+			Continent* continent = _continents.at(j);
+			if((*continentOfTerritory) == (*continent)) {
+				continue;
+			}
+			if(findTerritory(id, continent->getId()) != NULL){
+				return false;
+			}
+		}
+	}
 
 	return true;
+}
+
+void Map::dfs(int indexOfTerritory, vector<bool> &visited){
+	visited[indexOfTerritory] = true;
+	vector<Territory*> adjTerritories = _territories.at(indexOfTerritory)->getAdjacentTerritories();
+	vector<Territory*>::iterator i;
+	// process all adjacent territories that are not visited yet
+	for(i = adjTerritories.begin(); i != adjTerritories.end(); ++i){
+		if(!visited[(*i)->getId() - 1]) {
+			dfs((*i)->getId() - 1, visited);
+		}
+	} 
+}
+
+void Map::dfs(vector<Territory*> subgraph, int indexOfTerritory, vector<bool> &visited){
+	visited[indexOfTerritory] = true;
+	vector<Territory*> adjTerritories = subgraph.at(indexOfTerritory)->getAdjacentTerritories();
+	vector<Territory*>::iterator i;
+	// process all adjacent territories that are not visited yet
+	for(i = adjTerritories.begin(); i != adjTerritories.end(); ++i){
+		// skip territories not in continent
+		auto it = find(subgraph.begin(), subgraph.end(), (*i));
+		if(it != subgraph.end()){
+			int indexOfAdjTerritory = it - subgraph.begin();
+			if(!visited[indexOfAdjTerritory]) {
+				dfs(subgraph, indexOfAdjTerritory, visited);
+			}
+		}
+	} 
 }
 
 // MAPLOADER
@@ -238,20 +333,15 @@ bool Map::validate(){
 MapLoader::MapLoader(){
     this->_filePath = "";
     this->_map = new Map();
-    this->_territories = vector<Territory*>();
 }
 
 MapLoader::~MapLoader(){
-    delete _map; _map = NULL;
-    for ( int i = 0; i < _territories.size(); i++ ) {
-       delete _territories[i];  _territories[i] = NULL;
-    }
+    _map = NULL;
 }
 
 MapLoader::MapLoader(const MapLoader& mapLoader){
     this->_filePath = mapLoader._filePath;
     this->_map = mapLoader._map;
-    this->_territories = mapLoader._territories;
 }
 
 Map* MapLoader::loadMap(string filePath){
@@ -344,8 +434,6 @@ Map* MapLoader::loadMap(string filePath){
             Continent* continent = continents.at(stoi(lineData[2]) - 1);
             Territory* territory = new Territory(id, name, continent, 0);
             territories.push_back(new Territory(id, name, continent, 0));
-            // add created territores to continents
-            continents.at(stoi(lineData[2]) - 1)->addTerritory(territory);
 		}
 
 		// if [borders] does not exist, then the file is invalid
@@ -369,6 +457,8 @@ Map* MapLoader::loadMap(string filePath){
                 Territory* adjacentTerritory = territories.at(territoryId - 1);
                 territory->addAdjacentTerritory(adjacentTerritory);
             }
+			// add territores to continents
+			continents.at(territory->getContinent()->getId() - 1)->addTerritory(territory);
 		}
 
         _map = new Map(territories, continents);
