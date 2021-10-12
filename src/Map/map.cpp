@@ -1,266 +1,475 @@
-/*
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <map>
 #include "map.h"
-
-using namespace std;
 
 // TERRITORY
 
-Territory::Territory() : id(0), name(""), continent(""), numArmies(0) {}
-
-Territory::Territory(int id, string name, string continent, int numArmies) : id(id), name(name), continent(continent), numArmies(numArmies) {}
-
-int Territory::getId() { return id; }
-
-string Territory::getName() { return name; }
-
-string Territory::getContinent() { return continent; }
-
-int Territory::getNumArmies() { return numArmies; }
-
-Player Territory::getPlayer() { return player; }
-
-void Territory::setNumArmies(int numArmies) { this->numArmies = numArmies; }
-
-void Territory::setPlayer(Player player) { this->player = player; }
-
-bool Territory::operator==(Territory territory)const
-{
-	return this->name == territory.name;
+Territory::Territory() {
+   this->_id = 0;
+   this->_name = "";
+   this->_continent = new Continent();
+   this->_units = 0;
+   this->_owner = new Player();
+   this->_adjacentTerritories = vector<Territory*>();
 }
 
-std::ostream& operator<< (std::ostream& stream, Territory territory)
-{
-    return stream << "Name: " << territory.getName() << endl <<
-                  "Continent: " << territory.getContinent() << endl <<
-                  "Number of armies: " << territory.getNumArmies() << endl;
+Territory::Territory(int id, string name, Continent* continent, int units) {
+    this->_id = id;
+    this->_name = name;
+    this->_continent = new Continent(*continent);
+    this->_units = units;
+    this->_owner = new Player();
+    this->_adjacentTerritories = vector<Territory*>();
 }
 
-// NODE
-
-Node::Node() : territory(), adjList(vector<Node *>()), visited(false) {}
-
-Node::Node(Territory territory) : territory(territory), adjList(vector<Node *>()), visited(false) {}
-
-Node::Node(Territory territory, vector<Node *> adjList) : territory(territory), adjList(adjList), visited(false) {}
-
-Territory Node::getTerritory() { return territory; }
-
-vector<Node *> Node::getAdjList() { return adjList; }
-
-Territory* Node::getPointerToTerritory() const { return const_cast<Territory*>(&territory); }
-
-void Node::setAdjList(vector<Node *> newAdjList) {
-    if (!adjList.empty())
-        adjList.clear();
-    for (size_t i = 0; i < newAdjList.size(); i++) {
-        adjList.push_back(newAdjList[i]);
+Territory::~Territory(){
+    delete _continent; _continent = NULL;
+    delete _owner; _owner = NULL;
+    for ( int i = 0; i < _adjacentTerritories.size(); i++ ) {
+        _adjacentTerritories[i] = NULL;
     }
 }
 
-void Node::setVisited(bool visisted) { this->visited = visited; }
-
-bool Node::isVisited() { return visited; }
-
-// Method used to add a pointer to a node to the adjacency list of this node
-void Node::addNode(Node *node)
-{
-	for (size_t i = 0; i < adjList.size(); i++)
-	{
-		// Avoid duplicates
-		if (adjList[i]->getTerritory() == node ->getTerritory())
-			return;
-	}
-	this->adjList.push_back(node);
+Territory::Territory(const Territory& territory){
+    this->_id = territory._id;
+    this->_name = territory._name;
+    this->_continent = territory._continent;
+    this->_units = territory._units;
+    this->_owner = territory._owner;
+    this->_adjacentTerritories = territory._adjacentTerritories;
 }
 
-bool operator<(const Node &lhs, const Node &rhs){
-	return lhs.getPointerToTerritory()->getNumArmies() < rhs.getPointerToTerritory()->getNumArmies();
+Territory& Territory::operator=(const Territory& territory){
+	this->_id = territory._id;
+    this->_name = territory._name;
+    this->_continent = territory._continent;
+    this->_units = territory._units;
+    this->_owner = territory._owner;
+    this->_adjacentTerritories = territory._adjacentTerritories;
+
+    return *this;
 }
 
-std::ostream& operator << (std::ostream& stream, Node& node)
-{
-	stream << "Info of the node:\n" << node.getTerritory() << endl;
-	stream << "Adjacent nodes: ";
-    for (int i = 0; i < node.adjList.size(); i++) 
-    {
-        stream << node.adjList[i]->getTerritory().getName();
-        if (i < node.adjList.size() - 1)
-            stream << " -> ";
-    }
-    stream << "\n";
+bool Territory::operator==(const Territory& territory){
+	return this->_id == territory._id;
+}
+
+std::ostream& operator<<(std::ostream& stream, const Territory& territory){
+    stream << "Name: " << territory._name << endl <<
+                  "Continent: " << territory._continent->getName() << endl <<
+                  "Number of units: " << territory._units << endl <<
+                  "Owned by: " << territory._owner->getName() << endl; 
     return stream;
 }
 
+void Territory::addAdjacentTerritory(Territory* territory){
+    for (size_t i = 0; i < _adjacentTerritories.size(); i++)
+	{
+		// Avoid duplicates
+		if ( _adjacentTerritories[i] == territory)
+			return;
+	}
+	this->_adjacentTerritories.push_back(territory);
+}
+
+int Territory::getId() { return this->_id; }
+
+string Territory::getName() { return this->_name; }
+
+Continent* Territory::getContinent() { return this->_continent; }
+
+int Territory::getUnits() { return this->_units; }
+
+Player* Territory::getOwner() { return this->_owner; }
+
+vector<Territory*> Territory::getAdjacentTerritories() { return this->_adjacentTerritories; }
+
+void Territory::setUnits(int units) { this->_units = units; }
+
+void Territory::setOwner(Player* owner) { this->_owner = owner; }
 
 // CONTINENT
 
-Continent::Continent(): id(0), name(""), armyValue(0), nodesInContinent(vector<Node*>()) {}
-
-Continent::Continent(int id, string name, int armyValue): id(id), name(name), armyValue(armyValue), nodesInContinent(vector<Node*>()) {}
-
-int Continent::getId() { return id; }
-
-string Continent::getName() { return name; }
-
-int Continent::getArmyValue() { return armyValue; }
-
-vector<Node*>* Continent::getNodesInContinent() { return &nodesInContinent; }
-
-void Continent::addNode(Node* node)
-{
-	nodesInContinent.push_back(node);
+Continent::Continent(){
+    this->_id = 0;
+    this->_name = "";
+    this->_armyValue = 0;
+    this->_territories = vector<Territory*>();
 }
 
-std::ostream& operator << (std::ostream& stream, Continent& continent)
-{
-	stream << "Continent name: " << continent.getName() << ":\n";
-	stream << "Army value: " << continent.getArmyValue() << endl;
-	stream << "Number of countries: " << continent.getNodesInContinent()->size() << endl;
+Continent::Continent(int id, string name, int armyValue){
+    this->_id = id;
+    this->_name = name;
+    this->_armyValue = armyValue;
+    this->_territories = vector<Territory*>();
+}
+
+Continent::~Continent(){
+    for ( int i = 0; i < _territories.size(); i++ ) {
+        _territories[i] = NULL;
+    }
+}
+
+Continent::Continent(const Continent& continent){
+    this->_id = continent._id;
+    this->_name = continent._name;
+    this->_armyValue = continent._armyValue;
+    this->_territories = continent._territories;
+}
+
+Continent& Continent::operator=(const Continent& continent){
+	this->_id = continent._id;
+    this->_name = continent._name;
+    this->_armyValue = continent._armyValue;
+    this->_territories = continent._territories;
+
+    return *this;
+}
+
+bool Continent::operator==(const Continent& continent){
+	return this->_id == continent._id;
+}
+
+std::ostream& operator<< (std::ostream& stream, const Continent& continent){
+    stream << "Continent name: " << continent._name << ":\n";
+	stream << "Army value: " << continent._armyValue << endl;
+	stream << "Number of countries: " << continent._territories.size() << endl;
 	stream << "List of territories:\n";
-	for (size_t i = 0; i < continent.getNodesInContinent()->size(); i++) {
-		stream << "\t" << (*continent.getNodesInContinent())[i]->getTerritory().getName() << endl;
+	for (size_t i = 0; i < continent._territories.size(); i++) {
+		stream << "\t" << continent._territories[i] << endl;
 	}
 	stream << endl;
 	return stream;
 }
 
+void Continent::addTerritory(Territory* territory){
+    for (size_t i = 0; i < _territories.size(); i++)
+	{
+		// Avoid duplicates
+		if ( _territories[i] == territory)
+			return;
+	}
+	this->_territories.push_back(territory);
+}
+
+Territory* Continent::findTerritory(int id){
+	for (size_t i = 0; i < _territories.size(); i++)
+	{
+		if ( _territories[i]->getId() == id)
+			return _territories[i];
+	}
+	return NULL;
+}
+
+int Continent::getId() { return this->_id; }
+
+string Continent::getName() { return this->_name; }
+
+int Continent::getArmyValue() { return this->_armyValue; }
+
+vector<Territory *> Continent::getTerritories() { return this->_territories; }
 
 // MAP
 
-Map::Map() : numVertices(0) { }
-
-Map::Map(int numVertices, vector<Node>& nodes) : numVertices(numVertices)
-{
-	// If num vertices not equal to the number of nodes being added,
-	// something went wrong and so the the vectorOfNodes object will not be set.
-	try {
-		if (numVertices != nodes.size())
-			throw new exception;
-		vectorOfNodes = nodes;
-	}
-	catch (const exception& e) {
-		cout << "The number of nodes in the node vector is not as expected." << endl;
-	}
+Map::Map(){
+    this->_territories = vector<Territory*>();
+	this->_continents = vector<Continent*>();
 }
 
-vector<Node*>* Map::getVectorOfNodes()
-{
-	vector<Node*>* nodes = new vector<Node*>();
-	for(int i = 0; i < numVertices; i++)
-	{
-		nodes->push_back(&vectorOfNodes[i]);
-	}
-	return nodes;
+Map::Map(vector<Territory*> territories, vector<Continent*> continents){
+    this->_territories = territories;
+	this->_continents = continents;
 }
 
-int Map::getNumTerritories() { return numVertices; };
-
-void Map::addNode(Node& node)
-{
-	vectorOfNodes.push_back(node);
-	numVertices = vectorOfNodes.size();
-}
-
-// Add edge between two nodes in the map
-void Map::addEdge(Node *node1, Node *node2)
-{
-	for (size_t i = 0; i < vectorOfNodes.size(); i++)
-	{
-		if (vectorOfNodes[i].getPointerToTerritory()->getName() == node1->getPointerToTerritory()->getName())
-		{
-			vectorOfNodes[i].addNode(node2);
-		}
-		if (vectorOfNodes[i].getPointerToTerritory()->getName() == node2->getPointerToTerritory()->getName())
-		{
-			vectorOfNodes[i].addNode(node1);
-		}
-	}
-}
-
-
-bool Map::areConnectedByEdge(Node* node1, Node* node2) {
-    for (int i = 0; i < node1->getAdjList().size(); i++) {
-        if (node1->getAdjList()[i] == node2)
-            return true;
+Map::~Map(){
+    for ( int i = 0; i < _territories.size(); i++ ) {
+		delete _territories[i];
+        _territories[i] = NULL;
     }
-    return false;
+	for ( int i = 0; i < _continents.size(); i++ ) {
+		delete _continents[i];
+        _continents[i] = NULL;
+    }
 }
 
-// Valdiate map
+Map::Map(const Map& map){
+    this->_territories = map._territories;
+	this->_continents = map._continents;
+}
+
+Map& Map::operator=(const Map& map){
+    this->_territories = map._territories;
+	this->_continents = map._continents;
+
+    return *this;
+}
+
+std::ostream& operator<<(std::ostream& stream, const Map& map){
+    stream << "\nInfo of map:" << endl;
+	stream << "List of territories:" << endl;
+	for (size_t i = 0; i < map._territories.size(); i++)
+	{
+        Territory* t = map._territories[i];
+		stream << *t << "\n";
+	}
+	stream << endl;
+	return stream;
+}
+
+Continent* Map::findContinent(int id){
+	for (size_t i = 0; i < _continents.size(); i++)
+	{
+		if ( _continents[i]->getId() == id)
+			return _continents[i];
+	}
+	return NULL;
+}
+
+Territory* Map::findTerritory(int id){
+	for (size_t i = 0; i < _territories.size(); i++)
+	{
+		if ( _territories[i]->getId() == id)
+			return _territories[i];
+	}
+	return NULL;
+}
+
+Territory* Map::findTerritory(int territoryId, int continentId){
+	Continent* continent = findContinent(continentId);
+	if(continent == NULL)
+		return NULL;
+	vector<Territory*> territories = continent->getTerritories();
+	for (size_t i = 0; i < territories.size(); i++)
+	{
+		if ( territories[i]->getId() == territoryId)
+			return territories[i];
+	}
+	return NULL;
+}
+
 bool Map::validate(){
-	if(! isMapConnected()){
+	if(_territories.empty() || _continents.empty()){
 		return false;
-	} 
-	return true;
-}
+	}
 
-// Returns false if visitAdjacentNodes() fails to visit all nodes, meanings it's not connected.
-// Used for validating a map.
-bool Map::isMapConnected()
-{
-	bool mapIsConnected = true;
-    if(vectorOfNodes.empty())
-        return false;
-    vector<Node *> initialAdjListNode = vectorOfNodes[0].getAdjList();
+	// 1) Check if map is connected
 
-    if (initialAdjListNode.empty())
-        return false;
-
-	visitAdjacentNodes(initialAdjListNode);
-
-    for (size_t i = 0; i < vectorOfNodes.size(); i++) {
-        if (!vectorOfNodes[i].isVisited()) {
-            mapIsConnected = false;
-            break;
+	// do for all territories
+	for (size_t i = 0; i < _territories.size(); i++) {
+		// initialize visited
+		vector<bool> visited(_territories.size()); 
+		// start dfs from first territory
+		dfs(i, visited);
+		// if dfs doesn't visit all territories, then map is invalid
+		if (find(visited.begin(), visited.end(), false) != visited.end()) {
+            return false;
         }
-    }
-    // Reinitialize visisted
-    for (size_t i = 0; i < vectorOfNodes.size(); i++) {
-        vectorOfNodes[i].setVisited(false);
-    }
-    return mapIsConnected;
-}
+	}
 
-// Helper method used for DFS
-void Map::visitAdjacentNodes(vector<Node*> adjListNode)
-{
-	if (!adjListNode.empty())
-	{
-		for (size_t i = 0; i < adjListNode.size(); i++)
-		{
-			if (!adjListNode[i]->isVisited())
-			{
-				for (size_t j = 0; j < vectorOfNodes.size(); j++)
-				{
-					if (adjListNode[i]->getTerritory() == vectorOfNodes[j].getTerritory())
-					{
-						if (!vectorOfNodes[j].isVisited())
-						{
-							vectorOfNodes[j].setVisited(true);
-							visitAdjacentNodes(vectorOfNodes[j].getAdjList());
-						}
-					}
-				}
+	// 2) Check if all continents are a connected subgraph
+
+	// do for all continents
+	for (size_t i = 0; i < _continents.size(); i++) {
+		// get subgraph of continent
+		vector<Territory*> subgraph = _continents.at(i)->getTerritories();
+		// do for all territories in subgraph
+		for(size_t j = 0; j < subgraph.size(); j++){
+			// initialize visited
+			vector<bool> visited(subgraph.size()); 
+			// start dfs from first territory
+			dfs(subgraph, j, visited);
+			// if dfs doesn't visit all territories of continent, then map is invalid
+			if (find(visited.begin(), visited.end(), false) != visited.end()) {
+				return false;
 			}
 		}
 	}
+
+	// 3) each territory belongs to one continent
+
+	for (size_t i = 0; i < _territories.size(); i++) {
+		int id = _territories.at(i)->getId();
+		Continent* continentOfTerritory = _territories.at(i)->getContinent();
+		// check if any continent owns this territory other than the one assigned to it
+		for (size_t j = 0; j < _continents.size(); j++){
+			Continent* continent = _continents.at(j);
+			if((*continentOfTerritory) == (*continent)) {
+				continue;
+			}
+			if(findTerritory(id, continent->getId()) != NULL){
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
-ostream& operator << (ostream& stream, Map& map)
-{
-	stream << "Info of this map:\n";
-	stream << "Number of vertices: " << map.numVertices << endl;
-	stream << "Array of nodes:\n";
-	for (size_t i = 0; i < map.vectorOfNodes.size(); i++)
-	{
-		stream << map.vectorOfNodes[i] << "\n";
+void Map::dfs(int indexOfTerritory, vector<bool> &visited){
+	visited[indexOfTerritory] = true;
+	vector<Territory*> adjTerritories = _territories.at(indexOfTerritory)->getAdjacentTerritories();
+	vector<Territory*>::iterator i;
+	// process all adjacent territories that are not visited yet
+	for(i = adjTerritories.begin(); i != adjTerritories.end(); ++i){
+		if(!visited[(*i)->getId() - 1]) {
+			dfs((*i)->getId() - 1, visited);
+		}
+	} 
+}
+
+void Map::dfs(vector<Territory*> subgraph, int indexOfTerritory, vector<bool> &visited){
+	visited[indexOfTerritory] = true;
+	vector<Territory*> adjTerritories = subgraph.at(indexOfTerritory)->getAdjacentTerritories();
+	vector<Territory*>::iterator i;
+	// process all adjacent territories that are not visited yet
+	for(i = adjTerritories.begin(); i != adjTerritories.end(); ++i){
+		// skip territories not in continent
+		auto it = find(subgraph.begin(), subgraph.end(), (*i));
+		if(it != subgraph.end()){
+			int indexOfAdjTerritory = it - subgraph.begin();
+			if(!visited[indexOfAdjTerritory]) {
+				dfs(subgraph, indexOfAdjTerritory, visited);
+			}
+		}
+	} 
+}
+
+// MAPLOADER
+
+MapLoader::MapLoader(){
+    this->_filePath = "";
+    this->_map = new Map();
+}
+
+MapLoader::~MapLoader(){
+    _map = NULL;
+}
+
+MapLoader::MapLoader(const MapLoader& mapLoader){
+    this->_filePath = mapLoader._filePath;
+    this->_map = mapLoader._map;
+}
+
+Map* MapLoader::loadMap(string filePath){
+
+    vector<Continent*> continents;
+    vector<Territory*> territories;
+    ifstream input;
+    bool error;
+
+    // Read lines
+	input.open(filePath.c_str());
+
+	if (!input) {
+		cout << "File " << filePath << " is invalid" << endl;
+		return new Map();
 	}
-	return stream;
+
+	vector<string> lines;
+	string line;
+	while (getline(input, line)) {
+		lines.push_back(line);
+	}
+
+    // Create Map
+    error = lines.empty();
+	if (!error) {
+		int continentId = 0;
+		int continentStart = -1;
+		int territoryStart = -1;
+		int borderStart = -1;
+
+		for (int i = 0; i < lines.size(); i++)
+		{
+			if (lines[i].find("[continents]") != string::npos)
+			{
+				continentStart = (i + 1);
+				break;
+			}
+		}
+
+		// if [continents] does not exist, then the file is invalid
+		if (continentStart == -1)
+		{
+			cout << "The file " << filePath << " is not a valid .map file." << endl;
+			return new Map();
+		}
+		
+		for (int i = continentStart; i < lines.size(); i++)
+		{
+			continentId++;
+			if (lines[i].find("[countries]") != string::npos)
+			{
+				territoryStart = (i + 1);
+				break;
+			} 
+			else if(lines[i].empty())
+			{
+				continue;
+			}
+			// create continents
+			vector<string> lineData = split(lines[i], ' ');
+			int id = continentId;
+			string name = lineData[0];
+			int armyValue = stoi(lineData[1]);
+			continents.push_back(new Continent(id, name, armyValue));
+		}
+
+		// if [territories] does not exist, then the file is invalid
+		if (territoryStart == -1)
+		{
+			cout << "The file " << filePath << " is not a valid .map file. We cannot create a Parser object." << endl;
+			return new Map();
+		}
+
+		for (int i = territoryStart; i < lines.size(); i++)
+		{
+			if (lines[i].find("[borders]") != string::npos)
+			{
+				borderStart = (i + 1);
+				break;
+			}
+			else if(lines[i].empty())
+			{
+				continue;
+			}
+            // create territories
+			vector<string> lineData = split(lines[i], ' ');
+            int id = stoi(lineData[0]);
+			string name = lineData[1];
+            Continent* continent = continents.at(stoi(lineData[2]) - 1);
+            Territory* territory = new Territory(id, name, continent, 0);
+            territories.push_back(new Territory(id, name, continent, 0));
+		}
+
+		// if [borders] does not exist, then the file is invalid
+		if (borderStart == -1)
+		{
+			cout << "The file " << filePath << " is not a valid .map file. We cannot create a Parser object." << endl;
+			return new Map();
+		}
+
+		for (int i = borderStart; i < lines.size(); i++)
+		{
+			if(lines[i].empty())
+			{
+				break;
+			}
+			// add adjacent territories to territories
+			vector<string> lineData = split(lines[i], ' ');
+            Territory* territory = territories.at(stoi(lineData[0]) - 1);
+            for(int i = 1; i < lineData.size(); i++){
+                int territoryId = stoi(lineData[i]);
+                Territory* adjacentTerritory = territories.at(territoryId - 1);
+                territory->addAdjacentTerritory(adjacentTerritory);
+            }
+			// add territores to continents
+			continents.at(territory->getContinent()->getId() - 1)->addTerritory(territory);
+		}
+
+        _map = new Map(territories, continents);
+		return _map;
+	}
+
+    return new Map();
 }
 
 // SPLIT() FUNCTION from https://stackoverflow.com/questions/236129/how-do-i-iterate-over-the-words-of-a-string
@@ -279,145 +488,3 @@ vector<string> split(const string &s, char delim) {
 	split(s, delim, back_inserter(elems));
 	return elems;
 }
-
-
-// MAPLOADER
-
-MapLoader::MapLoader() : fileName(""){}
-
-MapLoader::MapLoader(string fileName) : fileName(fileName) {}
-
-vector<string> MapLoader::readLines() {
-	ifstream input;
-	input.open(fileName.c_str());
-
-	if (!input) {
-		cout << "File " << fileName << " is invalid" << endl;
-		return vector<string>();
-	}
-
-	vector<string> lines;
-	string line;
-	while (getline(input, line)) {
-		lines.push_back(line);
-	}
-
-	return lines;
-}
-
-void MapLoader::loadMap(vector<string> lines) {
-	nodes = new vector<Node>;
-	continents = new vector<Continent*>;
-
-	error = lines.empty();
-	if (!error) {
-		int continentId = 0;
-		int continentStart = -1;
-		int territoryStart = -1;
-		int borderStart = -1;
-
-		for (int i = 0; i < lines.size(); i++)
-		{
-			if (lines[i].find("[continents]") != std::string::npos)
-			{
-				continentStart = (i + 1);
-				break;
-			}
-		}
-
-		// if [continents] does not exist, then the file is invalid
-		if (continentStart == -1)
-		{
-			cout << "The file " << fileName << " is not a valid .map file." << endl;
-			return;
-		}
-		
-		for (int i = continentStart; i < lines.size(); i++)
-		{
-			continentId++;
-			if (lines[i].find("[countries]") != std::string::npos)
-			{
-				territoryStart = (i + 1);
-				break;
-			} 
-			else if(lines[i].empty())
-			{
-				continue;
-			}
-			// create continents
-			vector<string> lineData = split(lines[i], ' ');
-			int id = continentId;
-			string name = lineData[0];
-			int armyValue = stoi(lineData[1]);
-			continents->push_back(new Continent(id, name, armyValue));
-		}
-		// if [territories] does not exist, then the file is invalid
-		if (territoryStart == -1)
-		{
-			cout << "The file " << fileName << " is not a valid .map file. We cannot create a Parser object." << endl;
-			return;
-		}
-
-		for (int i = territoryStart; i < lines.size(); i++)
-		{
-			if (lines[i].find("[borders]") != std::string::npos)
-			{
-				borderStart = (i + 1);
-				break;
-			}
-			else if(lines[i].empty())
-			{
-				continue;
-			}
-
-			vector<string> lineData = split(lines[i], ' ');
-			string continentName;
-			vector<Continent*>::iterator iter;
-			for( iter = continents->begin(); iter != continents->end(); ++iter){
-				if((*iter)->getId() == stoi(lineData[2])){
-					continentName = (*iter)->getName();
-					// create territory nodes
-					Node n = Node(Territory(stoi(lineData[0]), lineData[1], continentName, 0));
-					nodes->push_back(n);
-					// add territory to their continent
-					(*iter)->addNode(&n);
-				}
-			}
-		}
-
-		// if [borders] does not exist, then the file is invalid
-		if (borderStart == -1)
-		{
-			cout << "The file " << fileName << " is not a valid .map file. We cannot create a Parser object." << endl;
-			return;
-		}
-
-		for (int i = borderStart; i < lines.size(); i++)
-		{
-			if(lines[i].empty())
-			{
-				break;
-			}
-			// add adjacent nodes to created nodes
-			vector<string> lineData = split(lines[i], ' ');
-			vector<Node>::iterator iter;
-			for( iter = nodes->begin(); iter != nodes->end(); ++iter){
-				if((iter)->getTerritory().getId() == stoi(lineData[0])){
-					for(int i = 1; i < lineData.size(); i++){
-						int territoryId = stoi(lineData[i]);
-						Node element = nodes->at(territoryId - 1);
-						(iter)->addNode(&element);
-					}
-				}
-			}
-		}
-
-		// create game Map
-		gameMap = new Map(nodes->size(), *nodes);
-	}
-}
-
-Map* MapLoader::getMap() { return gameMap; }
-
-vector<Continent*>* MapLoader::getContinents() { return continents; }
-*/
