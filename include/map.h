@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include "player.h"
+#include "Player.h"
 using namespace std;
 
 class Continent;
@@ -23,7 +23,7 @@ private:
 
 public:
     Territory();
-    Territory(int id, string name, Continent* continent, int units);
+    Territory(int id, string name, Continent* continent);
     ~Territory();
     Territory(const Territory& territory);
     Territory& operator=(const Territory &territory);
@@ -168,7 +168,7 @@ public:
     friend std::ostream &operator<<(std::ostream &stream, const Map& map);
 
     /**
-     * Finds a continent within the by id.
+     * Finds a continent in the map by id.
      * 
      * @param id the id of the continent to find.
      * @return the continent if found; NULL otherwise.
@@ -193,9 +193,9 @@ public:
     Territory* findTerritory(int territoryId, int continentId);
 
     /**
-     * Checks if the order is valid.
+     * Checks if the map is valid.
      * 
-     * @return true if not execute and valid; false otherwise.
+     * @return true if map is valid; false otherwise.
      **/
     bool validate();
 

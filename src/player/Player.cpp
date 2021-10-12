@@ -130,7 +130,7 @@ vector<Territory*> Player::toAttack(){
 // Asks the user for input on which order to create, and creates the corresponding order objects and adds it to the player's ordersList
 void Player::issueOrder() {
     string orders = "List of possible orders to be made: \n 1. Deploy\n 2. Advance\n 3. Bomb\n 4. Blockade\n 5. Airlift\n 6. Negotiate\n 7. Stop issuing orders\n ";
-    int orderNumber;
+    int orderNumber = 0;
 
     while(orderNumber != 7) {
         std::cout << orders << std::endl;
@@ -222,8 +222,6 @@ void Player::addOrder(Order *order) { ordersList->add(order);}
 
 void Player::addTerritory(Territory *territory) { territories.push_back(territory);}
 
-string Player::getName() { return this->name;}
-
 vector<Territory *> Player::getTerritories() { return this->territories;}
 
 OrdersList* Player::getOrdersList() { return this->ordersList;}
@@ -235,3 +233,5 @@ void Player::setTerritories(vector<Territory *> territories) { this->territories
 void Player::setOrders(OrdersList* ordersList) { this->ordersList = new OrdersList(*ordersList);}
 
 void Player::setHandOfCards(Hand* handOfCards) { this->handOfCards = new Hand(*handOfCards);}
+
+string Player::getName()  { return this->name;}

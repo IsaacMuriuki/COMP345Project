@@ -1,21 +1,19 @@
-#include "map.h"
-
-// TERRITORY
+#include "Map.h"
 
 Territory::Territory() {
    this->_id = 0;
    this->_name = "";
    this->_continent = new Continent();
    this->_units = 0;
-   this->_owner = new Player();
+   this->_owner = NULL;
    this->_adjacentTerritories = vector<Territory*>();
 }
 
-Territory::Territory(int id, string name, Continent* continent, int units) {
+Territory::Territory(int id, string name, Continent* continent) {
     this->_id = id;
     this->_name = name;
     this->_continent = new Continent(*continent);
-    this->_units = units;
+    this->_units = 0;
     this->_owner = new Player();
     this->_adjacentTerritories = vector<Territory*>();
 }
@@ -60,6 +58,11 @@ std::ostream& operator<<(std::ostream& stream, const Territory& territory){
     return stream;
 }
 
+/**
+ * Adds a territory to the list of territories adjacent to this one.
+ * 
+ * @param territory the adjacent territory.
+ **/
 void Territory::addAdjacentTerritory(Territory* territory){
     for (size_t i = 0; i < _adjacentTerritories.size(); i++)
 	{
@@ -128,18 +131,21 @@ bool Continent::operator==(const Continent& continent){
 	return this->_id == continent._id;
 }
 
-std::ostream& operator<< (std::ostream& stream, const Continent& continent){
-    stream << "Continent name: " << continent._name << ":\n";
+std::ostream& operator<<(std::ostream& stream, const Continent& continent){
+    stream << "Continent name: " << continent._name << endl;
 	stream << "Army value: " << continent._armyValue << endl;
-	stream << "Number of countries: " << continent._territories.size() << endl;
 	stream << "List of territories:\n";
 	for (size_t i = 0; i < continent._territories.size(); i++) {
-		stream << "\t" << continent._territories[i] << endl;
+		stream << continent._territories[i]->getName() << endl;
 	}
-	stream << endl;
 	return stream;
 }
 
+/**
+ * Adds a territory to the list of territories on this continent.
+ * 
+ * @param territory the territory.
+ **/
 void Continent::addTerritory(Territory* territory){
     for (size_t i = 0; i < _territories.size(); i++)
 	{
@@ -150,6 +156,12 @@ void Continent::addTerritory(Territory* territory){
 	this->_territories.push_back(territory);
 }
 
+/**
+ * Finds a territory within this continent by id.
+ * 
+ * @param id the id of the territory to find.
+ * @return the territory if found; NULL otherwise.
+ **/
 Territory* Continent::findTerritory(int id){
 	for (size_t i = 0; i < _territories.size(); i++)
 	{
@@ -203,17 +215,18 @@ Map& Map::operator=(const Map& map){
 }
 
 std::ostream& operator<<(std::ostream& stream, const Map& map){
-    stream << "\nInfo of map:" << endl;
-	stream << "List of territories:" << endl;
-	for (size_t i = 0; i < map._territories.size(); i++)
-	{
-        Territory* t = map._territories[i];
-		stream << *t << "\n";
-	}
-	stream << endl;
+    stream << "Info of map:" << endl;
+	stream << "Number of territories: " << map._territories.size() << endl;
+	stream << "Number of continents: " << map._continents.size() << endl;
 	return stream;
 }
 
+/**
+ * Finds a continent in the map by id.
+ * 
+ * @param id the id of the continent to find.
+ * @return the continent if found; NULL otherwise.
+ **/
 Continent* Map::findContinent(int id){
 	for (size_t i = 0; i < _continents.size(); i++)
 	{
@@ -223,6 +236,12 @@ Continent* Map::findContinent(int id){
 	return NULL;
 }
 
+/**
+ * Finds a territory in the map by id.
+ * 
+ * @param id the id of the territory to find.
+ * @return the territory if found; NULL otherwise.
+ **/
 Territory* Map::findTerritory(int id){
 	for (size_t i = 0; i < _territories.size(); i++)
 	{
@@ -232,6 +251,13 @@ Territory* Map::findTerritory(int id){
 	return NULL;
 }
 
+/**
+ * Finds a territory on a specific continent in the map by id.
+ * 
+ * @param territoryId the id of the territory to find.
+ * @param continentId the id of the continent to find in.
+ * @return the territory if found; NULL otherwise.
+ **/
 Territory* Map::findTerritory(int territoryId, int continentId){
 	Continent* continent = findContinent(continentId);
 	if(continent == NULL)
@@ -245,6 +271,11 @@ Territory* Map::findTerritory(int territoryId, int continentId){
 	return NULL;
 }
 
+/**
+ * Checks if the map is valid.
+ * 
+ * @return true if map is valid; false otherwise.
+ **/
 bool Map::validate(){
 	if(_territories.empty() || _continents.empty()){
 		return false;
@@ -303,6 +334,12 @@ bool Map::validate(){
 	return true;
 }
 
+/**
+ * Performs DFS traversal on class member _territories.
+ * 
+ * @param indexOfTerritory index of starting territory.
+ * @param visited keeps track if whether territories are visited or not.
+ **/
 void Map::dfs(int indexOfTerritory, vector<bool> &visited){
 	visited[indexOfTerritory] = true;
 	vector<Territory*> adjTerritories = _territories.at(indexOfTerritory)->getAdjacentTerritories();
@@ -315,6 +352,13 @@ void Map::dfs(int indexOfTerritory, vector<bool> &visited){
 	} 
 }
 
+/**
+ * Performs DFS traversal on a specific subgraph.
+ * 
+ * @param subgraph the subgraph.
+ * @param indexOfTerritory index of starting territory.
+ * @param visited keeps track if whether territories are visited or not.
+ **/
 void Map::dfs(vector<Territory*> subgraph, int indexOfTerritory, vector<bool> &visited){
 	visited[indexOfTerritory] = true;
 	vector<Territory*> adjTerritories = subgraph.at(indexOfTerritory)->getAdjacentTerritories();
@@ -348,6 +392,12 @@ MapLoader::MapLoader(const MapLoader& mapLoader){
     this->_map = mapLoader._map;
 }
 
+/**
+ * Creates a Map object from loading a map file.
+ * 
+ * @param filePath the path to the map file.
+ * @return the created map object if the file is valid, NULL otherwise.
+ **/
 Map* MapLoader::loadMap(string filePath){
 
     vector<Continent*> continents;
@@ -359,8 +409,7 @@ Map* MapLoader::loadMap(string filePath){
 	input.open(filePath.c_str());
 
 	if (!input) {
-		cout << "File " << filePath << " is invalid" << endl;
-		return new Map();
+		return NULL;
 	}
 
 	vector<string> lines;
@@ -389,8 +438,7 @@ Map* MapLoader::loadMap(string filePath){
 		// if [continents] does not exist, then the file is invalid
 		if (continentStart == -1)
 		{
-			cout << "The file " << filePath << " is not a valid .map file." << endl;
-			return new Map();
+			return NULL;
 		}
 		
 		for (int i = continentStart; i < lines.size(); i++)
@@ -416,8 +464,7 @@ Map* MapLoader::loadMap(string filePath){
 		// if [territories] does not exist, then the file is invalid
 		if (territoryStart == -1)
 		{
-			cout << "The file " << filePath << " is not a valid .map file. We cannot create a Parser object." << endl;
-			return new Map();
+			return NULL;
 		}
 
 		for (int i = territoryStart; i < lines.size(); i++)
@@ -436,15 +483,13 @@ Map* MapLoader::loadMap(string filePath){
             int id = stoi(lineData[0]);
 			string name = lineData[1];
             Continent* continent = continents.at(stoi(lineData[2]) - 1);
-            Territory* territory = new Territory(id, name, continent, 0);
-            territories.push_back(new Territory(id, name, continent, 0));
+            territories.push_back(new Territory(id, name, continent));
 		}
 
 		// if [borders] does not exist, then the file is invalid
 		if (borderStart == -1)
 		{
-			cout << "The file " << filePath << " is not a valid .map file. We cannot create a Parser object." << endl;
-			return new Map();
+			return NULL;
 		}
 
 		for (int i = borderStart; i < lines.size(); i++)
@@ -469,7 +514,7 @@ Map* MapLoader::loadMap(string filePath){
 		return _map;
 	}
 
-    return new Map();
+    return NULL;
 }
 
 // SPLIT() FUNCTION from https://stackoverflow.com/questions/236129/how-do-i-iterate-over-the-words-of-a-string
