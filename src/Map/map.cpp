@@ -253,9 +253,9 @@ bool Map::validate(){
 	// 1) Check if map is connected
 
 	// do for all territories
-	for (size_t i = 0; i < _territories.size(); i++) {
+	for (int i = 0; i < _territories.size(); i++) {
 		// initialize visited
-		vector<bool> visited(_territories.size()); 
+		vector<bool> visited(_territories.size());
 		// start dfs from first territory
 		dfs(i, visited);
 		// if dfs doesn't visit all territories, then map is invalid
@@ -267,11 +267,11 @@ bool Map::validate(){
 	// 2) Check if all continents are a connected subgraph
 
 	// do for all continents
-	for (size_t i = 0; i < _continents.size(); i++) {
+	for (int i = 0; i < _continents.size(); i++) {
 		// get subgraph of continent
 		vector<Territory*> subgraph = _continents.at(i)->getTerritories();
 		// do for all territories in subgraph
-		for(size_t j = 0; j < subgraph.size(); j++){
+		for(int j = 0; j < subgraph.size(); j++){
 			// initialize visited
 			vector<bool> visited(subgraph.size()); 
 			// start dfs from first territory

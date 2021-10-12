@@ -1,34 +1,19 @@
 #include "map.h"
 #include "Drivers.h"
 #include <stdio.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
+namespace fs = std::experimental::filesystem;
 
 void MapDriver::demo(){
     const string MAPS_FOLDER = "../../maps/";
-    /*struct dirent *entry;
-    DIR *dir = opendir("../maps/");
-    if (dir != NULL) {
-        while ((entry = readdir (dir)) != NULL) {
-            cout << entry << endl;
-                cout << "Loading map: " << entry->d_name << endl;
-                cout << "Validating..." << endl;
-                
-                string filePath = MAPS_FOLDER + entry->d_name;
-                MapLoader loader;
-                Map* m = loader.loadMap(filePath);
-                //cout << *m << endl;
-                cout << m->validate() << endl;
-                filePath = MAPS_FOLDER + "solar.map";
-                m = loader.loadMap(filePath);
-                cout << m->validate() << endl;
-                delete m;
-                
-            }
-            closedir (dir);    
-    } else {
-        perror ("");
-        return EXIT_FAILURE;
-    }*/
+    MapLoader loader;
+    for (const auto & entry : fs::directory_iterator(MAPS_FOLDER)){
+        cout << "Loading map: " << entry.path().filename() << endl;
+        cout << "Validating..." << endl;
+        Map* m = loader.loadMap(entry.path().string());
+        cout << m->validate() << endl;
+        delete m;
+    }
 }
 
 
