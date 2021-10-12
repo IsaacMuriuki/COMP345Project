@@ -32,6 +32,7 @@ int main() {
         switch (option) {
             case 'A':
                 // MapDriver
+                MapDriver::demo();
                 break;
             case 'B':{
                 // PlayerDriver

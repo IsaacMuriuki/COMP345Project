@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <iostream>
 #include <vector>
 
@@ -60,4 +61,3 @@ public:
 	void setHand(int index, CardType cardType);
 	int size();
 };
-
