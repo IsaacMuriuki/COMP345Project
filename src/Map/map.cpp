@@ -1,4 +1,4 @@
-#include "Map.h"
+#include "map.h"
 
 Territory::Territory() {
    this->_id = 0;
