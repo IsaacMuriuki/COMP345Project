@@ -11,19 +11,21 @@
 
 class GameState
 {
-    public:
+    protected:
     std::string name;
     std::vector<std::string> cmds;
-    bool running;
 
+    public:
     GameState(std::string _name = "gamestate");
     GameState(std::string _name, std::vector<std::string> _cmds);
     ~GameState();
     GameState(const GameState& state);
     GameState& operator=(GameState&& state);
-    virtual void OnStateEnter();
-    virtual void OnStateExit();
+    virtual void onStateEnter();
+    virtual void onStateExit();
     friend std::ostream& operator<<(std::ostream& os, const GameState& state);
+    std::string getName();
+    std::vector<std::string> getCmds();
     GameState* clone();
 };
 
@@ -85,9 +87,7 @@ class WinState : public GameState {
 
 class GameEngine
 {
-    public:
-
-    bool running;
+    private:
 
     const std::string PLAY_CMD = "play";
     const std::string LOAD_MAP_CMD = "loadmap";
@@ -110,20 +110,27 @@ class GameEngine
     ExecuteOrdersState* executeOrdersState;
     WinState* winState;
 
+    bool running;
     GameState* currentState;
-
     std::map<std::string, GameState*> cmds;
+
+    void SetCommands();
+    bool ExecuteCmd(std::string);
+    void SetState(GameState* );
+    void TransitionTo(GameState* );
+
+    public:
 
     GameEngine();
     ~GameEngine();
     GameEngine(const GameEngine& engine);
     GameEngine& operator=(GameEngine&& gameEngine);
-    void SetCommands();
+
     void Run();
-    bool ExecuteCmd(std::string);
-    void SetState(GameState* );
-    void TransitionTo(GameState* );
     friend std::ostream& operator<<(std::ostream& os, const GameEngine& engine);
+    bool isRunning();
+    GameState* getCurrentState();
+    std::map<std::string, GameState*> getCmds();
     GameEngine* clone();
 };
 

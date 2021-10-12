@@ -111,9 +111,10 @@ void GameEngine::Run(){
         std::cout << "\nEnter your command: " << std::endl;
         std::cin.clear(); 
         std::cin.sync();
+        
         std::cin >> cmd; 
         std::cout << std::endl;
-
+        
         //Validates the command and execute the appropriate state transition
         ExecuteCmd(cmd);
     }
@@ -131,8 +132,9 @@ void GameEngine::Run(){
 bool GameEngine::ExecuteCmd(std::string cmdID){
 
     //Check if the current state has a matching command ID
-    if(std::find(currentState->cmds.begin(), currentState->cmds.end(), cmdID) != currentState->cmds.end()) {
-        
+    std::vector<std::string> stateCmds = currentState->getCmds();
+    if(std::find(stateCmds.begin(), stateCmds.end(), cmdID) != stateCmds.end()) {
+
         //Check if the current state considers the command valid
         if(cmdID == END_CMD){
             running = false;
@@ -149,7 +151,7 @@ bool GameEngine::ExecuteCmd(std::string cmdID){
         }
     } else{
         //If the current state does not consider the command valid, prints an error message
-        std::cout << "State '" << currentState->name << "' doesn't recognize command '" << cmdID << "'." << std::endl; 
+        std::cout << "State '" << currentState->getName() << "' doesn't recognize command '" << cmdID << "'." << std::endl; 
         return false;
     }
 }
@@ -160,7 +162,7 @@ bool GameEngine::ExecuteCmd(std::string cmdID){
 
 void GameEngine::SetState(GameState* nextState){
     currentState = nextState;
-    if(currentState != NULL) currentState->OnStateEnter();
+    if(currentState != NULL) currentState->onStateEnter();
 }
 
 /**
@@ -168,7 +170,7 @@ void GameEngine::SetState(GameState* nextState){
  **/
 
 void GameEngine::TransitionTo(GameState* nextState){
-    if(currentState != NULL) currentState->OnStateExit();
+    if(currentState != NULL) currentState->onStateExit();
     SetState(nextState);
 }
 
@@ -178,9 +180,15 @@ std::ostream& operator<<(std::ostream& os, const GameEngine& engine)
     return os;
 }
 
+bool GameEngine::isRunning(){return running;}
+GameState* GameEngine::getCurrentState(){ return currentState;}
+std::map<std::string, GameState*> GameEngine::getCmds(){return cmds;}
+
+GameEngine* GameEngine::clone() { return new GameEngine(*this); }
+
 // GameState class definition
 
-GameState::GameState(std::string _name = "gamestate"){
+GameState::GameState(std::string _name){
     name = _name;
 }
 
@@ -206,14 +214,14 @@ GameState& GameState::operator=(GameState&& state){
 /**
  * Method executed upon entering the state. Is meant to be overitten to implement the functionality specific to each game state.
  **/
-void GameState::OnStateEnter(){
+void GameState::onStateEnter(){
     std::cout << "Entered gamestate '" << name << "'." << std::endl;
 }
 
 /**
  * Method executed upon exiting the state. Is meant to be overitten to implement the functionality specific to each game state.
  **/
-void GameState::OnStateExit(){
+void GameState::onStateExit(){
     std::cout << "Exited gamestate '" << name << "'." << std::endl;
 }
 
@@ -222,6 +230,9 @@ std::ostream& operator<<(std::ostream& os, const GameState& state)
     os << state.name << " state";
     return os;
 }
+
+std::string GameState::getName() {return name;}
+std::vector<std::string> GameState::getCmds() {return cmds;}
 
 GameState* GameState::clone() { return new GameState(*this); }
 
