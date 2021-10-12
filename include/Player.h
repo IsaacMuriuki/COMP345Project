@@ -6,9 +6,11 @@
 #include <vector>
 #include <string>
 
-#include "map.h"
+#include "Map.h"
 #include "Cards.h"
 #include "OrdersList.h"
+
+class Territory;
 
 class Player{
 public:
