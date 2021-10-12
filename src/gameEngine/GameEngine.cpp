@@ -6,7 +6,7 @@ GameEngine::GameEngine(){
     
     //Initializing all pointers to their respective game states
 
-    startState = new StartState ("start", {LOAD_MAP_CMD});
+    startState = new StartState ("start", {LOAD_MAP_CMD, END_CMD});
     mapLoadedState = new MapLoadedState("map loaded", {LOAD_MAP_CMD, VALIDATE_MAP_CMD});
     mapValidatedState = new MapValidatedState("map validated", {ADD_PLAYER_CMD});
     playersAddedState = new PlayersAddedState("players added", {ADD_PLAYER_CMD, ASSIGN_COUNTRIES_CMD});
@@ -30,10 +30,6 @@ GameEngine::~GameEngine(){
     delete issueOrdersState;
     delete executeOrdersState;
     delete winState;
-
-    for(std::map<std::string, GameState*>::iterator cmd = cmds.begin(); cmd != cmds.end(); cmd++) {
-        delete (cmd->second);
-    }
 
     cmds.clear();
 };
@@ -162,7 +158,7 @@ bool GameEngine::ExecuteCmd(std::string cmdID){
 
 void GameEngine::SetState(GameState* nextState){
     currentState = nextState;
-    if(currentState != NULL) currentState->onStateEnter();
+    if(currentState != nullptr) currentState->onStateEnter();
 }
 
 /**
@@ -170,7 +166,7 @@ void GameEngine::SetState(GameState* nextState){
  **/
 
 void GameEngine::TransitionTo(GameState* nextState){
-    if(currentState != NULL) currentState->onStateExit();
+    if(currentState != nullptr) currentState->onStateExit();
     SetState(nextState);
 }
 
