@@ -98,7 +98,7 @@ std::ostream& operator<<(std::ostream &strm, const Player& player){
      */
     strm << "\nCards \n";
     for (int i =0; i <player.handOfCards->size(); ++i){
-        strm << CardType(player.handOfCards->getHand(i).getCardType()) << "\n";
+        strm << player.handOfCards->getHand(i).toString() << "\n";
     }
 
     return strm;
