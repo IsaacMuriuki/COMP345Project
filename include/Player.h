@@ -10,6 +10,8 @@
 #include "Cards.h"
 #include "OrdersList.h"
 
+class Territory;
+
 class Player{
 public:
     // Constructors, destructor and copy constructor
