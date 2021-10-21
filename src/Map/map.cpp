@@ -5,7 +5,7 @@ Territory::Territory() {
    this->_name = "";
    this->_continent = new Continent();
    this->_units = 0;
-   this->_owner = NULL;
+   this->_owner = new Player();
    this->_adjacentTerritories = vector<Territory*>();
 }
 
