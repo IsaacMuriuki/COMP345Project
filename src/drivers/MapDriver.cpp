@@ -5,7 +5,7 @@
 namespace fs = std::filesystem;
 
 void MapDriver::demo(){
-    const string MAPS_FOLDER = "/../../maps/";
+    const string MAPS_FOLDER = "../../maps/";
     MapLoader loader;
     // read all files in valid maps folder
     try{
