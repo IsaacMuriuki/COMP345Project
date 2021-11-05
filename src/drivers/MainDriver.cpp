@@ -51,7 +51,7 @@ int main() {
                 break;
             case 'E':
                 // GameEngineDriver
-                GameEngineDriver::demo();
+                // GameEngineDriver::demo();
                 break;
             case 'F':
                 // Ignore.

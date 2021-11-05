@@ -181,7 +181,7 @@ ostream& operator<<(ostream& out, const Card& c)
 istream& operator>>(istream& in, const Card& c)
 {
 	std::cout << "Choose a card type";
-	in >> c.toString();
+	in >> c.cardType;
 	return in;
 }
 
