@@ -2,7 +2,7 @@
 
 // Default constructor
 Player::Player() {
-    std::cout << "Player default constructor" << std::endl;
+    //std::cout << "Player default constructor" << std::endl;
 
     this->name = "";
     this->territories = vector<Territory*>();
@@ -22,7 +22,7 @@ Player::Player() {
  * @param handOfCards
  */
 Player::Player(string name, vector<Territory*> territories, OrdersList* ordersList, Hand* handOfCards){
-    std::cout << "Player parameterized constructor" << std::endl;
+    //std::cout << "Player parameterized constructor" << std::endl;
     this->name = name;
     this->territories = territories;
     this->ordersList = new OrdersList(*ordersList);
