@@ -21,7 +21,8 @@ int main() {
             std::cout << "C- Orders List (Thomas)" << std::endl;
             std::cout << "D- Cards/Deck (Tyler)" << std::endl;
             std::cout << "E- Game Engine (Salaheddine)" << std::endl;
-            std::cout << "F- Stop the program" << std::endl;
+            std::cout << "F- Commands (Salaheddine)" << std::endl;
+            std::cout << "G- Stop the program" << std::endl;
         }
 
         std::cout << "Enter your option: ";
@@ -32,29 +33,33 @@ int main() {
         switch (option) {
             case 'A':
                 // MapDriver
-                MapDriver::demo();
+                mapDriver();
                 break;
             case 'B':{
                 // PlayerDriver
-                PlayerDriver::demo();
+                playerDriver();
                 break;
             }
             case 'C': {
-
                 // OrdersDriver
-                OrdersDriver::demo();
+                ordersDriver();
                 break;
             }
             case 'D':
                 // CardsDriver
-                CardsDriver::demo();
+                cardsDriver();
                 break;
             case 'E':
                 // GameEngineDriver
-                // GameEngineDriver::demo();
+                gameEngineDriver();
                 break;
             case 'F':
+                // Commands
+                commandsDriver();
+                break;
+            case 'G':
                 // Ignore.
+                return EXIT_SUCCESS;
                 break;
             default:
                 std::cout << "Please double check your selection." << std::endl;
