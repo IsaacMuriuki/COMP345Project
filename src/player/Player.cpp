@@ -2,7 +2,7 @@
 
 // Default constructor
 Player::Player() {
-    std::cout << "Player default constructor" << std::endl;
+    //std::cout << "Player default constructor" << std::endl;
 
     this->name = "";
     this->territories = vector<Territory*>();
@@ -22,7 +22,7 @@ Player::Player() {
  * @param handOfCards
  */
 Player::Player(string name, vector<Territory*> territories, OrdersList* ordersList, Hand* handOfCards){
-    std::cout << "Player parameterized constructor" << std::endl;
+    //std::cout << "Player parameterized constructor" << std::endl;
     this->name = name;
     this->territories = territories;
     this->ordersList = new OrdersList(*ordersList);
@@ -98,7 +98,7 @@ std::ostream& operator<<(std::ostream &strm, const Player& player){
      */
     strm << "\nCards \n";
     for (int i =0; i <player.handOfCards->size(); ++i){
-        strm << CardType(player.handOfCards->getHand(i).getCardType()) << "\n";
+        strm << player.handOfCards->getHand(i).toString() << "\n";
     }
 
     return strm;
@@ -130,7 +130,7 @@ vector<Territory*> Player::toAttack(){
 // Asks the user for input on which order to create, and creates the corresponding order objects and adds it to the player's ordersList
 void Player::issueOrder() {
     string orders = "List of possible orders to be made: \n 1. Deploy\n 2. Advance\n 3. Bomb\n 4. Blockade\n 5. Airlift\n 6. Negotiate\n 7. Stop issuing orders\n ";
-    int orderNumber;
+    int orderNumber = 0;
 
     while(orderNumber != 7) {
         std::cout << orders << std::endl;
@@ -235,5 +235,3 @@ void Player::setOrders(OrdersList* ordersList) { this->ordersList = new OrdersLi
 void Player::setHandOfCards(Hand* handOfCards) { this->handOfCards = new Hand(*handOfCards);}
 
 string Player::getName()  { return this->name;}
-
-

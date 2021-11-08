@@ -4,12 +4,12 @@
 #include "Player.h"
 
 void PlayerDriver::demo(){
-    Territory* t1 = new Territory("Kenya", "Africa", 50);
-    Territory* t2 = new Territory("Somalia", "Africa", 10);
-    Territory* t3 = new Territory("South Africa", "Africa", 25);
-    Territory* t4 = new Territory("Netherlands", "Europe", 200);
-    Territory* t5 = new Territory("Belgium", "Europe", 125);
-    Territory* t6 = new Territory("England", "Europe", 75);
+    Territory* t1 = new Territory(1, "Kenya", new Continent(1, "Africa", 2));
+    Territory* t2 = new Territory(2, "Somalia", new Continent(2, "Africa", 2));
+    Territory* t3 = new Territory(3, "South Africa", new Continent(3, "Africa", 3));
+    Territory* t4 = new Territory(4, "Netherlands", new Continent(4, "Europe", 4));
+    Territory* t5 = new Territory(5, "Belgium", new Continent(5, "Europe", 5));
+    Territory* t6 = new Territory(6, "England", new Continent(6, "Europe", 5));
 
     vector<Territory*> territories;
     territories.push_back(t1); territories.push_back(t2); territories.push_back(t3); territories.push_back(t4); territories.push_back(t5); territories.push_back(t6);
@@ -54,4 +54,5 @@ void PlayerDriver::demo(){
     std::cout << *player << std::endl;
 
     delete t1; delete t2; delete t3; delete t4; delete t5; delete t6;
+    delete player;
 }

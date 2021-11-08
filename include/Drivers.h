@@ -15,6 +15,11 @@ class CardsDriver {
     static void demo();
 };
 
+class MapDriver {
+    public:
+    static void demo();
+};
+
 class PlayerDriver{
     public:
     static void demo();

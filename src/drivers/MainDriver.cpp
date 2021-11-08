@@ -32,6 +32,7 @@ int main() {
         switch (option) {
             case 'A':
                 // MapDriver
+                MapDriver::demo();
                 break;
             case 'B':{
                 // PlayerDriver
@@ -50,7 +51,7 @@ int main() {
                 break;
             case 'E':
                 // GameEngineDriver
-                GameEngineDriver::demo();
+                // GameEngineDriver::demo();
                 break;
             case 'F':
                 // Ignore.
