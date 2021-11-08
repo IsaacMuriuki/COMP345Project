@@ -6,7 +6,7 @@ GameEngine::GameEngine(){
     
     //Initializing all pointers to their respective game states
 
-    startState = new StartState ("start", {LOAD_MAP_CMD, END_CMD});
+    startState = new StartState ("start", {LOAD_MAP_CMD});
     mapLoadedState = new MapLoadedState("map loaded", {LOAD_MAP_CMD, VALIDATE_MAP_CMD});
     mapValidatedState = new MapValidatedState("map validated", {ADD_PLAYER_CMD});
     playersAddedState = new PlayersAddedState("players added", {ADD_PLAYER_CMD, ASSIGN_COUNTRIES_CMD});
