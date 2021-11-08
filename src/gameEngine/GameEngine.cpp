@@ -70,7 +70,7 @@ GameEngine& GameEngine::operator=(GameEngine&& engine) {
 }
 
 /**
- * Assigns .
+ * Assigns commands to pointers to the state they lead to.
  **/
 
 void GameEngine::SetCommands(){

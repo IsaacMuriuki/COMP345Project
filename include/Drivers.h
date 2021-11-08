@@ -1,26 +1,8 @@
 #pragma once
 
-class OrdersDriver {
-    public:
-    static void demo();
-};
-
-class GameEngineDriver {
-    public:
-    static void demo();
-};
-
-class CardsDriver {
-    public:
-    static void demo();
-};
-
-class MapDriver {
-    public:
-    static void demo();
-};
-
-class PlayerDriver{
-    public:
-    static void demo();
-};
+void playerDriver();
+void ordersDriver();
+void mapDriver();
+void cardsDriver();
+void gameEngineDriver();
+void commandsDriver();
