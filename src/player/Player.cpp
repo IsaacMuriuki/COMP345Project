@@ -8,6 +8,7 @@ Player::Player() {
     this->territories = vector<Territory*>();
     this->ordersList = new OrdersList();
     this->handOfCards = new Hand();
+    this-> reinforcementPool = 0;
 }
 
 /**
@@ -27,6 +28,7 @@ Player::Player(string name, vector<Territory*> territories, OrdersList* ordersLi
     this->territories = territories;
     this->ordersList = new OrdersList(*ordersList);
     this->handOfCards = new Hand(*handOfCards);
+    this->reinforcementPool = 0;
 }
 
 // Destructor
@@ -232,6 +234,13 @@ void Player::setTerritories(vector<Territory *> territories) { this->territories
 
 void Player::setOrders(OrdersList* ordersList) { this->ordersList = new OrdersList(*ordersList);}
 
+void Player::addToReinforcementPool(int num) { this->reinforcementPool+=num;}
+
+void Player::removeFromReinforcementPool(int num) {this->reinforcementPool-=num;}
+
+int Player::getReinforcementPool() const {return reinforcementPool;}
+
 void Player::setHandOfCards(Hand* handOfCards) { this->handOfCards = new Hand(*handOfCards);}
 
 string Player::getName()  { return this->name;}
+

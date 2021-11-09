@@ -35,6 +35,9 @@ public:
     void setHandOfCards(Hand* );
     void setTerritories(vector<Territory*> );
     void setOrders(OrdersList* );
+    void addToReinforcementPool(int);
+    void removeFromReinforcementPool(int);
+    int getReinforcementPool() const;
 
     // Overloading << and = operators
     friend std::ostream& operator<<(std::ostream &, const Player& );
@@ -44,6 +47,7 @@ private:
     vector<Territory*> territories;
     Hand* handOfCards;
     OrdersList* ordersList;
+    int reinforcementPool;
 };
 
 #endif //COMP_345_PROJECT_PLAYER_H

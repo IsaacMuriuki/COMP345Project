@@ -25,7 +25,6 @@ Order::Order(const Order& order) : _executed(order._executed) {
  **/
 void Order::execute() {
     if (validate()) {
-        onExecute();
         _executed = true;
     }
 }
@@ -37,15 +36,6 @@ void Order::execute() {
  **/
 bool Order::isExecuted() const {
     return _executed;
-}
-
-/**
- * Checks if the order is valid.
- * 
- * @return true if not execute and valid; false otherwise.
- **/
-bool Order::validate() const {
-    return !_executed && onValidate();
 }
 
 
@@ -66,7 +56,7 @@ CardOrder::~CardOrder() {
 
 CardOrder& CardOrder::operator=(CardOrder&& order) {
     if (this != &order) {
-        
+
     }
     return *this;
 }
@@ -77,8 +67,10 @@ CardOrder::CardOrder(const CardOrder& order) {
 
 
 // Deploy class definition
-Deploy::Deploy(int units) {
+Deploy::Deploy(int units, Player* player, Territory* territory) {
     _units = units;
+    this->player = player;
+    this->territory = territory;
 }
 
 Deploy::~Deploy() {
@@ -89,6 +81,8 @@ Deploy& Deploy::operator=(Deploy&& order) {
     if (this != &order) {
         order._units = _units;
     }
+    order.player = player;
+    order.territory = territory;
     return *this;
 }
 
@@ -123,6 +117,17 @@ std::string Deploy::getEffectApplied() const {
     return "Placed " + std::to_string(_units) + " units on ";
 }
 
+void Deploy::execute() {
+    // If the player owns the territory, add selected number of armies to the territory
+    if(validate()){
+        territory->setUnits(territory->getUnits() + _units);
+        player->removeFromReinforcementPool(_units);
+
+        std::cout << "Execute Deploy Order: " << _units << " moved from " << player->getName() << "'s reinforcement pool to "
+                  << territory->getName() << " (units: " << territory->getUnits() << ")." << std::endl;
+    }
+}
+
 /**
  * Additional actions taken for when the order gets executed.
  **/
@@ -131,19 +136,32 @@ void Deploy::onExecute() {
 }
 
 /**
- * Additional checks for validation of the order.
+ * Additional checks for validation of the order -> checking if the player owns the territory
  * 
  * @return true if the additional validations pass; false otherwise.
  **/
-bool Deploy::onValidate() const {
-    // TODO: ensure territory is in player's team.
-    return _units > 0;
+bool Deploy::validate() const {
+    vector<Territory*> territories = player->toDefend();
+    bool playerOwnsterritory = false;
+    for (int i = 0; i < territories.size(); ++i) {
+        if(territories[i]->getId() == territory->getId()){
+            playerOwnsterritory = true;
+            break;
+        }
+    }
+    if (!playerOwnsterritory) std::cout << "Invalid deploy order ! Player " << player->getName() << " does not own the territory " << territory->getName() << std::endl;
+
+    return _units > 0 && _units < player->getReinforcementPool() && playerOwnsterritory;
 }
+
+void Deploy::setUnitsToBeDeployed(int units) { this->_units = units; }
 
 
 // Advance class definition
-Advance::Advance(int units) {
+Advance::Advance(int units, Territory* fromTerritory, Territory* toTerritory) {
     _units = units;
+    this->sourceTerritory = fromTerritory;
+    this->targetTerritory = toTerritory;
 }
 
 Advance::~Advance() {
@@ -154,6 +172,8 @@ Advance& Advance::operator=(Advance&& order) {
     if (this != &order) {
         order._units = _units;
     }
+    order.sourceTerritory = sourceTerritory;
+    order.targetTerritory = targetTerritory;
     return *this;
 }
 
@@ -192,7 +212,60 @@ std::string Advance::getEffectApplied() const {
  * Additional actions taken for when the order gets executed.
  **/
 void Advance::onExecute() {
-    std::cout << "Advance, army!" << std::endl;
+    if(validate()){
+        // If the player owns both source and target territories
+        if(targetTerritory->getOwner() == sourceTerritory->getOwner()){
+            std::cout << "Advance order: The player " << player->getName() << " owns both territories, moving " << _units << " from " << sourceTerritory->getName() << " to " << targetTerritory->getName() << std::endl;
+            sourceTerritory->setUnits(sourceTerritory->getUnits() - _units);
+            targetTerritory->setUnits(targetTerritory->getUnits() + _units);
+        }
+            // Simulation of an attack
+        else if(targetTerritory->getOwner() != player){
+            int attackingUnitsProbability = rand() % 100;
+            int defendingUnitsProbability = rand() % 100;
+            const int defendingUnitsCount = targetTerritory->getUnits();
+            const int attackingUnitsCount = sourceTerritory->getUnits();
+            int deadAttackingUnits = 0;
+            int deadDefendingUnits = 0;
+
+            // Attack simulation
+            for (int i = 0; i < attackingUnitsCount; ++i) {
+                if(attackingUnitsProbability < 60){
+                    deadDefendingUnits++;
+                    if(deadDefendingUnits == defendingUnitsCount) break;
+                }
+            }
+
+            // Defence simulation
+            for (int i = 0; i < defendingUnitsCount; ++i) {
+                if(defendingUnitsProbability < 70){
+                    deadAttackingUnits++;
+                    if(deadAttackingUnits == attackingUnitsCount) break;
+                }
+            }
+
+            // All of the defender's armies are eliminated - successful attack
+            if(deadDefendingUnits == defendingUnitsCount){
+                std::cout << "Advance order success: The target territory " << targetTerritory->getName() << " has been defeated and is now owned by Player " << player->getName() << ". Advancing "
+                          << attackingUnitsCount-deadAttackingUnits << " from " << sourceTerritory->getName() << " to " << targetTerritory->getName() << std::endl;
+
+                targetTerritory->setOwner(player);
+                targetTerritory->setUnits(attackingUnitsCount-deadAttackingUnits);
+                sourceTerritory->setUnits(sourceTerritory->getUnits() - _units);
+
+                /**
+                 * TODO: A player receives a card at the end of his turn if they successfully conquered at least one territory during their turn.
+                 */
+            }
+                // Unsuccessful attack
+            else{
+                std::cout << "Advance order unsuccessful: Player " << player->getName() << " lost all attacking territories from " << sourceTerritory->getName()
+                          << ", while " << defendingUnitsCount - deadDefendingUnits << " remain alive on the target territory " << targetTerritory->getName() << std::endl;
+                sourceTerritory->setUnits(attackingUnitsCount - deadAttackingUnits);
+                targetTerritory->setUnits(defendingUnitsCount - deadDefendingUnits);
+            }
+        }
+    }
 }
 
 /**
@@ -200,11 +273,58 @@ void Advance::onExecute() {
  * 
  * @return true if the additional validations pass; false otherwise.
  **/
-bool Advance::onValidate() const {
-    // TODO: make sure there are more units on the territory than, or equal to, advancing.
-    return _units > 0;
+bool Advance::validate() const {
+    // Ensure source territory belongs to the player
+    if(sourceTerritory->getOwner() != player){
+        std::cout << "Invalid advance order ! Player " << player->getName() << " does not own the source territory " << sourceTerritory->getName() << std::endl;
+        return false;
+    }
+
+    // Check if the target is adjacent to the source territory
+    vector<Territory*> adjacentTerritoriesToSource = sourceTerritory->getAdjacentTerritories();
+    bool isAdjacentToSource = false;
+    for (int i = 0; i < adjacentTerritoriesToSource.size(); ++i) {
+        if(adjacentTerritoriesToSource[i]->getId() == sourceTerritory->getId()){
+            isAdjacentToSource = true;
+            break;
+        }
+    }
+    if(!isAdjacentToSource){
+        std::cout << "Invalid advance order ! Player " << player->getName() << "'s target territory " << targetTerritory->getName() << " is not adjacent to their source territory " << sourceTerritory->getName() << std::endl;
+        return isAdjacentToSource;
+    }
+
+    // Ensure player cant advance a negative amount of units
+    if(_units < 0){
+        std::cout << "Invalid advance order ! Players cannot advance a negative number of units " << std::endl;
+        return false;
+    }
+
+    // Ensure player cant advance more units than they have in the source territory
+    if(_units > sourceTerritory->getUnits()){
+        std::cout << "Invalid advance order ! Player " << player->getName() << " cannot advance " << _units << " from territory " << sourceTerritory->getName()
+                  << " which has " << sourceTerritory->getUnits() << " units." << std::endl;
+        return false;
+    }
+
+    return true;
 }
 
+Territory *Advance::getSourceTerritory() const {
+    return sourceTerritory;
+}
+
+void Advance::setSourceTerritory(Territory *fromTerritory) {
+    Advance::sourceTerritory = fromTerritory;
+}
+
+Territory *Advance::getTargetTerritory() const {
+    return targetTerritory;
+}
+
+void Advance::setTargetTerritory(Territory *toTerritory) {
+    Advance::targetTerritory = toTerritory;
+}
 
 // Bomb class definition
 Bomb::Bomb() {
@@ -217,7 +337,7 @@ Bomb::~Bomb() {
 
 Bomb& Bomb::operator=(Bomb&& order) {
     if (this != &order) {
-        
+
     }
     return *this;
 }
@@ -265,7 +385,7 @@ void Bomb::onExecute() {
  * 
  * @return true if the additional validations pass; false otherwise.
  **/
-bool Bomb::onValidate() const {
+bool Bomb::validate() const {
     return true;
 }
 
@@ -329,7 +449,7 @@ void Blockade::onExecute() {
  * 
  * @return true if the additional validations pass; false otherwise.
  **/
-bool Blockade::onValidate() const {
+bool Blockade::validate() const {
     return true;
 }
 
@@ -345,7 +465,7 @@ Airlift::~Airlift() {
 
 Airlift& Airlift::operator=(Airlift&& order) {
     if (this != &order) {
-        
+
     }
     return *this;
 }
@@ -393,7 +513,7 @@ void Airlift::onExecute() {
  * 
  * @return true if the additional validations pass; false otherwise.
  **/
-bool Airlift::onValidate() const {
+bool Airlift::validate() const {
     return true;
 }
 
@@ -457,6 +577,6 @@ void Negotiate::onExecute() {
  * 
  * @return true if the additional validations pass; false otherwise.
  **/
-bool Negotiate::onValidate() const {
+bool Negotiate::validate() const {
     return true;
 }
