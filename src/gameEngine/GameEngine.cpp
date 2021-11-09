@@ -31,10 +31,6 @@ GameEngine::~GameEngine(){
     delete executeOrdersState;
     delete winState;
 
-    for(std::map<std::string, GameState*>::iterator cmd = cmds.begin(); cmd != cmds.end(); cmd++) {
-        delete (cmd->second);
-    }
-
     cmds.clear();
 };
 
@@ -74,7 +70,7 @@ GameEngine& GameEngine::operator=(GameEngine&& engine) {
 }
 
 /**
- * Assigns .
+ * Assigns commands to pointers to the state they lead to.
  **/
 
 void GameEngine::SetCommands(){
@@ -162,7 +158,7 @@ bool GameEngine::ExecuteCmd(std::string cmdID){
 
 void GameEngine::SetState(GameState* nextState){
     currentState = nextState;
-    if(currentState != NULL) currentState->onStateEnter();
+    if(currentState != nullptr) currentState->onStateEnter();
 }
 
 /**
@@ -170,7 +166,7 @@ void GameEngine::SetState(GameState* nextState){
  **/
 
 void GameEngine::TransitionTo(GameState* nextState){
-    if(currentState != NULL) currentState->onStateExit();
+    if(currentState != nullptr) currentState->onStateExit();
     SetState(nextState);
 }
 

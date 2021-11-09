@@ -9,9 +9,10 @@ class Order {
     // TODO: might need Player* here.
     public:
     Order();
-    ~Order();
+    virtual ~Order();
     Order(const Order& order);
     virtual Order& operator=(Order&& order);
+    friend std::ostream& operator<<(std::ostream &out, const Order& order);
 
     /**
      * Gets a deep copy of the order itself.

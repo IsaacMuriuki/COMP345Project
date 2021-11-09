@@ -48,6 +48,13 @@ bool Order::validate() const {
     return !_executed && onValidate();
 }
 
+
+std::ostream& operator<<(std::ostream &out, const Order& order) {
+    out << order.getDescription() << (order.isExecuted() ? " - " + order.getEffectApplied() : "");
+    return out;
+}
+
+
 // CardOrder class definition
 CardOrder::CardOrder() {
 
