@@ -1,33 +1,29 @@
 #include "Orders.h"
 
-
 // Order class definition
-Order::Order() {
-    _executed = false;
-}
+Order::Order() : executed(false){}
 
+Order::Order(Player* player) : player(player), executed(false) {}
+
+// Player set to null, not deleted
 Order::~Order() {
-
+    player = nullptr;
 }
 
+// Shallow copy of player
 Order& Order::operator=(Order&& order) {
     if (this != &order) {
-        _executed = order._executed;
+        executed = order.executed;
+        player = order.player;
     }
     return *this;
 }
 
-Order::Order(const Order& order) : _executed(order._executed) {
-}
-
-void Order::execute() {
-    if (validate()) {
-        _executed = true;
-    }
-}
+// Shallow copy of player
+Order::Order(const Order& order) : executed(order.executed), player(order.player) {}
 
 bool Order::isExecuted() const {
-    return _executed;
+    return executed;
 }
 
 std::ostream& operator<<(std::ostream &out, const Order& order) {
@@ -35,48 +31,49 @@ std::ostream& operator<<(std::ostream &out, const Order& order) {
     return out;
 }
 
-// CardOrder class definition
-CardOrder::CardOrder() {
+/**
+ * CardOrder class definition
+ */
+CardOrder::CardOrder() { }
 
-}
+CardOrder::CardOrder(Player * player) : Order(player) {}
 
 CardOrder::~CardOrder() {
-
+    player = nullptr;
 }
 
 CardOrder& CardOrder::operator=(CardOrder&& order) {
     if (this != &order) {
-
+        player = order.player;
     }
     return *this;
 }
 
-CardOrder::CardOrder(const CardOrder& order) {
-
-}
+CardOrder::CardOrder(const CardOrder& order) : Order(order){}
 
 
-// Deploy class definition
-Deploy::Deploy(int units, Player* player, Territory* territory) {
-    _units = units;
-    this->player = player;
-    this->territory = territory;
-}
+/**
+ * Deploy class definition
+ */
+Deploy::Deploy() {}
+
+Deploy::Deploy(int units, Player* player, Territory* territory) : Order(player), units(units), territory(territory)  {}
 
 Deploy::~Deploy() {
-    // TODO: delete both territories.
+    player = nullptr;
+    territory = nullptr;
 }
 
 Deploy& Deploy::operator=(Deploy&& order) {
     if (this != &order) {
-        order._units = _units;
+        order.units = units;
     }
     order.player = player;
     order.territory = territory;
     return *this;
 }
 
-Deploy::Deploy(const Deploy& deploy) {
+Deploy::Deploy(const Deploy& deploy) : Order(deploy.player), units(deploy.units), territory(deploy.territory)  {
 
 }
 
@@ -89,64 +86,71 @@ std::string Deploy::getDescription() const {
 }
 
 std::string Deploy::getEffectApplied() const {
-    return "Placed " + std::to_string(_units) + " units on ";
+    return "Placed " + std::to_string(units) + " units on ";
 }
 
 void Deploy::execute() {
     // If the player owns the territory, add selected number of armies to the territory
     if(validate()){
-        territory->setUnits(territory->getUnits() + _units);
-        player->removeFromReinforcementPool(_units);
+        territory->setUnits(territory->getUnits() + units);
+        player->removeFromReinforcementPool(units);
 
-        std::cout << "Execute Deploy Order: " << _units << " moved from " << player->getName() << "'s reinforcement pool to "
+        std::cout << "Execute Deploy Order: " << units << " moved from " << player->getName() << "'s reinforcement pool to "
                   << territory->getName() << " (units: " << territory->getUnits() << ")." << std::endl;
     }
 }
 
 void Deploy::onExecute() {
-    std::cout << "Deploy the army of " << _units << " units!" << std::endl;
+    std::cout << "Deploy the army of " << units << " units!" << std::endl;
 }
 
+/**
+ * Checks if player owns territory
+ */
 bool Deploy::validate() const {
     vector<Territory*> territories = player->toDefend();
-    bool playerOwnsterritory = false;
+    bool playerOwnsTerritory = false;
     for (int i = 0; i < territories.size(); ++i) {
         if(territories[i]->getId() == territory->getId()){
-            playerOwnsterritory = true;
+            playerOwnsTerritory = true;
             break;
         }
     }
-    if (!playerOwnsterritory) std::cout << "Invalid deploy order ! Player " << player->getName() << " does not own the territory " << territory->getName() << std::endl;
+    if (!playerOwnsTerritory) std::cout << "Invalid deploy order ! Player " << player->getName() << " does not own the territory " << territory->getName() << std::endl;
 
-    return _units > 0 && _units < player->getReinforcementPool() && playerOwnsterritory;
+    return units > 0 && units < player->getReinforcementPool() && playerOwnsTerritory;
 }
 
-void Deploy::setUnitsToBeDeployed(int units) { this->_units = units; }
+void Deploy::setUnitsToBeDeployed(int units) { this->units = units; }
 
 
-// Advance class definition
-Advance::Advance(int units, Territory* fromTerritory, Territory* toTerritory) {
-    _units = units;
-    this->sourceTerritory = fromTerritory;
-    this->targetTerritory = toTerritory;
-}
+/**
+ * Advance class definition
+ */
+Advance::Advance() {}
+
+Advance::Advance(Player* player, int units, Territory* fromTerritory, Territory* toTerritory) : Order(player), units(units),
+                                                                                                sourceTerritory(fromTerritory), targetTerritory(toTerritory){ }
 
 Advance::~Advance() {
-    // TODO: delete territory.
+    player = nullptr;
+    sourceTerritory = nullptr;
+    targetTerritory = nullptr;
 }
 
 Advance& Advance::operator=(Advance&& order) {
     if (this != &order) {
-        order._units = _units;
+        order.units = units;
+        order.player = player;
+        order.sourceTerritory = sourceTerritory;
+        order.targetTerritory = targetTerritory;
     }
-    order.sourceTerritory = sourceTerritory;
-    order.targetTerritory = targetTerritory;
+
     return *this;
 }
 
-Advance::Advance(const Advance& advance) {
-
-}
+Advance::Advance(const Advance& advance) : Order(advance.player), units(advance.units),
+                                           sourceTerritory(advance.sourceTerritory), targetTerritory(advance.targetTerritory){ }
 
 Order* Advance::clone() {
     return new Advance(*this);
@@ -157,16 +161,16 @@ std::string Advance::getDescription() const {
 }
 
 std::string Advance::getEffectApplied() const {
-    return "Moved " + std::to_string(_units) + " units to ";
+    return "Moved " + std::to_string(units) + " units to ";
 }
 
-void Advance::onExecute() {
+void Advance::execute() {
     if(validate()){
         // If the player owns both source and target territories
         if(targetTerritory->getOwner() == sourceTerritory->getOwner()){
-            std::cout << "Advance order: The player " << player->getName() << " owns both territories, moving " << _units << " from " << sourceTerritory->getName() << " to " << targetTerritory->getName() << std::endl;
-            sourceTerritory->setUnits(sourceTerritory->getUnits() - _units);
-            targetTerritory->setUnits(targetTerritory->getUnits() + _units);
+            std::cout << "Advance order: The player " << player->getName() << " owns both territories, moving " << units << " from " << sourceTerritory->getName() << " to " << targetTerritory->getName() << std::endl;
+            sourceTerritory->setUnits(sourceTerritory->getUnits() - units);
+            targetTerritory->setUnits(targetTerritory->getUnits() + units);
         }
             // Simulation of an attack
         else if(targetTerritory->getOwner() != player){
@@ -193,22 +197,27 @@ void Advance::onExecute() {
                 }
             }
 
+            bool hasSuccessfullyAttacked = false;
             // All of the defender's armies are eliminated - successful attack
             if(deadDefendingUnits == defendingUnitsCount){
                 std::cout << "Advance order success: The target territory " << targetTerritory->getName() << " has been defeated and is now owned by Player " << player->getName() << ". Advancing "
-                          << attackingUnitsCount-deadAttackingUnits << " from " << sourceTerritory->getName() << " to " << targetTerritory->getName() << std::endl;
+                          << attackingUnitsCount-deadAttackingUnits << " surviving attacking units from " << sourceTerritory->getName() << " to " << targetTerritory->getName() << std::endl;
 
+                hasSuccessfullyAttacked = true;
                 targetTerritory->setOwner(player);
                 targetTerritory->setUnits(attackingUnitsCount-deadAttackingUnits);
-                sourceTerritory->setUnits(sourceTerritory->getUnits() - _units);
+                sourceTerritory->setUnits(sourceTerritory->getUnits() - units);
 
                 /**
                  * TODO: A player receives a card at the end of his turn if they successfully conquered at least one territory during their turn.
                  */
+                if(hasSuccessfullyAttacked){
+                    // give card to player
+                }
             }
                 // Unsuccessful attack
             else{
-                std::cout << "Advance order unsuccessful: Player " << player->getName() << " lost all attacking territories from " << sourceTerritory->getName()
+                std::cout << "Advance order unsuccessful: Player " << player->getName() << " lost all attacking armies from " << sourceTerritory->getName()
                           << ", while " << defendingUnitsCount - deadDefendingUnits << " remain alive on the target territory " << targetTerritory->getName() << std::endl;
                 sourceTerritory->setUnits(attackingUnitsCount - deadAttackingUnits);
                 targetTerritory->setUnits(defendingUnitsCount - deadDefendingUnits);
@@ -239,14 +248,14 @@ bool Advance::validate() const {
     }
 
     // Ensure player cant advance a negative amount of units
-    if(_units < 0){
+    if(units < 0){
         std::cout << "Invalid advance order ! Players cannot advance a negative number of units " << std::endl;
         return false;
     }
 
     // Ensure player cant advance more units than they have in the source territory
-    if(_units > sourceTerritory->getUnits()){
-        std::cout << "Invalid advance order ! Player " << player->getName() << " cannot advance " << _units << " from territory " << sourceTerritory->getName()
+    if(units > sourceTerritory->getUnits()){
+        std::cout << "Invalid advance order ! Player " << player->getName() << " cannot advance " << units << " from territory " << sourceTerritory->getName()
                   << " which has " << sourceTerritory->getUnits() << " units." << std::endl;
         return false;
     }
@@ -270,106 +279,67 @@ void Advance::setTargetTerritory(Territory *toTerritory) {
     Advance::targetTerritory = toTerritory;
 }
 
-// Bomb class definition
-Bomb::Bomb() {
+/**
+ * Airlift class definition
+ */
 
-}
+Airlift::Airlift() {}
 
-Bomb::~Bomb() {
-
-}
-
-Bomb& Bomb::operator=(Bomb&& order) {
-    if (this != &order) {
-
-    }
-    return *this;
-}
-
-Bomb::Bomb(const Bomb& bomb) {
-
-}
-
-Order* Bomb::clone() {
-    return new Bomb(*this);
-}
-
-std::string Bomb::getDescription() const {
-    return "Kill half of the army on an opponent's territory, adjacent to one of your territory.";
-}
-
-std::string Bomb::getEffectApplied() const {
-    return "Kill x units located on ";
-}
-
-void Bomb::onExecute() {
-    std::cout << "Bomb yourselves!" << std::endl;
-}
-
-bool Bomb::validate() const {
-    return true;
-}
-
-
-// Blockade class definition
-Blockade::Blockade() {
-
-}
-
-Blockade::~Blockade() {
-
-}
-
-Blockade& Blockade::operator=(Blockade&& order) {
-    if (this != &order) {
-
-    }
-    return *this;
-}
-
-Blockade::Blockade(const Blockade& blockade) {
-
-}
-
-Order* Blockade::clone() {
-    return new Blockade(*this);
-}
-
-std::string Blockade::getDescription() const {
-    return "Triple the number of units on your territory and makes it neutral.";
-}
-
-std::string Blockade::getEffectApplied() const {
-    return "A blockade setup on ... of size ...";
-}
-
-void Blockade::onExecute() {
-    std::cout << "Run for your life!" << std::endl;
-}
-
-bool Blockade::validate() const {
-    return true;
-}
-
-
-// Airlift class definition
-Airlift::Airlift() {
-
-}
+Airlift::Airlift(Player* player, int units, Territory* sourceTerritory, Territory* targetTerritory) : CardOrder(player), units(units),
+                                                                                                      sourceTerritory(sourceTerritory), targetTerritory(targetTerritory){}
 
 Airlift::~Airlift() {
-
+    player = nullptr;
+    sourceTerritory = nullptr;
+    targetTerritory = nullptr;
 }
 
 Airlift& Airlift::operator=(Airlift&& order) {
     if (this != &order) {
-
+        order.units = units;
+        order.player = player;
+        order.sourceTerritory = sourceTerritory;
+        order.targetTerritory = targetTerritory;
     }
     return *this;
 }
 
-Airlift::Airlift(const Airlift& airlift) {
+Airlift::Airlift(const Airlift& airlift) : CardOrder(airlift.player), units(airlift.units),
+                                           sourceTerritory(airlift.sourceTerritory), targetTerritory(airlift.targetTerritory){}
 
+
+
+void Airlift::execute() {
+    if (validate()) {
+        // Player owns both territories
+        if (sourceTerritory->getOwner() == player && targetTerritory->getOwner() == player) {
+            std::cout << "Airlift order: Moving player " << player->getName() << "'s units (" << units << "), from " <<
+                      sourceTerritory->getName() << " to " << targetTerritory->getName() << std::endl;
+
+            sourceTerritory->setUnits(sourceTerritory->getUnits() - units);
+            targetTerritory->setUnits(targetTerritory->getUnits() + units);
+        }
+    }
+}
+
+/**
+* TODO: validate -> airlift can only be executed by a player playing a card
+*/
+bool Airlift::validate() const {
+    // Player owns neither territory
+    if(sourceTerritory->getOwner() != player || targetTerritory->getOwner() != player){
+        std::cout << "Invalid Airlift order ! The player " << player->getName() << " does not own either the source or target territory" << std::endl;
+        return false;
+    }
+
+    // Check if the player has enough units in source territory
+    if(units > sourceTerritory->getUnits()){
+        std::cout << "Invalid Airlift order ! The player " << player->getName() << " does have enough units in the territory " << sourceTerritory->getName() << "(Currently " <<
+                  sourceTerritory->getUnits() << " units)" << std::endl;
+        return false;
+    }
+
+    return true;
 }
 
 Order* Airlift::clone() {
@@ -388,29 +358,185 @@ void Airlift::onExecute() {
     std::cout << "We have liftoff." << std::endl;
 }
 
-bool Airlift::validate() const {
-    return true;
-}
 
-
-// Negotiate class definition
-Negotiate::Negotiate() {
+// Bomb class definition
+Bomb::Bomb() {
 
 }
 
-Negotiate::~Negotiate() {
+Bomb::Bomb(Player* player, Territory* targetTerritory) : CardOrder(player), targetTerritory(targetTerritory) {}
 
+Bomb::~Bomb() {
+    player = nullptr;
+    targetTerritory = targetTerritory;
 }
 
-Negotiate& Negotiate::operator=(Negotiate&& order) {
+Bomb& Bomb::operator=(Bomb&& order) {
     if (this != &order) {
-
+        player = order.player;
+        targetTerritory = order.targetTerritory;
     }
     return *this;
 }
 
-Negotiate::Negotiate(const Negotiate& negotiate) {
+Bomb::Bomb(const Bomb& bomb) : CardOrder(bomb.player), targetTerritory(bomb.targetTerritory) {}
 
+void Bomb::execute() {
+    if(validate()){
+        targetTerritory->setUnits(targetTerritory->getUnits() / 2);
+        std::cout << "Bomb order: Removing half the armies in target territory " << targetTerritory->getName() << std::endl;
+    }
+}
+
+bool Bomb::validate() const {
+    // Check if player owns target territory
+    if(targetTerritory->getOwner() == player){
+        std::cout << "Bomb order invalid ! Player " << player->getName() << " owns the target territory" << std::endl;
+        return false;
+    }
+
+    vector<Territory*> adjacentTerritories;
+    bool isAdjacent = false;
+    // Check if target territory is adjacent to a territory owned by the player
+    for(Territory* t: player->toDefend()){
+        adjacentTerritories = t->getAdjacentTerritories();
+        for(Territory* adjacent: adjacentTerritories){
+            if(adjacent->getId() == targetTerritory->getId()) {
+                isAdjacent = true;
+                break;
+            }
+        }
+        adjacentTerritories.clear();
+    }
+
+    if(!isAdjacent){
+        std::cout << "Bomb order invalid ! The target territory is not adjacent to any of the territories owned by " << player->getName() << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+Order* Bomb::clone() {
+    return new Bomb(*this);
+}
+
+std::string Bomb::getDescription() const {
+    return "Kill half of the army on an opponent's territory, adjacent to one of your territory.";
+}
+
+std::string Bomb::getEffectApplied() const {
+    return "Kill x units located on ";
+}
+
+void Bomb::onExecute() {
+    std::cout << "Bomb yourselves!" << std::endl;
+}
+
+/**
+ * Blockade class definition
+ */
+Blockade::Blockade() {
+
+}
+
+Blockade::Blockade(Player *player, Territory *targetTerritory) : CardOrder(player), targetTerritory(targetTerritory){}
+
+
+Blockade::~Blockade(){
+    player = nullptr;
+    targetTerritory = nullptr;
+}
+
+Blockade& Blockade::operator=(Blockade&& order) {
+    if (this != &order) {
+        player = order.player;
+        targetTerritory = order.targetTerritory;
+    }
+    return *this;
+}
+
+Blockade::Blockade(const Blockade& blockade) : CardOrder(blockade.player), targetTerritory(blockade.targetTerritory){}
+
+Order* Blockade::clone() {
+    return new Blockade(*this);
+}
+
+/**
+ * TODO: Create neutral player and transfer target territory owndership to them
+ */
+void Blockade::execute() {
+    if(validate()){
+        if(targetTerritory->getOwner() == player){
+            std::cout << "Blockade order: Doubling the number of armies in " << targetTerritory->getName() << ", and transferring its ownership to the Neutral player (** NOT IMPLEMENTED **)." << std::endl;
+
+            targetTerritory->setUnits(targetTerritory->getUnits() * 2);
+
+//            if(/* neutral player does not exist */){
+//                /* Create neutral player */
+//            }
+//            targetTerritory->setOwner(/* Created Neutral Player */);
+        }
+    }
+}
+
+bool Blockade::validate() const {
+    // Check if target territory belongs to player
+    if(targetTerritory->getOwner() != player){
+        std::cout << "Blockade order invalid ! The player " << player->getName() << " does not own the target territory" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+std::string Blockade::getDescription() const {
+    return "Triple the number of units on your territory and makes it neutral.";
+}
+
+std::string Blockade::getEffectApplied() const {
+    return "A blockade setup on ... of size ...";
+}
+
+void Blockade::onExecute() {
+    std::cout << "Run for your life!" << std::endl;
+}
+
+
+// Negotiate class definition
+Negotiate::Negotiate() {}
+
+Negotiate::Negotiate(Player* targetPlayer) : CardOrder(player), targetPlayer(targetPlayer) {}
+
+Negotiate::~Negotiate() {
+    player = nullptr;
+    targetPlayer = nullptr;
+}
+
+Negotiate& Negotiate::operator=(Negotiate&& order) {
+    if (this != &order) {
+        player = order.player;
+        targetPlayer = order.targetPlayer;
+    }
+    return *this;
+}
+
+Negotiate::Negotiate(const Negotiate& negotiate) : CardOrder(negotiate.player), targetPlayer(negotiate.targetPlayer) {}
+
+/**
+ * TODO: allow players to attack each other after the turn is over
+ */
+void Negotiate::execute() {
+    if(validate()){
+
+    }
+}
+
+bool Negotiate::validate() const {
+    if(targetPlayer == player){
+        std::cout << "Negotiate order invalid ! The target player is the player issuing the order" << std::endl;
+        return false;
+    }
+    return true;
 }
 
 Order* Negotiate::clone() {
@@ -427,8 +553,4 @@ std::string Negotiate::getEffectApplied() const {
 
 void Negotiate::onExecute() {
     std::cout << "Negotiate with the enemy's army!" << std::endl;
-}
-
-bool Negotiate::validate() const {
-    return true;
 }
