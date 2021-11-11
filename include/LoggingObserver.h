@@ -5,26 +5,31 @@ using namespace std;
 
 class ILoggable{
     public:
-        virtual ~ILoggable() {};
         virtual string stringToLog() = 0;
 };
 
 class Observer{
     public:
         ~Observer();
-        virtual void Update(ILoggable) = 0;
+        virtual void Update(ILoggable* iLoggable) = 0;
     protected:
         Observer();
 };
 
 class Subject{
+    private:
+        list<Observer*> *_observers;
     public:
-        virtual void Notify(ILoggable);
+        Subject();
+        ~Subject();
+        virtual void Attach(Observer* o);
+        virtual void Detach(Observer* o);
+        virtual void Notify(ILoggable* iLoggable);
 };
 
 class LogObserver : public Observer{
     public:
         LogObserver();
         ~LogObserver();
-        void Update(ILoggable);
+        void Update(ILoggable* iLoggable);
 };
