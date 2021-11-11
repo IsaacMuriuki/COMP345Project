@@ -1,6 +1,19 @@
 #include "GameEngine.h"
 
 // GameEngine class definition
+// 
+//Dummy Data
+
+Continent NA = Continent(0, "NA", 4);
+Territory CANADA = Territory(0, "CANADA", &NA);
+Territory US = Territory(1, "US", &NA);
+Territory MEXICO = Territory(2, "MEXICO", &NA);
+std::vector<Player> playerList;
+
+
+
+
+
 
 GameEngine::GameEngine(){
     
@@ -14,6 +27,24 @@ GameEngine::GameEngine(){
     issueOrdersState = new IssueOrdersState("issue orders", {ISSUE_ORDER_CMD, END_ISSUE_ORDERS_CMD});
     executeOrdersState = new ExecuteOrdersState("execute orders", {EXEC_ORDER_CMD, END_EXEC_ORDERS_CMD, WIN_CMD});
     winState = new WinState("win", {PLAY_CMD, END_CMD});
+
+    CANADA.addAdjacentTerritory(&US);
+    US.addAdjacentTerritory(&CANADA);
+    US.addAdjacentTerritory(&MEXICO);
+    MEXICO.addAdjacentTerritory(&US);
+
+    NA.addTerritory(&US);
+    NA.addTerritory(&CANADA);
+    NA.addTerritory(&MEXICO);
+
+    playerList.push_back(Player());
+    playerList.push_back(Player());
+    playerList[1].addTerritory(&CANADA);
+    playerList[0].setName("Ted");
+    playerList[1].addTerritory(&US);
+    playerList[1].addTerritory(&MEXICO);
+    playerList[1].setName("Hillary");
+
 
     SetCommands();
 
@@ -258,9 +289,79 @@ PlayersAddedState::PlayersAddedState(const PlayersAddedState& state) : PlayersAd
 
 // AssignReinforcementState class definition
 
-AssignReinforcementState::AssignReinforcementState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) { }
+AssignReinforcementState::AssignReinforcementState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
 AssignReinforcementState::~AssignReinforcementState(){};
 AssignReinforcementState::AssignReinforcementState(const AssignReinforcementState& state) : AssignReinforcementState(state.name, state.cmds) { }
+
+void AssignReinforcementState::onStateEnter() {
+    std::cout << "Entered gamestate '" << name << "'." << std::endl; 
+    //the ammount of reinforcements a player will have
+    int reinforcementCount = 0;
+    //displays the countries and their units to the console
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries with these army counts: " << std::endl;
+        for (Territory* territory : player.getTerritories()) {
+            std::cout << territory->getName() << " with " << territory->getUnits() << std::endl;
+        }
+    }
+    //Iterates through the players to let them add units to their country
+    int choice;
+    bool fullContinent = true;
+    for (Player player : playerList) {
+        if (player.getTerritories().size() == 0) { continue; }
+        reinforcementCount = (player.getTerritories().size())/3;
+        //checks to see for full continents (right now just NA)
+        for (Territory* territory : NA.getTerritories()) {
+            bool inContinent = false;
+            for (Territory* territoryPlayer : player.getTerritories()) {
+                if (territory->getId() == territoryPlayer->getId()) { inContinent = true; }
+            }
+            if (inContinent == false) { fullContinent = false; }
+
+        }
+        if (fullContinent == true) { reinforcementCount = reinforcementCount + NA.getArmyValue(); }
+        if (reinforcementCount < 3) reinforcementCount = 3;
+        std::cout << "These are your countries: ";
+        for (Territory *territory : player.getTerritories()) {
+            std::cout << territory->getName() << " ";
+        }
+        std::cout << std::endl;
+        while (reinforcementCount > 0) {
+            std::cout << "You have " << reinforcementCount << " to add (choose by index)" << std::endl;
+            std::cin >> choice;
+            if (choice >= player.getTerritories().size() || choice < 0) {
+                std::cout << "Invalid choice" << std::endl;
+            }
+            else {
+                player.getTerritories().at(choice)->setUnits(player.getTerritories().at(choice)->getUnits() + 1);
+                reinforcementCount--;
+            }
+            
+        }
+        std::cout << reinforcementCount << std::endl;
+    }
+    //displays the countries and their updated unit counts  to the console
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries with these army counts: " << std::endl;
+        for (Territory* territory : player.getTerritories()) {
+            std::cout << territory->getName() << " with " << territory->getUnits() << std::endl;
+        }
+    }
+
+
+
+}
+
+/**
+ * Method executed upon exiting the state. Is meant to be overitten to implement the functionality specific to each game state.
+ **/
+void AssignReinforcementState::onStateExit() {
+    std::cout << "Exited gamestate '" << name << "'." << std::endl;
+}
+
+
+
+
 
 // IssueOrdersState class definition
 

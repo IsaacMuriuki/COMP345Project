@@ -8,6 +8,8 @@
 #include <vector>
 #include <functional>
 #include <algorithm>
+#include "Player.h"
+#include "map.h"
 
 class GameState
 {
@@ -62,6 +64,8 @@ class AssignReinforcementState : public GameState {
     AssignReinforcementState(std::string _name, std::vector<std::string> _cmds);
     AssignReinforcementState(const AssignReinforcementState& state);
     ~AssignReinforcementState();
+    virtual void onStateEnter();
+    virtual void onStateExit();
 };
 
 class IssueOrdersState : public GameState { 
@@ -132,6 +136,7 @@ class GameEngine
     GameState* getCurrentState();
     std::map<std::string, GameState*> getCmds();
     GameEngine* clone();
+    
 };
 
 #endif

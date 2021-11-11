@@ -32,6 +32,7 @@ public:
     OrdersList* getOrdersList();
     Hand* getHandOfCards();
     string getName();
+    void setName(string Name);
     void setHandOfCards(Hand* );
     void setTerritories(vector<Territory*> );
     void setOrders(OrdersList* );

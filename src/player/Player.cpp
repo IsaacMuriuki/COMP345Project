@@ -234,4 +234,6 @@ void Player::setOrders(OrdersList* ordersList) { this->ordersList = new OrdersLi
 
 void Player::setHandOfCards(Hand* handOfCards) { this->handOfCards = new Hand(*handOfCards);}
 
+void Player::setName(string Name) { this->name = Name; }
+
 string Player::getName()  { return this->name;}
