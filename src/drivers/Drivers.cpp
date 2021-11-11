@@ -247,3 +247,7 @@ void commandsDriver(){
     // 3) commands that are invalid in the current game state are rejected, and valid commands result in the correct effect and state change
     
 }
+
+void logObserverDriver(){
+    cout << "\nHello" << endl;
+}
