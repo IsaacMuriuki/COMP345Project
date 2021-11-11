@@ -1,6 +1,8 @@
 #ifndef GAME_ENGINE_H
 #define GAME_ENGINE_H
 
+#include "LoggingObserver.h"
+
 #include <iostream>
 #include <stdio.h>
 #include <string>
@@ -85,7 +87,7 @@ class WinState : public GameState {
     ~WinState();
 };
 
-class GameEngine
+class GameEngine : public ILoggable, public Subject
 {
     private:
 
@@ -132,6 +134,7 @@ class GameEngine
     GameState* getCurrentState();
     std::map<std::string, GameState*> getCmds();
     GameEngine* clone();
+    string stringToLog();
 };
 
 #endif

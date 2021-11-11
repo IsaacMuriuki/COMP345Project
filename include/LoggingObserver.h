@@ -1,6 +1,7 @@
 #pragma once
 #include <list>
 #include <string>
+#include <iostream>
 using namespace std;
 
 class ILoggable{
@@ -10,10 +11,9 @@ class ILoggable{
 
 class Observer{
     public:
+        Observer();
         ~Observer();
         virtual void Update(ILoggable* iLoggable) = 0;
-    protected:
-        Observer();
 };
 
 class Subject{

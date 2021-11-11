@@ -6,6 +6,7 @@
 #include "Orders.h"
 #include "OrdersList.h"
 #include "Player.h"
+#include "LoggingObserver.h"
 
 #include <stdio.h>
 #include <iostream>
@@ -143,6 +144,7 @@ void ordersDriver() {
 void mapDriver() {
     const string MAPS_FOLDER = "../../maps/"; // for mac this works ->   const string MAPS_FOLDER = "../maps";
     MapLoader loader;
+
     // read all files in valid maps folder
     try{
         for (const auto & entry : fs::directory_iterator(MAPS_FOLDER)){

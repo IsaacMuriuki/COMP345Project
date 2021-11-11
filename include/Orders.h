@@ -1,9 +1,11 @@
 #pragma once
 
+#include "LoggingObserver.h"
+
 #include <iostream>
 #include <string>
 
-class Order {
+class Order : public ILoggable, public Subject{
     private:
     bool _executed;
     // TODO: might need Player* here.
@@ -69,6 +71,8 @@ class Order {
      * Additional checks for validation of the order.
      **/
     virtual bool onValidate() const = 0;
+
+    string stringToLog();
 };
 
 /**

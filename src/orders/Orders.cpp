@@ -48,6 +48,9 @@ bool Order::validate() const {
     return !_executed && onValidate();
 }
 
+string Order::stringToLog() {
+    return "Observing Order::execute()";
+}
 
 std::ostream& operator<<(std::ostream &out, const Order& order) {
     out << order.getDescription() << (order.isExecuted() ? " - " + order.getEffectApplied() : "");

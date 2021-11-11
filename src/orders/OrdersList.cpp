@@ -103,3 +103,7 @@ bool OrdersList::remove(int index) {
 int OrdersList::size() {
     return _orders.size();
 }
+
+string OrdersList::stringToLog(){
+    return "Observing OrdersList::addOrder()";
+}

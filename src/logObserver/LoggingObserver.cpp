@@ -26,10 +26,10 @@ void Subject::Notify(ILoggable* iLoggable){
     }
 }
 
-LogObserver::LogObserver(){};
+LogObserver::LogObserver(){}
 
-LogObserver::~LogObserver(){};
+LogObserver::~LogObserver(){}
 
 void LogObserver::Update(ILoggable* iLoggable){
-    iLoggable->stringToLog();
+    cout << iLoggable->stringToLog() << endl;
 }

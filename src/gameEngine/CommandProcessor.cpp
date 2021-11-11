@@ -47,6 +47,10 @@ Command* CommandProcessor::getCommand(){
     return new Command();
 }
 
+string CommandProcessor::stringToLog(){
+    return "Observing CommandProcessor::saveCommand()";
+}
+
 // FileCommandProcessorAdapter class definition
 
 FileCommandProcessorAdapter::FileCommandProcessorAdapter(){
@@ -100,4 +104,8 @@ Command::~Command(){
 
 void Command::saveEffect(string newEffect){
     effect = newEffect;
+}
+
+string Command::stringToLog(){
+    return "Observing Command::saveEffect()";
 }

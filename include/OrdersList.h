@@ -2,9 +2,9 @@
 
 #include <vector>
 #include "Orders.h"
+#include "LoggingObserver.h"
 
-
-class OrdersList {
+class OrdersList : public ILoggable, public Subject {
     private:
     std::vector<Order*> _orders;
 
@@ -60,4 +60,6 @@ class OrdersList {
      * @return number of orders in orders list.
      **/
     int size();
+
+    string stringToLog();
 };

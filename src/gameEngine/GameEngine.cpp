@@ -182,6 +182,10 @@ std::map<std::string, GameState*> GameEngine::getCmds(){return cmds;}
 
 GameEngine* GameEngine::clone() { return new GameEngine(*this); }
 
+string GameEngine::stringToLog(){
+    return "Observing GameEngine::transition()";
+}
+
 // GameState class definition
 
 GameState::GameState(std::string _name){
