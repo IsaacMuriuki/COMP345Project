@@ -23,7 +23,6 @@ Player::Player() {
  * @param handOfCards
  */
 Player::Player(string name, vector<Territory*> territories, OrdersList* ordersList, Hand* handOfCards){
-    //std::cout << "Player parameterized constructor" << std::endl;
     this->name = name;
     this->territories = territories;
     this->ordersList = new OrdersList(*ordersList);
@@ -40,6 +39,8 @@ Player::~Player(){
     for (int i = 0; i < territories.size(); ++i) {
         territories[i] = NULL;
     }
+
+    for(Player* p : playersBeingNegotiatedWith){ p = nullptr; }
 }
 
 /**
@@ -52,6 +53,7 @@ Player::Player(const Player& player){
     this->territories = player.territories;
     this->ordersList = new OrdersList(*player.ordersList);
     this->handOfCards = new Hand(*player.handOfCards);
+    this->playersBeingNegotiatedWith = player.playersBeingNegotiatedWith;
 }
 
 /**
@@ -65,6 +67,7 @@ Player& Player::operator=(const Player& player){
     this->territories = player.territories;
     this->ordersList = new OrdersList(*player.ordersList);
     this->handOfCards = new Hand(*player.handOfCards);
+    this->playersBeingNegotiatedWith = player.playersBeingNegotiatedWith;
 
     return *this;
 }
@@ -243,4 +246,8 @@ int Player::getReinforcementPool() const {return reinforcementPool;}
 void Player::setHandOfCards(Hand* handOfCards) { this->handOfCards = new Hand(*handOfCards);}
 
 string Player::getName()  { return this->name;}
+
+vector<Player *> Player::getPlayersBeingNegotiatedWith() const {return playersBeingNegotiatedWith; }
+
+void Player::addToPlayersBeingNegotiatedWith(Player *player) {playersBeingNegotiatedWith.push_back(player);}
 

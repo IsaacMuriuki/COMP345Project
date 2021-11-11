@@ -38,6 +38,8 @@ public:
     void addToReinforcementPool(int);
     void removeFromReinforcementPool(int);
     int getReinforcementPool() const;
+    vector<Player *> getPlayersBeingNegotiatedWith() const;
+    void addToPlayersBeingNegotiatedWith(Player* player);
 
     // Overloading << and = operators
     friend std::ostream& operator<<(std::ostream &, const Player& );
@@ -48,6 +50,7 @@ private:
     Hand* handOfCards;
     OrdersList* ordersList;
     int reinforcementPool;
+    vector<Player*> playersBeingNegotiatedWith;
 };
 
 #endif //COMP_345_PROJECT_PLAYER_H

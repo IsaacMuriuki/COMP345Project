@@ -210,6 +210,7 @@ void Advance::execute() {
 
                 /**
                  * TODO: A player receives a card at the end of his turn if they successfully conquered at least one territory during their turn.
+                 * - might need to add a reference to the Deck in the players Hand, in order to be able to draw() a card
                  */
                 if(hasSuccessfullyAttacked){
                     // give card to player
@@ -246,6 +247,31 @@ bool Advance::validate() const {
         std::cout << "Invalid advance order ! Player " << player->getName() << "'s target territory " << targetTerritory->getName() << " is not adjacent to their source territory " << sourceTerritory->getName() << std::endl;
         return isAdjacentToSource;
     }
+
+    /**
+     * Check if:
+     * 1. the target territory is owned by another player
+     * 2. the players are negotiating as a result of the negotiate order by playing the diplomacy card
+     */
+     if(targetTerritory->getOwner() != player) {
+         if(!player->getPlayersBeingNegotiatedWith().empty()) {
+             vector<Player *> playersNegotiatingWith = player->getPlayersBeingNegotiatedWith();
+             bool isNegotiatingWithTarget = false;
+             Player* targetPlayer = targetTerritory->getOwner();
+
+             for(Player* p : playersNegotiatingWith){
+                 if(p == targetPlayer){
+                     isNegotiatingWithTarget = true;
+                     break;
+                 }
+             }
+
+             if(isNegotiatingWithTarget){
+                 std::cout << "Invalid advance order ! Attack on " << targetTerritory->getName() << " because the players are currently negotiating" << std::endl;
+                 return false;
+             }
+         }
+     }
 
     // Ensure player cant advance a negative amount of units
     if(units < 0){
@@ -323,7 +349,7 @@ void Airlift::execute() {
 }
 
 /**
-* TODO: validate -> airlift can only be executed by a player playing a card
+* TODO: validate -> airlift can only be executed by a player playing a card (prob to be done in issueOrder() )
 */
 bool Airlift::validate() const {
     // Player owns neither territory
@@ -463,7 +489,9 @@ Order* Blockade::clone() {
 }
 
 /**
- * TODO: Create neutral player and transfer target territory owndership to them
+ * TODO: Create neutral player and transfer target territory ownership to them
+ * - maybe always add a neutral player in the start of a game (should not be given territories like the others),
+ * so just need to transfer ownership here
  */
 void Blockade::execute() {
     if(validate()){
@@ -527,7 +555,8 @@ Negotiate::Negotiate(const Negotiate& negotiate) : CardOrder(negotiate.player), 
  */
 void Negotiate::execute() {
     if(validate()){
-
+        targetPlayer->addToPlayersBeingNegotiatedWith(player);
+        player->addToPlayersBeingNegotiatedWith(targetPlayer);
     }
 }
 
