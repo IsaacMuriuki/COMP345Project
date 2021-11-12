@@ -46,7 +46,7 @@ public:
     MapLoadedState(const MapLoadedState &state);
     ~MapLoadedState();
     virtual void onStateEnter();
-    //  virtual void onStateExit();
+    virtual void onStateExit();
 };
 
 class MapValidatedState : public GameState
@@ -55,7 +55,7 @@ public:
     MapValidatedState(std::string _name, std::vector<std::string> _cmds);
     MapValidatedState(const MapValidatedState &state);
     ~MapValidatedState();
-    //  virtual void onStateEnter();
+    virtual void onStateEnter();
     // virtual void onStateExit();
 };
 

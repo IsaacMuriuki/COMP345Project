@@ -266,6 +266,7 @@ StartState::~StartState(){};
 StartState::StartState(const StartState &state) : StartState(state.name, state.cmds) {}
 
 // MapLoadedState class definition
+static Map *m;
 
 MapLoadedState::MapLoadedState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
 MapLoadedState::~MapLoadedState(){};
@@ -275,19 +276,36 @@ void MapLoadedState::onStateEnter()
     std::cout << "Entered gamestate '" << name << "'." << std::endl;
     const string MAPS_FOLDER = "../../maps/"; // for mac this works ->   const string MAPS_FOLDER = "../maps";
     MapLoader loader;
-    std::cout << "Please select a map you would like to load from the following options:" << std::endl;
+    std::cout << "Please select the map # you would like to load from the following options:" << std::endl;
     int counter = 1;
+    std::vector<string> mapFiles;
     for (const auto &entry : fs::directory_iterator(MAPS_FOLDER))
     {
         cout << "\n Map#" << counter << " : " << entry.path().filename() << endl;
         counter++;
+        mapFiles.push_back(entry.path().string());
     }
+    int option = 0;
+    std::cin >> option;
+    mapFiles.at(option - 1);
+    m = loader.loadMap(mapFiles.at(option - 1));
+    cout << "Map Loaded succesfully \n"
+         << *m << endl;
+}
+
+void MapLoadedState::onStateExit()
+{
+    std::cout << "Exited gamestate '" << name << "'." << std::endl;
 }
 // MapValidatedState class definition
 
 MapValidatedState::MapValidatedState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
 MapValidatedState::~MapValidatedState(){};
 MapValidatedState::MapValidatedState(const MapValidatedState &state) : MapValidatedState(state.name, state.cmds) {}
+void MapValidatedState::onStateEnter()
+{
+    cout << *m << endl;
+}
 
 // PlayersAddedState class definition
 
