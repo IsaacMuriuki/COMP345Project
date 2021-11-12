@@ -104,6 +104,11 @@ int OrdersList::size() {
     return _orders.size();
 }
 
+/**
+ * Returns OrdersList entry to be logged.
+ * 
+ * @return entry as a string.
+ * */
 string OrdersList::stringToLog(){
     return "Observing OrdersList::addOrder()";
 }

@@ -61,5 +61,10 @@ class OrdersList : public ILoggable, public Subject {
      **/
     int size();
 
+    /**
+     * Returns OrdersList entry to be logged.
+     * 
+     * @return entry as a string.
+     * */
     string stringToLog();
 };

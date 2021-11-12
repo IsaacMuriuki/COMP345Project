@@ -43,6 +43,13 @@ class Order : public ILoggable, public Subject{
     bool validate() const;
 
     /**
+     * Returns Orders entry to be logged.
+     * 
+     * @return entry as a string.
+     * */
+    string stringToLog();
+
+    /**
      * Outputs a description and the effects of the order after the order is executed.
      **/
     friend std::ostream& operator<<(std::ostream &out, const Order& order);
@@ -71,8 +78,6 @@ class Order : public ILoggable, public Subject{
      * Additional checks for validation of the order.
      **/
     virtual bool onValidate() const = 0;
-
-    string stringToLog();
 };
 
 /**

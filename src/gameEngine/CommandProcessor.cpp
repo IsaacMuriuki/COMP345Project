@@ -47,6 +47,11 @@ Command* CommandProcessor::getCommand(){
     return new Command();
 }
 
+/**
+ * Returns CommandProcessor entry to be logged.
+ * 
+ * @return entry as a string.
+ * */
 string CommandProcessor::stringToLog(){
     return "Observing CommandProcessor::saveCommand()";
 }
@@ -106,6 +111,11 @@ void Command::saveEffect(string newEffect){
     effect = newEffect;
 }
 
+/**
+ * Returns Command entry to be logged.
+ * 
+ * @return entry as a string.
+ * */
 string Command::stringToLog(){
     return "Observing Command::saveEffect()";
 }

@@ -10,9 +10,6 @@
 
 #include <stdio.h>
 #include <iostream>
-#include <fstream>
-#include <chrono>
-#include <ctime>    
 #include <filesystem>
 
 using std::cout, std::cin, std::endl;
@@ -253,12 +250,5 @@ void commandsDriver(){
 
 void logObserverDriver(){
     cout << "\n\nHello" << endl;
-    ofstream outfile ("./../../gamelog.txt", ios_base::app);
-    // append to log file
-    std::time_t current_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    // add timestamp to log
-    auto timestamp = std::put_time(localtime(&current_time), "%Y-%m-%d %H:%M:%S");
-    // write to log file
-    outfile << timestamp << ": " << "temporary words" << endl;
-    outfile.close();
+    
 }

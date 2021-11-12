@@ -48,6 +48,11 @@ bool Order::validate() const {
     return !_executed && onValidate();
 }
 
+/**
+ * Returns Order entry to be logged.
+ * 
+ * @return entry as a string.
+ * */
 string Order::stringToLog() {
     return "Observing Order::execute()";
 }
