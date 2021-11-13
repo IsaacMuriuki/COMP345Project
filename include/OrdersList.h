@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <typeinfo>
 #include "Orders.h"
 #include "LoggingObserver.h"
 
@@ -62,7 +63,7 @@ class OrdersList : public ILoggable, public Subject {
     int size();
 
     /**
-     * Returns OrdersList entry to be logged.
+     * Returns an entry of the order issued to be logged.
      * 
      * @return entry as a string.
      * */

@@ -37,6 +37,9 @@ void CommandProcessor::readCommand(string cmdName){
 void CommandProcessor::saveCommand(string cmdName){
     Command* cmd = new Command(cmdName);
     cmds.push_back(cmd);
+
+    // Notifies observer of the command.
+    Notify(this);
 }
 /* Check if the command is valid in the current game state */
 bool CommandProcessor::validate(Command cmd){
@@ -48,12 +51,13 @@ Command* CommandProcessor::getCommand(){
 }
 
 /**
- * Returns CommandProcessor entry to be logged.
+ * Returns an entry of the command to be logged.
  * 
  * @return entry as a string.
  * */
 string CommandProcessor::stringToLog(){
-    return "Observing CommandProcessor::saveCommand()";
+    // WIP missing command name: return "Command: " + cmds[cmds.size() - 1]. OrderList;
+    return "Command: Command name";
 }
 
 // FileCommandProcessorAdapter class definition
@@ -109,13 +113,16 @@ Command::~Command(){
 
 void Command::saveEffect(string newEffect){
     effect = newEffect;
+
+     // Notifies observer of the command's effect.
+    Notify(this);
 }
 
 /**
- * Returns Command entry to be logged.
+ * Returns an entry of the effect of a command to be logged.
  * 
  * @return entry as a string.
  * */
 string Command::stringToLog(){
-    return "Observing Command::saveEffect()";
+    return "Command's Effect: " + effect;
 }

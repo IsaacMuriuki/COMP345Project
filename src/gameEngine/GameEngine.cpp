@@ -168,6 +168,9 @@ void GameEngine::SetState(GameState* nextState){
 void GameEngine::TransitionTo(GameState* nextState){
     if(currentState != nullptr) currentState->onStateExit();
     SetState(nextState);
+
+    // Notifies observer of the new game state.
+    Notify(this);
 }
 
 std::ostream& operator<<(std::ostream& os, const GameEngine& engine)
@@ -183,12 +186,14 @@ std::map<std::string, GameState*> GameEngine::getCmds(){return cmds;}
 GameEngine* GameEngine::clone() { return new GameEngine(*this); }
 
 /**
- * Returns GameEngine entry to be logged.
+ * Returns an entry of the new game state to be logged.
  * 
  * @return entry as a string.
  * */
 string GameEngine::stringToLog(){
-    return "Observing GameEngine::transition()";
+    stringstream ss;
+    ss << "Game Engine: " << *currentState;
+    return ss.str();
 }
 
 // GameState class definition

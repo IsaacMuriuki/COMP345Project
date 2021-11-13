@@ -43,7 +43,7 @@ class Order : public ILoggable, public Subject{
     bool validate() const;
 
     /**
-     * Returns Orders entry to be logged.
+     * Returns an entry of the effect of the order executed to be logged.
      * 
      * @return entry as a string.
      * */
