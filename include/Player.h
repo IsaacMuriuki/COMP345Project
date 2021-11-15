@@ -7,10 +7,12 @@
 #include <string>
 
 #include "map.h"
-#include "Cards.h"
 #include "OrdersList.h"
+#include "Cards.h"
 
 class Territory;
+class Order;
+class OrdersList;
 
 class Player{
 public:

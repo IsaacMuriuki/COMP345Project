@@ -32,27 +32,6 @@ std::ostream& operator<<(std::ostream &out, const Order& order) {
 }
 
 /**
- * CardOrder class definition
- */
-CardOrder::CardOrder() { }
-
-CardOrder::CardOrder(Player * player) : Order(player) {}
-
-CardOrder::~CardOrder() {
-    player = nullptr;
-}
-
-CardOrder& CardOrder::operator=(CardOrder&& order) {
-    if (this != &order) {
-        player = order.player;
-    }
-    return *this;
-}
-
-CardOrder::CardOrder(const CardOrder& order) : Order(order){}
-
-
-/**
  * Deploy class definition
  */
 Deploy::Deploy() {}
@@ -305,13 +284,15 @@ void Advance::setTargetTerritory(Territory *toTerritory) {
     Advance::targetTerritory = toTerritory;
 }
 
+void Advance::onExecute() {}
+
 /**
  * Airlift class definition
  */
 
 Airlift::Airlift() {}
 
-Airlift::Airlift(Player* player, int units, Territory* sourceTerritory, Territory* targetTerritory) : CardOrder(player), units(units),
+Airlift::Airlift(Player* player, int units, Territory* sourceTerritory, Territory* targetTerritory) : Order(player), units(units),
                                                                                                       sourceTerritory(sourceTerritory), targetTerritory(targetTerritory){}
 
 Airlift::~Airlift() {
@@ -330,7 +311,7 @@ Airlift& Airlift::operator=(Airlift&& order) {
     return *this;
 }
 
-Airlift::Airlift(const Airlift& airlift) : CardOrder(airlift.player), units(airlift.units),
+Airlift::Airlift(const Airlift& airlift) : Order(airlift.player), units(airlift.units),
                                            sourceTerritory(airlift.sourceTerritory), targetTerritory(airlift.targetTerritory){}
 
 
@@ -390,7 +371,7 @@ Bomb::Bomb() {
 
 }
 
-Bomb::Bomb(Player* player, Territory* targetTerritory) : CardOrder(player), targetTerritory(targetTerritory) {}
+Bomb::Bomb(Player* player, Territory* targetTerritory) : Order(player), targetTerritory(targetTerritory) {}
 
 Bomb::~Bomb() {
     player = nullptr;
@@ -405,7 +386,7 @@ Bomb& Bomb::operator=(Bomb&& order) {
     return *this;
 }
 
-Bomb::Bomb(const Bomb& bomb) : CardOrder(bomb.player), targetTerritory(bomb.targetTerritory) {}
+Bomb::Bomb(const Bomb& bomb) : Order(bomb.player), targetTerritory(bomb.targetTerritory) {}
 
 void Bomb::execute() {
     if(validate()){
@@ -466,7 +447,7 @@ Blockade::Blockade() {
 
 }
 
-Blockade::Blockade(Player *player, Territory *targetTerritory) : CardOrder(player), targetTerritory(targetTerritory){}
+Blockade::Blockade(Player *player, Territory *targetTerritory) : Order(player), targetTerritory(targetTerritory){}
 
 
 Blockade::~Blockade(){
@@ -482,7 +463,7 @@ Blockade& Blockade::operator=(Blockade&& order) {
     return *this;
 }
 
-Blockade::Blockade(const Blockade& blockade) : CardOrder(blockade.player), targetTerritory(blockade.targetTerritory){}
+Blockade::Blockade(const Blockade& blockade) : Order(blockade.player), targetTerritory(blockade.targetTerritory){}
 
 Order* Blockade::clone() {
     return new Blockade(*this);
@@ -533,7 +514,7 @@ void Blockade::onExecute() {
 // Negotiate class definition
 Negotiate::Negotiate() {}
 
-Negotiate::Negotiate(Player* targetPlayer) : CardOrder(player), targetPlayer(targetPlayer) {}
+Negotiate::Negotiate(Player* targetPlayer) : Order(player), targetPlayer(targetPlayer) {}
 
 Negotiate::~Negotiate() {
     player = nullptr;
@@ -548,7 +529,7 @@ Negotiate& Negotiate::operator=(Negotiate&& order) {
     return *this;
 }
 
-Negotiate::Negotiate(const Negotiate& negotiate) : CardOrder(negotiate.player), targetPlayer(negotiate.targetPlayer) {}
+Negotiate::Negotiate(const Negotiate& negotiate) : Order(negotiate.player), targetPlayer(negotiate.targetPlayer) {}
 
 /**
  * TODO: allow players to attack each other after the turn is over

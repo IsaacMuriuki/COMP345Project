@@ -2,8 +2,14 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
+
 #include "Player.h"
 #include "map.h"
+using std::vector;
+
+class Player;
+class Territory;
 
 class Order {
 public:
@@ -40,7 +46,7 @@ public:
      **/
     virtual bool validate() const = 0;
 
-    virtual void onExecute();
+    virtual void onExecute() = 0;
 
     /**
      * Outputs a description and the effects of the order after the order is executed.
@@ -60,44 +66,6 @@ protected:
 
     /**
      * Gets the results of the order when it executed.
-     * 
-     * @return results of the order.
-     **/
-    virtual std::string getEffectApplied() const = 0;
-};
-
-/**
- * Order caused by using a card.
- **/
-class CardOrder : public Order {
-protected:
-    // TODO: maybe add Card* as class field.
-public:
-    CardOrder();
-    CardOrder(Player*);
-    ~CardOrder();
-    virtual CardOrder& operator=(CardOrder&& order);
-    CardOrder(const CardOrder& order);
-
-    /**
-     * Gets a deep copy of the order itself.
-     * 
-     * @return deep copy of the order.
-     **/
-    virtual Order* clone() = 0;
-
-protected:
-    /**
-     * Gets the description of the order.
-     * Used for stream operator.
-     * 
-     * @return description of the order.
-     **/
-    virtual std::string getDescription() const = 0;
-
-    /**
-     * Gets the results of the order when it executed.
-     * Used for stream operator.
      * 
      * @return results of the order.
      **/
@@ -210,7 +178,7 @@ protected:
 /**
  * Order caused by using a card.
  **/
-class Airlift : public CardOrder {
+class Airlift : public Order {
 public:
     Airlift();
     Airlift(Player* player, int units, Territory* sourceTerritory, Territory* targetTerritory);
@@ -261,7 +229,7 @@ protected:
 /**
  * Order caused by using a card.
  **/
-class Bomb : public CardOrder {
+class Bomb : public Order {
 public:
     Bomb();
     Bomb(Player* player, Territory* targetTerritory);
@@ -308,7 +276,7 @@ protected:
 /**
  * Order caused by using a card.
  **/
-class Blockade : public CardOrder {
+class Blockade : public Order {
 public:
     Blockade();
     Blockade(Player* player, Territory* targetTerritory);
@@ -356,7 +324,7 @@ protected:
 
 
 
-class Negotiate : public CardOrder {
+class Negotiate : public Order {
 public:
     Negotiate();
     Negotiate(Player* targetPlayer);

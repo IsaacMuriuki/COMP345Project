@@ -3,6 +3,7 @@
 #include <vector>
 #include "Orders.h"
 
+class Order;
 
 class OrdersList {
     private:
