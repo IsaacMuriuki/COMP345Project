@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include "Player.h"
+#include "map.h"
 
 class Order {
 public:

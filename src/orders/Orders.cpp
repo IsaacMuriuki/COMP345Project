@@ -67,9 +67,9 @@ Deploy::~Deploy() {
 Deploy& Deploy::operator=(Deploy&& order) {
     if (this != &order) {
         order.units = units;
+        order.player = player;
+        order.territory = territory;
     }
-    order.player = player;
-    order.territory = territory;
     return *this;
 }
 

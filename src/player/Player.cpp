@@ -63,12 +63,15 @@ Player::Player(const Player& player){
  * @return
  */
 Player& Player::operator=(const Player& player){
-    this->name = player.name;
-    this->territories = player.territories;
-    this->ordersList = new OrdersList(*player.ordersList);
-    this->handOfCards = new Hand(*player.handOfCards);
-    this->playersBeingNegotiatedWith = player.playersBeingNegotiatedWith;
-
+    if(&player != this) {
+        delete ordersList;
+        delete handOfCards;
+        this->name = player.name;
+        this->territories = player.territories;
+        this->ordersList = new OrdersList(*player.ordersList);
+        this->handOfCards = new Hand(*player.handOfCards);
+        this->playersBeingNegotiatedWith = player.playersBeingNegotiatedWith;
+    }
     return *this;
 }
 
@@ -166,8 +169,8 @@ void Player::issueOrder() {
                 }
 
                 std::cout << "Creating a deployment order" << std::endl;
-                Deploy *deploy = new Deploy(numberOfDeployments);
-                ordersList->add(deploy);
+                //Deploy *deploy = new Deploy(numberOfDeployments);
+                //ordersList->add(deploy);
                 break;
             }
             case 2: {
@@ -184,8 +187,8 @@ void Player::issueOrder() {
                 }
 
                 std::cout << "Creating an advance order" << std::endl;
-                Advance *advance = new Advance(numberOfAdvancements);
-                ordersList->add(advance);
+                //Advance *advance = new Advance(numberOfAdvancements);
+                //ordersList->add(advance);
                 break;
             }
             case 3: {

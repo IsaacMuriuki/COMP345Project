@@ -3,8 +3,6 @@
 #include <string>
 #include "Drivers.h"
 
-#include "GameEngine.h"
-
 int main() {
     std::cout << "Menu - COMP 345 Project - Part 1 - Team DN7" << std::endl;
     std::cout << "Here are the driver options for execution:" << std::endl;
@@ -58,6 +56,10 @@ int main() {
                 commandsDriver();
                 break;
             case 'G':
+                // Order execution
+                orderExecutionDriver();
+                break;
+            case 'H':
                 // Ignore.
                 return EXIT_SUCCESS;
                 break;
