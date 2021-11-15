@@ -250,5 +250,27 @@ void commandsDriver(){
 
 void logObserverDriver(){
     cout << "\n\nHello" << endl;
+    LogObserver* logObserver = new LogObserver();
+    vector<Territory*> territories;
+    Player* player = new Player("Henry", territories, new OrdersList(), new Hand());
+    Airlift* airlift = new Airlift();
+    Negotiate* negotiate = new Negotiate();
+    Deploy* deploy = new Deploy(2);
+
+    // attach player's orderlist and orders to observer
+    player->getOrdersList()->Attach(logObserver);
+    airlift->Attach(logObserver);
+    negotiate->Attach(logObserver);
+    deploy->Attach(logObserver);
+
+    // add orders to player's orderlist
+    player->getOrdersList()->add(airlift);
+    player->getOrdersList()->add(negotiate);
+    player->getOrdersList()->add(deploy);
     
+    // execute all of player's valid orders
+    OrdersList* orderList = player->getOrdersList();
+    for(int i = 0; i < orderList->size(); i++){
+        orderList->get(i)->execute();
+    }
 }
