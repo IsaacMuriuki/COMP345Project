@@ -1,4 +1,4 @@
-#include <Player.h>
+#include "Player.h"
 
 // Default constructor
 Player::Player()
@@ -22,6 +22,7 @@ Player::Player(string name)
     this->territories = vector<Territory *>();
     this->ordersList = new OrdersList();
     this->handOfCards = new Hand();
+    this-> reinforcementPool = 0;
 }
 
 /**
@@ -35,13 +36,12 @@ Player::Player(string name)
  * @param ordersList
  * @param handOfCards
  */
-Player::Player(string name, vector<Territory *> territories, OrdersList *ordersList, Hand *handOfCards)
-{
-    //std::cout << "Player parameterized constructor" << std::endl;
+Player::Player(string name, vector<Territory*> territories, OrdersList* ordersList, Hand* handOfCards){
     this->name = name;
     this->territories = territories;
     this->ordersList = new OrdersList(*ordersList);
     this->handOfCards = new Hand(*handOfCards);
+    this->reinforcementPool = 0;
 }
 
 // Destructor
@@ -57,6 +57,8 @@ Player::~Player()
     {
         territories[i] = NULL;
     }
+
+    for(Player* p : playersBeingNegotiatedWith){ p = nullptr; }
 }
 
 /**
@@ -70,6 +72,7 @@ Player::Player(const Player &player)
     this->territories = player.territories;
     this->ordersList = new OrdersList(*player.ordersList);
     this->handOfCards = new Hand(*player.handOfCards);
+    this->playersBeingNegotiatedWith = player.playersBeingNegotiatedWith;
 }
 
 /**
@@ -78,13 +81,17 @@ Player::Player(const Player &player)
  * @param player
  * @return
  */
-Player &Player::operator=(const Player &player)
-{
-    this->name = player.name;
-    this->territories = player.territories;
-    this->ordersList = new OrdersList(*player.ordersList);
-    this->handOfCards = new Hand(*player.handOfCards);
 
+Player& Player::operator=(const Player& player){
+    if(&player != this) {
+        delete ordersList;
+        delete handOfCards;
+        this->name = player.name;
+        this->territories = player.territories;
+        this->ordersList = new OrdersList(*player.ordersList);
+        this->handOfCards = new Hand(*player.handOfCards);
+        this->playersBeingNegotiatedWith = player.playersBeingNegotiatedWith;
+    }
     return *this;
 }
 
@@ -182,88 +189,71 @@ void Player::issueOrder()
                 break;
         }
 
-        switch (orderNumber)
-        {
-        case 1:
-        {
-            int numberOfDeployments;
-            std::cout << "Enter how many troops(?) you want to deploy: ";
-            while (true)
-            {
-                std::cin >> numberOfDeployments;
-                if (!cin || numberOfDeployments < 0)
-                {
-                    cout << "Enter a non-negative number: " << endl;
-                    cin.clear();
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    continue;
+        switch (orderNumber) {
+            case 1: {
+                int numberOfDeployments;
+                std::cout << "Enter how many troops(?) you want to deploy: ";
+                while (true) {
+                    std::cin >> numberOfDeployments;
+                    if (!cin || numberOfDeployments < 0) {
+                        cout << "Enter a non-negative number: " << endl;
+                        cin.clear();
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        continue;
+                    } else break;
                 }
-                else
-                    break;
-            }
 
-            std::cout << "Creating a deployment order" << std::endl;
-            Deploy *deploy = new Deploy(numberOfDeployments);
-            ordersList->add(deploy);
-            break;
-        }
-        case 2:
-        {
-            int numberOfAdvancements;
-            std::cout << "Enter how many troops(?) you want to advance: ";
-            while (true)
-            {
-                std::cin >> numberOfAdvancements;
-                if (!cin || numberOfAdvancements < 0)
-                {
-                    cout << "Enter a non-negative number: " << endl;
-                    cin.clear();
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    continue;
+                std::cout << "Creating a deployment order" << std::endl;
+                //Deploy *deploy = new Deploy(numberOfDeployments);
+                //ordersList->add(deploy);
+                break;
+            }
+            case 2: {
+                int numberOfAdvancements;
+                std::cout << "Enter how many troops(?) you want to advance: ";
+                while (true) {
+                    std::cin >> numberOfAdvancements;
+                    if (!cin || numberOfAdvancements < 0) {
+                        cout << "Enter a non-negative number: " << endl;
+                        cin.clear();
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        continue;
+                    } else break;
                 }
-                else
-                    break;
-            }
 
-            std::cout << "Creating an advance order" << std::endl;
-            Advance *advance = new Advance(numberOfAdvancements);
-            ordersList->add(advance);
-            break;
-        }
-        case 3:
-        {
-            std::cout << "Creating a bomb order" << std::endl;
-            Bomb *bomb = new Bomb();
-            ordersList->add(bomb);
-            break;
-        }
-        case 4:
-        {
-            std::cout << "Creating a blockade order" << std::endl;
-            Blockade *blockade = new Blockade();
-            ordersList->add(blockade);
-            break;
-        }
-        case 5:
-        {
-            std::cout << "Creating an airlift order" << std::endl;
-            Airlift *airlift = new Airlift();
-            ordersList->add(airlift);
-            break;
-        }
-        case 6:
-        {
-            std::cout << "Creating a negotiate order" << std::endl;
-            Negotiate *negotiate = new Negotiate();
-            ordersList->add(negotiate);
-            break;
-        }
-        case 7:
-        {
-            std::cout << "Done Creating Orders\n"
-                      << std::endl;
-            break;
-        }
+                std::cout << "Creating an advance order" << std::endl;
+                //Advance *advance = new Advance(numberOfAdvancements);
+                //ordersList->add(advance);
+                break;
+            }
+            case 3: {
+                std::cout << "Creating a bomb order" << std::endl;
+                Bomb *bomb = new Bomb();
+                ordersList->add(bomb);
+                break;
+            }
+            case 4: {
+                std::cout << "Creating a blockade order" << std::endl;
+                Blockade *blockade = new Blockade();
+                ordersList->add(blockade);
+                break;
+            }
+            case 5: {
+                std::cout << "Creating an airlift order" << std::endl;
+                Airlift *airlift = new Airlift();
+                ordersList->add(airlift);
+                break;
+            }
+            case 6: {
+                std::cout << "Creating a negotiate order" << std::endl;
+                Negotiate *negotiate = new Negotiate();
+                ordersList->add(negotiate);
+                break;
+            }
+            case 7: {
+                std::cout << "Done Creating Orders\n" << std::endl;
+                break;
+            }
         }
     }
 }
@@ -275,7 +265,15 @@ void Player::addOrder(Order *order) { ordersList->add(order); }
 
 void Player::addTerritory(Territory *territory) { territories.push_back(territory); }
 
-vector<Territory *> Player::getTerritories() { return this->territories; }
+void Player::removeTerritory(Territory* territory) {
+    for(int i = 0; i < territories.size(); ++i){
+        if(territory->getId() == territories[i]->getId()){
+            territories.erase(territories.begin() + i);
+        }
+    }
+}
+
+vector<Territory *> Player::getTerritories() { return this->territories;}
 
 OrdersList *Player::getOrdersList() { return this->ordersList; }
 
@@ -285,6 +283,16 @@ void Player::setTerritories(vector<Territory *> territories) { this->territories
 
 void Player::setOrders(OrdersList *ordersList) { this->ordersList = new OrdersList(*ordersList); }
 
-void Player::setHandOfCards(Hand *handOfCards) { this->handOfCards = new Hand(*handOfCards); }
+void Player::addToReinforcementPool(int num) { this->reinforcementPool+=num;}
 
-string Player::getName() { return this->name; }
+void Player::removeFromReinforcementPool(int num) {this->reinforcementPool-=num;}
+
+int Player::getReinforcementPool() const {return reinforcementPool;}
+
+void Player::setHandOfCards(Hand* handOfCards) { this->handOfCards = new Hand(*handOfCards);}
+
+string Player::getName()  { return this->name;}
+
+vector<Player *> Player::getPlayersBeingNegotiatedWith() const {return playersBeingNegotiatedWith; }
+
+void Player::addToPlayersBeingNegotiatedWith(Player *player) {playersBeingNegotiatedWith.push_back(player);}

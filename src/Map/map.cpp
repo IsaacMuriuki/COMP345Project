@@ -221,6 +221,9 @@ std::ostream& operator<<(std::ostream& stream, const Map& map){
 	return stream;
 }
 
+vector<Continent*> Map::getContinents() const {return _continents;}
+vector<Territory*> Map::getTerritories() const {return _territories;}
+
 /**
  * Finds a continent in the map by id.
  * 

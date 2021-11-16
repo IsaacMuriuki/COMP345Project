@@ -5,6 +5,7 @@
 #include "Orders.h"
 #include "LoggingObserver.h"
 
+class Order;
 class OrdersList : public ILoggable, public Subject {
     private:
     std::vector<Order*> _orders;
@@ -54,6 +55,11 @@ class OrdersList : public ILoggable, public Subject {
      * @return true if the order was removed; false otherwise.
      **/
     bool remove(int index);
+
+    /**
+     * Removes an order in the list
+     */
+    bool remove(Order*);
 
     /**
      * Gets the size of the orders list.
