@@ -10,6 +10,8 @@
 #include <algorithm>
 #include "Player.h"
 #include "map.h"
+#include "Orders.h"
+#include "OrdersList.h"
 
 class GameState
 {
@@ -73,6 +75,8 @@ class IssueOrdersState : public GameState {
     IssueOrdersState(std::string _name, std::vector<std::string> _cmds);
     IssueOrdersState(const IssueOrdersState& state);
     ~IssueOrdersState();
+    virtual void onStateEnter();
+    virtual void onStateExit();
 };
 
 class ExecuteOrdersState : public GameState { 
@@ -80,6 +84,8 @@ class ExecuteOrdersState : public GameState {
     ExecuteOrdersState(std::string _name, std::vector<std::string> _cmds);
     ExecuteOrdersState(const ExecuteOrdersState& state);
     ~ExecuteOrdersState();
+    virtual void onStateEnter();
+    virtual void onStateExit();
 };
 
 class WinState : public GameState { 

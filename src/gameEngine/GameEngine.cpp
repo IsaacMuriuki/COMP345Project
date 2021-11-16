@@ -39,7 +39,7 @@ GameEngine::GameEngine(){
 
     playerList.push_back(Player());
     playerList.push_back(Player());
-    playerList[1].addTerritory(&CANADA);
+    playerList[0].addTerritory(&CANADA);
     playerList[0].setName("Ted");
     playerList[1].addTerritory(&US);
     playerList[1].addTerritory(&MEXICO);
@@ -359,9 +359,38 @@ void AssignReinforcementState::onStateExit() {
     std::cout << "Exited gamestate '" << name << "'." << std::endl;
 }
 
+void IssueOrdersState::onStateEnter() {
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries to attack: " << std::endl;
+        for (Territory* territory : player.toAttack()) {
+            std::cout << territory->getName() << std::endl;
+        }
+    }
+        for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries to defend: " << std::endl;
+        for (Territory* territory : player.toDefend()) {
+            std::cout << territory->getName() << std::endl;
+        }
+    }
+        for (Player player : playerList) {
+            player.issueOrder();            
+        }
+}
+void IssueOrdersState::onStateExit() {
+    std::cout << "Exited gamestate '" << name << "'." << std::endl;
+}
 
+void ExecuteOrdersState::onStateEnter() {
+    for (Player player : playerList) {
 
-
+        for (int i = 0; i < player.getOrdersList()->size(); i++) {
+            player.getOrdersList()->get(i)->execute();
+        }
+    }
+}
+void ExecuteOrdersState::onStateExit() {
+    std::cout << "Exited gamestate '" << name << "'." << std::endl;
+}
 
 // IssueOrdersState class definition
 
