@@ -1,5 +1,4 @@
-#ifndef COMP_345_PROJECT_PLAYER_H
-#define COMP_345_PROJECT_PLAYER_H
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -30,6 +29,7 @@ public:
     // Helper methods
     void addOrder(Order* );
     void addTerritory(Territory* );
+    void removeTerritory(Territory*);
     vector<Territory*> getTerritories();
     OrdersList* getOrdersList();
     Hand* getHandOfCards();
@@ -55,4 +55,3 @@ private:
     vector<Player*> playersBeingNegotiatedWith;
 };
 
-#endif //COMP_345_PROJECT_PLAYER_H

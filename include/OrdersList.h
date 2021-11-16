@@ -56,6 +56,11 @@ class OrdersList {
     bool remove(int index);
 
     /**
+     * Removes an order in the list
+     */
+    bool remove(Order*);
+
+    /**
      * Gets the size of the orders list.
      * 
      * @return number of orders in orders list.

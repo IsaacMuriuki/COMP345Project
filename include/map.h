@@ -168,9 +168,12 @@ public:
     Map& operator=(const Map &map);
     friend std::ostream &operator<<(std::ostream &stream, const Map& map);
 
+    vector<Territory*> getTerritories() const;
+    vector<Continent*> getContinents() const;
+
     /**
      * Finds a continent in the map by id.
-     * 
+     *
      * @param id the id of the continent to find.
      * @return the continent if found; NULL otherwise.
      **/
@@ -178,7 +181,7 @@ public:
 
     /**
      * Finds a territory in the map by id.
-     * 
+     *
      * @param id the id of the territory to find.
      * @return the territory if found; NULL otherwise.
      **/
@@ -186,7 +189,7 @@ public:
 
     /**
      * Finds a territory on a specific continent in the map by id.
-     * 
+     *
      * @param territoryId the id of the territory to find.
      * @param continentId the id of the continent to find in.
      * @return the territory if found; NULL otherwise.
@@ -195,14 +198,14 @@ public:
 
     /**
      * Checks if the map is valid.
-     * 
+     *
      * @return true if map is valid; false otherwise.
      **/
     bool validate();
 
     /**
      * Performs DFS traversal on class member _territories.
-     * 
+     *
      * @param indexOfTerritory index of starting territory.
      * @param visited keeps track if whether territories are visited or not.
      **/
@@ -210,7 +213,7 @@ public:
 
     /**
      * Performs DFS traversal on a specific subgraph.
-     * 
+     *
      * @param subgraph the subgraph.
      * @param indexOfTerritory index of starting territory.
      * @param visited keeps track if whether territories are visited or not.

@@ -230,6 +230,14 @@ void Player::addOrder(Order *order) { ordersList->add(order);}
 
 void Player::addTerritory(Territory *territory) { territories.push_back(territory);}
 
+void Player::removeTerritory(Territory* territory) {
+    for(int i = 0; i < territories.size(); ++i){
+        if(territory->getId() == territories[i]->getId()){
+            territories.erase(territories.begin() + i);
+        }
+    }
+}
+
 vector<Territory *> Player::getTerritories() { return this->territories;}
 
 OrdersList* Player::getOrdersList() { return this->ordersList;}

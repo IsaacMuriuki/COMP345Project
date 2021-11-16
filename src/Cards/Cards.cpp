@@ -36,6 +36,7 @@ CardType Card::play()
 {
 	CardType temporaryCardTypeHolder = this->getCardType();
 	this->setCardType(unassigned);
+
 	return temporaryCardTypeHolder;
 }
 
@@ -43,7 +44,7 @@ CardType Card::play()
 
 string Card::toString() const
 {
-	char* cardTypesText[] =
+	string cardTypesText[] =
 	{
 		"bomb",
 		"reinforcement",
@@ -59,21 +60,20 @@ Deck::Deck()
 {
 	//Deck has 4 reinforcment, 1 diplomacy, 19 blockade, 5 airlift and 6 bomb
 	for (int i = 0; i < reinforcementCardAmount; i++) {
-		this->deck.push_back(Card(reinforcement));
+		this->deck.push_back(new Card(reinforcement));
 	}
 	for (int i = 0; i < diplomacyCardAmount; i++) {
-		this->deck.push_back(Card(diplomacy));
+		this->deck.push_back(new Card(diplomacy));
 	}
 	for (int i = 0; i < blockadeCardAmount; i++) {
-		this->deck.push_back(Card(blockade));
+		this->deck.push_back(new Card(blockade));
 	}
 	for (int i = 0; i < airliftCardAmount; i++) {
-		this->deck.push_back(Card(airlift));
+		this->deck.push_back(new Card(airlift));
 	}
 	for (int i = 0; i < bombCardAmount; i++) {
-		this->deck.push_back(Card(bomb));
+		this->deck.push_back(new Card(bomb));
 	}
-
 }
 
 void Deck::reshuffleIntoDeck(CardType cardType)
@@ -84,7 +84,7 @@ void Deck::reshuffleIntoDeck(CardType cardType)
 
 	//Check to see if all the cards in the deck already exist, if so it will skip the loop to reassign the card
 	for (int i = 0; i < sizeDeck; i++) {
-		if (this->deck[i].getCardType() != unassigned) {
+		if (this->deck[i]->getCardType() != unassigned) {
 			countAssigned = countAssigned + 1;
 		}
 	}
@@ -97,8 +97,8 @@ void Deck::reshuffleIntoDeck(CardType cardType)
 	while (cardShuffledIn == false) {
 		randomCard = rand() % sizeDeck;
 		//Check for a card that hasn't been removed from the deck
-		if (this->deck[randomCard].getCardType() == unassigned) {			
-			this->deck[randomCard].setCardType(cardType);
+		if (this->deck[randomCard]->getCardType() == unassigned) {
+			this->deck[randomCard]->setCardType(cardType);
 			cardShuffledIn = true;
 		}
 	}
@@ -113,8 +113,9 @@ CardType Deck::draw()
 	int countUnassigned = 0;
 	CardType drawnCard = unassigned;
 	//Check to see if all the cards in the deck already exist, if so it will skip the loop to reassign the card
-	for (int i = 0; i < sizeDeck; i++) {
-		if (this->deck[i].getCardType() == unassigned) {
+
+    for (int i = 0; i < sizeDeck; i++) {
+		if (this->deck.at(i)->getCardType() == unassigned) {
 			countUnassigned = countUnassigned + 1;
 		}
 	}
@@ -126,9 +127,9 @@ CardType Deck::draw()
 	while (cardDrawn == false) {
 		randomCard = rand() % sizeDeck;
 		//Check for a card that hasn't been removed from the deck
-		if (this->deck[randomCard].getCardType() != unassigned) {
-			drawnCard = this->deck[randomCard].getCardType();
-			this->deck[randomCard].setCardType(unassigned);
+		if (this->deck[randomCard]->getCardType() != unassigned) {
+			drawnCard = this->deck[randomCard]->getCardType();
+			this->deck[randomCard]->setCardType(unassigned);
 			cardDrawn = true;
 		}
 		
@@ -144,23 +145,37 @@ Deck::Deck(const Deck& deck)
 	
 }
 
+int Deck::size() {
+    return deck.size();
+}
+
+vector<Card*> Deck::getDeckOfCards() {return deck;}
 
 Hand::Hand()
 {
 	//set hand to being unassigned
 	for (int i = 0; i < 5; i++) {
-		this->hand.push_back(Card(unassigned));
+		this->hand.push_back(new Card(unassigned));
 	}
+    deck = nullptr;
 }
+
+Hand::Hand(Deck* deck) : deck(deck){}
+
+Deck *Hand::getDeck() {return deck;}
 
 Card Hand::getHand(int index)
 {
-	return this->hand[index];
+	return *this->hand[index];
 }
 
 void Hand::setHand(int index, CardType cardType)
 {
-	this->hand[index].setCardType(cardType);
+	this->hand[index]->setCardType(cardType);
+}
+
+void Hand::addCardToHand(CardType card) {
+    hand.push_back(new Card(card));
 }
 
 
@@ -169,6 +184,7 @@ Hand::Hand(const Hand& hand)
 	for (int i = 0; i < hand.hand.size(); i++) {
 		this->hand.push_back(hand.hand[i]);
 	}
+    this->deck = hand.deck;
 }
 
 ostream& operator<<(ostream& out, const Card& c)
@@ -188,6 +204,4 @@ int Hand::size() {
     return hand.size();
 }
 
-int Deck::size() {
-    return deck.size();
-}
+

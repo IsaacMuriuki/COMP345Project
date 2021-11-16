@@ -19,7 +19,7 @@ public:
     Order(const Order& order);
     virtual Order& operator=(Order&& order);
     friend std::ostream& operator<<(std::ostream &out, const Order& order);
-
+    int getOrderID();
     /**
      * Gets a deep copy of the order itself.
      * 
@@ -56,6 +56,8 @@ public:
 protected:
     bool executed;
     Player* player;
+    static int ID;
+    int orderID;
 
     /**
      * Gets the description of the order.
@@ -327,7 +329,7 @@ protected:
 class Negotiate : public Order {
 public:
     Negotiate();
-    Negotiate(Player* targetPlayer);
+    Negotiate(Player* player, Player* targetPlayer);
     ~Negotiate();
     Negotiate& operator=(Negotiate&& order);
     Negotiate(const Negotiate& order);
