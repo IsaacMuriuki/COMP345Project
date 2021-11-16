@@ -37,6 +37,8 @@ public:
     StartState(std::string _name, std::vector<std::string> _cmds);
     StartState(const StartState &state);
     ~StartState();
+    virtual void onStateEnter();
+    // virtual void onStateExit();
 };
 
 class MapLoadedState : public GameState
@@ -56,7 +58,7 @@ public:
     MapValidatedState(const MapValidatedState &state);
     ~MapValidatedState();
     virtual void onStateEnter();
-    // virtual void onStateExit();
+    //virtual void onStateExit();
 };
 
 class PlayersAddedState : public GameState
@@ -146,7 +148,7 @@ public:
     GameState *getCurrentState();
     std::map<std::string, GameState *> getCmds();
     GameEngine *clone();
-    void startupPhase();
+    //void startupPhase();
 };
 
 #endif

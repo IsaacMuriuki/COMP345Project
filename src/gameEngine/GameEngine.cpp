@@ -260,25 +260,18 @@ std::vector<std::string> GameState::getCmds() { return cmds; }
 GameState *GameState::clone() { return new GameState(*this); }
 
 // StartState class definition
-
+static Map *m;
 StartState::StartState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
 StartState::~StartState(){};
 StartState::StartState(const StartState &state) : StartState(state.name, state.cmds) {}
-
-// MapLoadedState class definition
-static Map *m;
-
-MapLoadedState::MapLoadedState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
-MapLoadedState::~MapLoadedState(){};
-MapLoadedState::MapLoadedState(const MapLoadedState &state) : MapLoadedState(state.name, state.cmds) {}
-void MapLoadedState::onStateEnter()
+void StartState::onStateEnter()
 {
     std::cout << "Entered gamestate '" << name << "'." << std::endl;
     const string MAPS_FOLDER = "../../maps/"; // for mac this works ->   const string MAPS_FOLDER = "../maps";
     MapLoader loader;
-    std::cout << "Please select the map # you would like to load from the following options:" << std::endl;
-    int counter = 1;
     std::vector<string> mapFiles;
+    int counter = 1;
+
     for (const auto &entry : fs::directory_iterator(MAPS_FOLDER))
     {
         cout << "\n Map#" << counter << " : " << entry.path().filename() << endl;
@@ -286,17 +279,108 @@ void MapLoadedState::onStateEnter()
         mapFiles.push_back(entry.path().string());
     }
     int option = 0;
-    std::cin >> option;
+    while (true)
+    {
+        std::cout << "\n Please select the map # you would like to load from the following options:" << std::endl;
+
+        std::cin >> option;
+
+        if (option < 1)
+        {
+            cout << "\n Invalid entry, you entered a number less than 1" << endl;
+        }
+        else if (option > mapFiles.size())
+        {
+            cout << "\n Invalid entry, you entered a number greater than the number of maps" << endl;
+        }
+        else
+        {
+            break;
+        }
+    }
     mapFiles.at(option - 1);
     m = loader.loadMap(mapFiles.at(option - 1));
-    cout << "Map Loaded succesfully \n"
+    cout << "\n Map#" << option << " Loaded succesfully \n "
          << *m << endl;
 }
 
+// MapLoadedState class definition
+
+MapLoadedState::MapLoadedState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
+MapLoadedState::~MapLoadedState(){};
+MapLoadedState::MapLoadedState(const MapLoadedState &state) : MapLoadedState(state.name, state.cmds) {}
+void MapLoadedState::onStateEnter()
+{
+
+    std::cout << "Entered gamestate '" << name << "'." << std::endl;
+}
 void MapLoadedState::onStateExit()
 {
-    std::cout << "Exited gamestate '" << name << "'." << std::endl;
+    if (m != NULL)
+    {
+        // check if map is valid
+        if (m->validate())
+        {
+            cout << "Map is valid" << endl;
+            {
+                std::cout << "Exited gamestate '" << name << "'." << std::endl;
+            }
+        }
+        else
+        {
+            cout << "Invalid map. Please enter a valid one" << endl;
+            delete m;
+            cout << *m << endl; //test to make sure invalid map deleted
+
+            const string MAPS_FOLDER = "../../maps/"; // for mac this works ->   const string MAPS_FOLDER = "../maps";
+            MapLoader loader;
+            std::vector<string> mapFiles;
+            int counter = 1;
+
+            for (const auto &entry : fs::directory_iterator(MAPS_FOLDER))
+            {
+                cout << "\n Map#" << counter << " : " << entry.path().filename() << endl;
+                counter++;
+                mapFiles.push_back(entry.path().string());
+            }
+            int option = 0;
+            while (true)
+            {
+                std::cout << "\n Please select the map # you would like to load from the following options:" << std::endl;
+
+                std::cin >> option;
+
+                if (option < 1)
+                {
+                    cout << "\n Invalid entry, you entered a number less than 1" << endl;
+                }
+                else if (option > mapFiles.size())
+                {
+                    cout << "\n Invalid entry, you entered a number greater than the number of maps" << endl;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            mapFiles.at(option - 1);
+            m = loader.loadMap(mapFiles.at(option - 1));
+            cout << "\n Map#" << option << " Loaded succesfully \n "
+                 << *m << endl;
+
+            if (!m->validate())
+            {
+                cout << "\n Invalid map choice again, the program will end." << endl;
+                exit(1);
+            }
+            else
+            {
+                cout << "Map is valid" << endl;
+            }
+        }
+    }
 }
+
 // MapValidatedState class definition
 
 MapValidatedState::MapValidatedState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
@@ -304,7 +388,8 @@ MapValidatedState::~MapValidatedState(){};
 MapValidatedState::MapValidatedState(const MapValidatedState &state) : MapValidatedState(state.name, state.cmds) {}
 void MapValidatedState::onStateEnter()
 {
-    cout << *m << endl;
+
+    std::cout << "Entered gamestate '" << name << "'." << std::endl;
 }
 
 // PlayersAddedState class definition
@@ -339,6 +424,4 @@ WinState::WinState(const WinState &state) : WinState(state.name, state.cmds) {}
 
 //startupPhase() method
 
-void GameEngine::startupPhase()
-{
-}
+//void GameEngine::startupPhase()
