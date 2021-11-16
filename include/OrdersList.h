@@ -1,10 +1,11 @@
 #pragma once
 
 #include <vector>
+#include <typeinfo>
 #include "Orders.h"
+#include "LoggingObserver.h"
 
-
-class OrdersList {
+class OrdersList : public ILoggable, public Subject {
     private:
     std::vector<Order*> _orders;
 
@@ -60,4 +61,11 @@ class OrdersList {
      * @return number of orders in orders list.
      **/
     int size();
+
+    /**
+     * Returns an entry of the order issued to be logged.
+     * 
+     * @return entry as a string.
+     * */
+    string stringToLog();
 };

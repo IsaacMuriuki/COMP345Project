@@ -10,7 +10,7 @@ int main() {
     std::cout << "Here are the driver options for execution:" << std::endl;
 
     char option = 'A'; // Initial value must be an option.
-    std::string options = "ABCDEF";
+    std::string options = "ABCDEF?";
 
     while (option != 'F') {
         std::cout << std::endl;
@@ -22,6 +22,7 @@ int main() {
             std::cout << "D- Cards/Deck (Tyler)" << std::endl;
             std::cout << "E- Game Engine (Salaheddine)" << std::endl;
             std::cout << "F- Commands (Salaheddine)" << std::endl;
+            std::cout << "?- Log Observer (Henry)" << std::endl;
             std::cout << "G- Stop the program" << std::endl;
         }
 
@@ -56,6 +57,10 @@ int main() {
             case 'F':
                 // Commands
                 commandsDriver();
+                break;
+            case '?':
+                // LogObserverDriver
+                logObserverDriver();
                 break;
             case 'G':
                 // Ignore.

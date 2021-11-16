@@ -4,7 +4,7 @@
 #include "LoggingObserver.h"
 #include "map.h"
 
-#include <iostream>
+#include < iostream>
 #include <stdio.h>
 #include <string>
 #include <map>
@@ -12,7 +12,8 @@
 #include <functional>
 #include <algorithm>
 #include <sstream>
-#include <filesystem>
+
+#include < filesystem>
 namespace fs = std::filesystem;
 
 class GameEngine;
@@ -147,6 +148,7 @@ public:
     void Run();
     friend std::ostream &operator<<(std::ostream &os, const GameEngine &engine);
     bool isRunning();
+
     GameState *getCurrentState();
     std::map<std::string, GameState *> getCmds();
     Map *getMap();

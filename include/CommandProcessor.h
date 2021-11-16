@@ -1,10 +1,12 @@
 #ifndef COMMAND_PROCESSOR_H
 #define COMMAND_PROCESSOR_H
 
+#include "LoggingObserver.h"
+
 #include<vector>
 #include<string>
 
-class Command{
+class Command : public ILoggable, public Subject{
     private:
         std::string effect;
     public:
@@ -12,9 +14,10 @@ class Command{
         Command(std::string effect);
         ~Command();
         void saveEffect(std::string newEffect);
+        string stringToLog();
 };
 
-class CommandProcessor{
+class CommandProcessor : public ILoggable, public Subject{
     private:
         std::vector<Command*> cmds;
         void readCommand(std::string cmdName); //Gets commands from the console as a string
@@ -24,6 +27,7 @@ class CommandProcessor{
         CommandProcessor();
         ~CommandProcessor();
         Command* getCommand();
+        string stringToLog();
 };
 
 class FileCommandProcessorAdapter{

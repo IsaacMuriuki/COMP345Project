@@ -6,6 +6,7 @@
 #include "Orders.h"
 #include "OrdersList.h"
 #include "Player.h"
+#include "LoggingObserver.h"
 
 #include <stdio.h>
 #include <iostream>
@@ -61,8 +62,7 @@ void playerDriver()
     // Player's issueOrder()
     player->issueOrder();
 
-std:
-    cout << "Orders issued : " << std::endl;
+    std::cout << "Orders issued : " << std::endl;
     for (int i = 0; i < player->getOrdersList()->size(); ++i)
     {
         std::cout << *player->getOrdersList()->get(i) << endl;
@@ -158,6 +158,7 @@ void mapDriver()
 {
     const string MAPS_FOLDER = "../../maps/"; // for mac this works ->   const string MAPS_FOLDER = "../maps";
     MapLoader loader;
+
     // read all files in valid maps folder
     try
     {
@@ -275,4 +276,33 @@ void commandsDriver()
     cout << "End of the commands driver." << endl;
 
     // 3) commands that are invalid in the current game state are rejected, and valid commands result in the correct effect and state change
+}
+
+void logObserverDriver()
+{
+    cout << "\n\nHello" << endl;
+    LogObserver *logObserver = new LogObserver();
+    vector<Territory *> territories;
+    Player *player = new Player("Henry", territories, new OrdersList(), new Hand());
+    Airlift *airlift = new Airlift();
+    Negotiate *negotiate = new Negotiate();
+    Deploy *deploy = new Deploy(2);
+
+    // attach player's orderlist and orders to observer
+    player->getOrdersList()->Attach(logObserver);
+    airlift->Attach(logObserver);
+    negotiate->Attach(logObserver);
+    deploy->Attach(logObserver);
+
+    // add orders to player's orderlist
+    player->getOrdersList()->add(airlift);
+    player->getOrdersList()->add(negotiate);
+    player->getOrdersList()->add(deploy);
+
+    // execute all of player's valid orders
+    OrdersList *orderList = player->getOrdersList();
+    for (int i = 0; i < orderList->size(); i++)
+    {
+        orderList->get(i)->execute();
+    }
 }

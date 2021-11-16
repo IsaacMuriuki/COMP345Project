@@ -27,6 +27,9 @@ void Order::execute() {
     if (validate()) {
         onExecute();
         _executed = true;
+
+        // Notifies observer of the effect of the order executed.
+        Notify(this);
     }
 }
 
@@ -48,6 +51,14 @@ bool Order::validate() const {
     return !_executed && onValidate();
 }
 
+/**
+ * Returns an entry of the effect of the order executed to be logged.
+ * 
+ * @return entry as a string.
+ * */
+string Order::stringToLog(){
+    return "Order Executed: " + this->getEffectApplied();
+}
 
 std::ostream& operator<<(std::ostream &out, const Order& order) {
     out << order.getDescription() << (order.isExecuted() ? " - " + order.getEffectApplied() : "");
