@@ -7,14 +7,14 @@ GameEngine::GameEngine()
 
     //Initializing all pointers to their respective game states
 
-    startState = new StartState("start", {LOAD_MAP_CMD});
-    mapLoadedState = new MapLoadedState("map loaded", {LOAD_MAP_CMD, VALIDATE_MAP_CMD});
-    mapValidatedState = new MapValidatedState("map validated", {ADD_PLAYER_CMD});
-    playersAddedState = new PlayersAddedState("players added", {ADD_PLAYER_CMD, ASSIGN_COUNTRIES_CMD});
-    assignReinforcementState = new AssignReinforcementState("assign reinforcement", {ISSUE_ORDER_CMD});
-    issueOrdersState = new IssueOrdersState("issue orders", {ISSUE_ORDER_CMD, END_ISSUE_ORDERS_CMD});
-    executeOrdersState = new ExecuteOrdersState("execute orders", {EXEC_ORDER_CMD, END_EXEC_ORDERS_CMD, WIN_CMD});
-    winState = new WinState("win", {PLAY_CMD, END_CMD});
+    startState = new StartState("start", {LOAD_MAP_CMD}, this);
+    mapLoadedState = new MapLoadedState("map loaded", {LOAD_MAP_CMD, VALIDATE_MAP_CMD}, this);
+    mapValidatedState = new MapValidatedState("map validated", {ADD_PLAYER_CMD}, this);
+    playersAddedState = new PlayersAddedState("players added", {ADD_PLAYER_CMD, ASSIGN_COUNTRIES_CMD}, this);
+    assignReinforcementState = new AssignReinforcementState("assign reinforcement", {ISSUE_ORDER_CMD}, this);
+    issueOrdersState = new IssueOrdersState("issue orders", {ISSUE_ORDER_CMD, END_ISSUE_ORDERS_CMD}, this);
+    executeOrdersState = new ExecuteOrdersState("execute orders", {EXEC_ORDER_CMD, END_EXEC_ORDERS_CMD, WIN_CMD}, this);
+    winState = new WinState("win", {PLAY_CMD, END_CMD}, this);
 
     SetCommands();
 
@@ -102,9 +102,7 @@ void GameEngine::SetCommands()
 
 void GameEngine::Run()
 {
-
-    //Sets the startState as the current state
-    SetState(startState);
+    startupPhase();
 
     //Program loops until reaching the end command is executed
     while (running)
@@ -188,6 +186,9 @@ void GameEngine::TransitionTo(GameState *nextState)
     if (currentState != nullptr)
         currentState->onStateExit();
     SetState(nextState);
+
+    // Notifies observer of the new game state.
+    Notify(this);
 }
 
 std::ostream &operator<<(std::ostream &os, const GameEngine &engine)
@@ -197,10 +198,130 @@ std::ostream &operator<<(std::ostream &os, const GameEngine &engine)
 }
 
 bool GameEngine::isRunning() { return running; }
+
 GameState *GameEngine::getCurrentState() { return currentState; }
+
 std::map<std::string, GameState *> GameEngine::getCmds() { return cmds; }
 
+Map *GameEngine::getMap() { return gameMap; }
+
+void GameEngine::setMap(Map *m)
+{
+    gameMap = m;
+}
+
+vector<Player *> GameEngine::getPlayers() { return playersList; }
+
+void GameEngine::addPlayer(Player *player)
+{
+    playersList.push_back(player);
+}
+
 GameEngine *GameEngine::clone() { return new GameEngine(*this); }
+
+void GameEngine::startupPhase()
+{
+    MapLoader loader;
+    Map *map;
+    bool gameStarted = false;
+    ;
+    //Sets the startState as the current state
+    SetState(startState);
+    PrintMapFiles();
+
+    //Program loops until reaching the end command is executed
+    while (running && !gameStarted)
+    {
+        //Take in the user input
+        std::string cmd;
+        std::cout << "\nEnter your command: " << std::endl;
+        std::cin >> cmd;
+
+        if (cmd == "loadmap")
+        {
+            string filename;
+            std::cin >> filename;
+            map = loader.loadMap(MAPS_FOLDER + filename);
+            if (map != NULL)
+            {
+                setMap(map);
+                cout << "Map "
+                     << "'" << filename << "'"
+                     << " is loaded. Please validate it" << endl;
+                if (currentState->getName() == "map loaded")
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                cout << "Invalid file, please select another map file" << endl;
+                continue;
+            }
+        }
+        else if (cmd == "validatemap")
+        {
+            if (map->validate())
+            {
+                cout << "Map is valid" << endl;
+                cout << *map << endl;
+                cout << "Add players into the game(2-6 players).\nEnter: addplayer <playername>\n";
+            }
+            else
+            {
+                cout << "Map is invalid, please select another map file" << endl;
+                PrintMapFiles();
+                continue; // don't execute command if invalid
+            }
+        }
+        else if (cmd == "addplayer")
+        {
+            string playername;
+            std::cin >> playername;
+            Player *player = new Player(playername);
+            addPlayer(player);
+            cout << "Player " << playername << " added" << endl;
+            if (currentState->getName() == "players added")
+            {
+                continue;
+            }
+        }
+        else if (cmd == "gamestart")
+        {
+            // do stuffs
+            gameStarted = true;
+        }
+        else
+        {
+            //temp error msg
+            cout << "Invalid command" << endl;
+        }
+
+        //Validates the command and execute the appropriate state transition
+        ExecuteCmd(cmd);
+    }
+}
+
+void GameEngine::PrintMapFiles()
+{
+    for (const auto &entry : fs::directory_iterator(MAPS_FOLDER))
+    {
+        cout << entry.path().filename() << endl;
+    }
+    std::cout << "Please select the map file you would like to load from the following options.\nEnter: loadmap <filename>" << std::endl;
+}
+
+/**
+ * Returns an entry of the new game state to be logged.
+ * 
+ * @return entry as a string.
+ * */
+string GameEngine::stringToLog()
+{
+    stringstream ss;
+    ss << "Game Engine: " << *currentState;
+    return ss.str();
+}
 
 // GameState class definition
 
@@ -209,10 +330,11 @@ GameState::GameState(std::string _name)
     name = _name;
 }
 
-GameState::GameState(std::string _name, std::vector<std::string> _cmds)
+GameState::GameState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine)
 {
     name = _name;
     cmds = _cmds;
+    gameEngine = _gameEngine;
 }
 
 GameState::~GameState()
@@ -220,7 +342,7 @@ GameState::~GameState()
     cmds.clear();
 };
 
-GameState::GameState(const GameState &state) : GameState(state.name, state.cmds) {}
+GameState::GameState(const GameState &state) : GameState(state.name, state.cmds, state.gameEngine) {}
 
 GameState &GameState::operator=(GameState &&state)
 {
@@ -228,6 +350,7 @@ GameState &GameState::operator=(GameState &&state)
     {
         name = state.name;
         cmds = state.cmds;
+        gameEngine = state.gameEngine;
     }
     return *this;
 }
@@ -260,168 +383,48 @@ std::vector<std::string> GameState::getCmds() { return cmds; }
 GameState *GameState::clone() { return new GameState(*this); }
 
 // StartState class definition
-static Map *m;
-StartState::StartState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
+StartState::StartState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine) : GameState(_name, _cmds, _gameEngine) {}
 StartState::~StartState(){};
-StartState::StartState(const StartState &state) : StartState(state.name, state.cmds) {}
-void StartState::onStateEnter()
-{
-    std::cout << "Entered gamestate '" << name << "'." << std::endl;
-    const string MAPS_FOLDER = "../../maps/"; // for mac this works ->   const string MAPS_FOLDER = "../maps";
-    MapLoader loader;
-    std::vector<string> mapFiles;
-    int counter = 1;
-
-    for (const auto &entry : fs::directory_iterator(MAPS_FOLDER))
-    {
-        cout << "\n Map#" << counter << " : " << entry.path().filename() << endl;
-        counter++;
-        mapFiles.push_back(entry.path().string());
-    }
-    int option = 0;
-    while (true)
-    {
-        std::cout << "\n Please select the map # you would like to load from the following options:" << std::endl;
-
-        std::cin >> option;
-
-        if (option < 1)
-        {
-            cout << "\n Invalid entry, you entered a number less than 1" << endl;
-        }
-        else if (option > mapFiles.size())
-        {
-            cout << "\n Invalid entry, you entered a number greater than the number of maps" << endl;
-        }
-        else
-        {
-            break;
-        }
-    }
-    mapFiles.at(option - 1);
-    m = loader.loadMap(mapFiles.at(option - 1));
-    cout << "\n Map#" << option << " Loaded succesfully \n "
-         << *m << endl;
-}
+StartState::StartState(const StartState &state) : StartState(state.name, state.cmds, state.gameEngine) {}
 
 // MapLoadedState class definition
 
-MapLoadedState::MapLoadedState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
+MapLoadedState::MapLoadedState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine) : GameState(_name, _cmds, _gameEngine) {}
 MapLoadedState::~MapLoadedState(){};
-MapLoadedState::MapLoadedState(const MapLoadedState &state) : MapLoadedState(state.name, state.cmds) {}
-void MapLoadedState::onStateEnter()
-{
-
-    std::cout << "Entered gamestate '" << name << "'." << std::endl;
-}
-void MapLoadedState::onStateExit()
-{
-    if (m != NULL)
-    {
-        // check if map is valid
-        if (m->validate())
-        {
-            cout << "Map is valid" << endl;
-            {
-                std::cout << "Exited gamestate '" << name << "'." << std::endl;
-            }
-        }
-        else
-        {
-            cout << "Invalid map. Please enter a valid one" << endl;
-            delete m;
-            cout << *m << endl; //test to make sure invalid map deleted
-
-            const string MAPS_FOLDER = "../../maps/"; // for mac this works ->   const string MAPS_FOLDER = "../maps";
-            MapLoader loader;
-            std::vector<string> mapFiles;
-            int counter = 1;
-
-            for (const auto &entry : fs::directory_iterator(MAPS_FOLDER))
-            {
-                cout << "\n Map#" << counter << " : " << entry.path().filename() << endl;
-                counter++;
-                mapFiles.push_back(entry.path().string());
-            }
-            int option = 0;
-            while (true)
-            {
-                std::cout << "\n Please select the map # you would like to load from the following options:" << std::endl;
-
-                std::cin >> option;
-
-                if (option < 1)
-                {
-                    cout << "\n Invalid entry, you entered a number less than 1" << endl;
-                }
-                else if (option > mapFiles.size())
-                {
-                    cout << "\n Invalid entry, you entered a number greater than the number of maps" << endl;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            mapFiles.at(option - 1);
-            m = loader.loadMap(mapFiles.at(option - 1));
-            cout << "\n Map#" << option << " Loaded succesfully \n "
-                 << *m << endl;
-
-            if (!m->validate())
-            {
-                cout << "\n Invalid map choice again, the program will end." << endl;
-                exit(1);
-            }
-            else
-            {
-                cout << "Map is valid" << endl;
-            }
-        }
-    }
-}
+MapLoadedState::MapLoadedState(const MapLoadedState &state) : MapLoadedState(state.name, state.cmds, state.gameEngine) {}
 
 // MapValidatedState class definition
 
-MapValidatedState::MapValidatedState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
+MapValidatedState::MapValidatedState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine) : GameState(_name, _cmds, _gameEngine) {}
 MapValidatedState::~MapValidatedState(){};
-MapValidatedState::MapValidatedState(const MapValidatedState &state) : MapValidatedState(state.name, state.cmds) {}
-void MapValidatedState::onStateEnter()
-{
-
-    std::cout << "Entered gamestate '" << name << "'." << std::endl;
-}
+MapValidatedState::MapValidatedState(const MapValidatedState &state) : MapValidatedState(state.name, state.cmds, state.gameEngine) {}
 
 // PlayersAddedState class definition
 
-PlayersAddedState::PlayersAddedState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
+PlayersAddedState::PlayersAddedState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine) : GameState(_name, _cmds, _gameEngine) {}
 PlayersAddedState::~PlayersAddedState(){};
-PlayersAddedState::PlayersAddedState(const PlayersAddedState &state) : PlayersAddedState(state.name, state.cmds) {}
+PlayersAddedState::PlayersAddedState(const PlayersAddedState &state) : PlayersAddedState(state.name, state.cmds, state.gameEngine) {}
 
 // AssignReinforcementState class definition
 
-AssignReinforcementState::AssignReinforcementState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
+AssignReinforcementState::AssignReinforcementState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine) : GameState(_name, _cmds, _gameEngine) {}
 AssignReinforcementState::~AssignReinforcementState(){};
-AssignReinforcementState::AssignReinforcementState(const AssignReinforcementState &state) : AssignReinforcementState(state.name, state.cmds) {}
+AssignReinforcementState::AssignReinforcementState(const AssignReinforcementState &state) : AssignReinforcementState(state.name, state.cmds, state.gameEngine) {}
 
 // IssueOrdersState class definition
 
-IssueOrdersState::IssueOrdersState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
+IssueOrdersState::IssueOrdersState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine) : GameState(_name, _cmds, _gameEngine) {}
 IssueOrdersState::~IssueOrdersState(){};
-IssueOrdersState::IssueOrdersState(const IssueOrdersState &state) : IssueOrdersState(state.name, state.cmds) {}
+IssueOrdersState::IssueOrdersState(const IssueOrdersState &state) : IssueOrdersState(state.name, state.cmds, state.gameEngine) {}
 
 // ExecuteOrdersState class definition
 
-ExecuteOrdersState::ExecuteOrdersState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
+ExecuteOrdersState::ExecuteOrdersState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine) : GameState(_name, _cmds, _gameEngine) {}
 ExecuteOrdersState::~ExecuteOrdersState(){};
-ExecuteOrdersState::ExecuteOrdersState(const ExecuteOrdersState &state) : ExecuteOrdersState(state.name, state.cmds) {}
+ExecuteOrdersState::ExecuteOrdersState(const ExecuteOrdersState &state) : ExecuteOrdersState(state.name, state.cmds, state.gameEngine) {}
 
 // WinState class definition
 
-WinState::WinState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
+WinState::WinState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine) : GameState(_name, _cmds, _gameEngine) {}
 WinState::~WinState(){};
-WinState::WinState(const WinState &state) : WinState(state.name, state.cmds) {}
-
-//startupPhase() method
-
-//void GameEngine::startupPhase()
+WinState::WinState(const WinState &state) : WinState(state.name, state.cmds, state.gameEngine) {}

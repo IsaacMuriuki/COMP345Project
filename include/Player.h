@@ -12,38 +12,41 @@
 
 class Territory;
 
-class Player{
+class Player
+{
 public:
     // Constructors, destructor and copy constructor
     Player();
-    Player(string, vector<Territory*> , OrdersList*, Hand* );
+    Player(string);
+    Player(string, vector<Territory *>, OrdersList *, Hand *);
     ~Player();
-    Player(const Player& player);
+    Player(const Player &player);
 
     // Methods we were asked to create
-    vector<Territory*> toDefend();
-    vector<Territory*> toAttack();
+    vector<Territory *> toDefend();
+    vector<Territory *> toAttack();
     void issueOrder();
 
     // Helper methods
-    void addOrder(Order* );
-    void addTerritory(Territory* );
-    vector<Territory*> getTerritories();
-    OrdersList* getOrdersList();
-    Hand* getHandOfCards();
+    void addOrder(Order *);
+    void addTerritory(Territory *);
+    vector<Territory *> getTerritories();
+    OrdersList *getOrdersList();
+    Hand *getHandOfCards();
     string getName();
-    void setHandOfCards(Hand* );
-    void setTerritories(vector<Territory*> );
-    void setOrders(OrdersList* );
+    void setHandOfCards(Hand *);
+    void setTerritories(vector<Territory *>);
+    void setOrders(OrdersList *);
 
     // Overloading << and = operators
-    friend std::ostream& operator<<(std::ostream &, const Player& );
-    Player& operator=(const Player& player);
+    friend std::ostream &operator<<(std::ostream &, const Player &);
+    Player &operator=(const Player &player);
+
 private:
     string name;
-    vector<Territory*> territories;
-    Hand* handOfCards;
-    OrdersList* ordersList;
+    vector<Territory *> territories;
+    Hand *handOfCards;
+    OrdersList *ordersList;
 };
 
 #endif //COMP_345_PROJECT_PLAYER_H

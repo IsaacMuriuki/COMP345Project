@@ -1,6 +1,9 @@
 #ifndef GAME_ENGINE_H
 #define GAME_ENGINE_H
 
+#include "LoggingObserver.h"
+#include "map.h"
+
 #include <iostream>
 #include <stdio.h>
 #include <string>
@@ -8,18 +11,21 @@
 #include <vector>
 #include <functional>
 #include <algorithm>
-#include "map.h"
+#include <sstream>
 #include <filesystem>
 namespace fs = std::filesystem;
+
+class GameEngine;
 class GameState
 {
 protected:
     std::string name;
     std::vector<std::string> cmds;
+    GameEngine *gameEngine;
 
 public:
     GameState(std::string _name = "gamestate");
-    GameState(std::string _name, std::vector<std::string> _cmds);
+    GameState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     ~GameState();
     GameState(const GameState &state);
     GameState &operator=(GameState &&state);
@@ -34,47 +40,39 @@ public:
 class StartState : public GameState
 {
 public:
-    StartState(std::string _name, std::vector<std::string> _cmds);
+    StartState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     StartState(const StartState &state);
     ~StartState();
-    virtual void onStateEnter();
-    // virtual void onStateExit();
 };
 
 class MapLoadedState : public GameState
 {
 public:
-    MapLoadedState(std::string _name, std::vector<std::string> _cmds);
+    MapLoadedState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     MapLoadedState(const MapLoadedState &state);
     ~MapLoadedState();
-    virtual void onStateEnter();
-    virtual void onStateExit();
 };
 
 class MapValidatedState : public GameState
 {
 public:
-    MapValidatedState(std::string _name, std::vector<std::string> _cmds);
+    MapValidatedState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     MapValidatedState(const MapValidatedState &state);
     ~MapValidatedState();
-    virtual void onStateEnter();
-    //virtual void onStateExit();
 };
 
 class PlayersAddedState : public GameState
 {
 public:
-    PlayersAddedState(std::string _name, std::vector<std::string> _cmds);
+    PlayersAddedState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     PlayersAddedState(const PlayersAddedState &state);
     ~PlayersAddedState();
-    //  virtual void onStateEnter();
-    //  virtual void onStateExit();
 };
 
 class AssignReinforcementState : public GameState
 {
 public:
-    AssignReinforcementState(std::string _name, std::vector<std::string> _cmds);
+    AssignReinforcementState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     AssignReinforcementState(const AssignReinforcementState &state);
     ~AssignReinforcementState();
 };
@@ -82,7 +80,7 @@ public:
 class IssueOrdersState : public GameState
 {
 public:
-    IssueOrdersState(std::string _name, std::vector<std::string> _cmds);
+    IssueOrdersState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     IssueOrdersState(const IssueOrdersState &state);
     ~IssueOrdersState();
 };
@@ -90,7 +88,7 @@ public:
 class ExecuteOrdersState : public GameState
 {
 public:
-    ExecuteOrdersState(std::string _name, std::vector<std::string> _cmds);
+    ExecuteOrdersState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     ExecuteOrdersState(const ExecuteOrdersState &state);
     ~ExecuteOrdersState();
 };
@@ -98,12 +96,12 @@ public:
 class WinState : public GameState
 {
 public:
-    WinState(std::string _name, std::vector<std::string> _cmds);
+    WinState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     WinState(const WinState &state);
     ~WinState();
 };
 
-class GameEngine
+class GameEngine : public ILoggable, public Subject
 {
 private:
     const std::string PLAY_CMD = "play";
@@ -117,6 +115,7 @@ private:
     const std::string END_EXEC_ORDERS_CMD = "endexecorders";
     const std::string WIN_CMD = "win";
     const std::string END_CMD = "end";
+    const std::string MAPS_FOLDER = "../../maps/"; // for mac this works ->   const string MAPS_FOLDER = "../maps";
 
     StartState *startState;
     MapLoadedState *mapLoadedState;
@@ -128,6 +127,8 @@ private:
     WinState *winState;
 
     bool running;
+    Map *gameMap;
+    vector<Player *> playersList;
     GameState *currentState;
     std::map<std::string, GameState *> cmds;
 
@@ -135,6 +136,7 @@ private:
     bool ExecuteCmd(std::string);
     void SetState(GameState *);
     void TransitionTo(GameState *);
+    void PrintMapFiles();
 
 public:
     GameEngine();
@@ -147,8 +149,13 @@ public:
     bool isRunning();
     GameState *getCurrentState();
     std::map<std::string, GameState *> getCmds();
+    Map *getMap();
+    void setMap(Map *);
+    vector<Player *> getPlayers();
+    void addPlayer(Player *);
     GameEngine *clone();
-    //void startupPhase();
+    void startupPhase();
+    string stringToLog();
 };
 
 #endif
