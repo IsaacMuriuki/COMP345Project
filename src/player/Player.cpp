@@ -1,4 +1,4 @@
-#include <Player.h>
+#include "Player.h"
 
 // Default constructor
 Player::Player() {
@@ -8,6 +8,7 @@ Player::Player() {
     this->territories = vector<Territory*>();
     this->ordersList = new OrdersList();
     this->handOfCards = new Hand();
+    this-> reinforcementPool = 0;
 }
 
 /**
@@ -22,11 +23,11 @@ Player::Player() {
  * @param handOfCards
  */
 Player::Player(string name, vector<Territory*> territories, OrdersList* ordersList, Hand* handOfCards){
-    //std::cout << "Player parameterized constructor" << std::endl;
     this->name = name;
     this->territories = territories;
     this->ordersList = new OrdersList(*ordersList);
     this->handOfCards = new Hand(*handOfCards);
+    this->reinforcementPool = 0;
 }
 
 // Destructor
@@ -38,6 +39,8 @@ Player::~Player(){
     for (int i = 0; i < territories.size(); ++i) {
         territories[i] = NULL;
     }
+
+    for(Player* p : playersBeingNegotiatedWith){ p = nullptr; }
 }
 
 /**
@@ -50,6 +53,7 @@ Player::Player(const Player& player){
     this->territories = player.territories;
     this->ordersList = new OrdersList(*player.ordersList);
     this->handOfCards = new Hand(*player.handOfCards);
+    this->playersBeingNegotiatedWith = player.playersBeingNegotiatedWith;
 }
 
 /**
@@ -59,11 +63,15 @@ Player::Player(const Player& player){
  * @return
  */
 Player& Player::operator=(const Player& player){
-    this->name = player.name;
-    this->territories = player.territories;
-    this->ordersList = new OrdersList(*player.ordersList);
-    this->handOfCards = new Hand(*player.handOfCards);
-
+    if(&player != this) {
+        delete ordersList;
+        delete handOfCards;
+        this->name = player.name;
+        this->territories = player.territories;
+        this->ordersList = new OrdersList(*player.ordersList);
+        this->handOfCards = new Hand(*player.handOfCards);
+        this->playersBeingNegotiatedWith = player.playersBeingNegotiatedWith;
+    }
     return *this;
 }
 
@@ -161,8 +169,8 @@ void Player::issueOrder() {
                 }
 
                 std::cout << "Creating a deployment order" << std::endl;
-                Deploy *deploy = new Deploy(numberOfDeployments);
-                ordersList->add(deploy);
+                //Deploy *deploy = new Deploy(numberOfDeployments);
+                //ordersList->add(deploy);
                 break;
             }
             case 2: {
@@ -179,8 +187,8 @@ void Player::issueOrder() {
                 }
 
                 std::cout << "Creating an advance order" << std::endl;
-                Advance *advance = new Advance(numberOfAdvancements);
-                ordersList->add(advance);
+                //Advance *advance = new Advance(numberOfAdvancements);
+                //ordersList->add(advance);
                 break;
             }
             case 3: {
@@ -222,6 +230,14 @@ void Player::addOrder(Order *order) { ordersList->add(order);}
 
 void Player::addTerritory(Territory *territory) { territories.push_back(territory);}
 
+void Player::removeTerritory(Territory* territory) {
+    for(int i = 0; i < territories.size(); ++i){
+        if(territory->getId() == territories[i]->getId()){
+            territories.erase(territories.begin() + i);
+        }
+    }
+}
+
 vector<Territory *> Player::getTerritories() { return this->territories;}
 
 OrdersList* Player::getOrdersList() { return this->ordersList;}
@@ -232,6 +248,17 @@ void Player::setTerritories(vector<Territory *> territories) { this->territories
 
 void Player::setOrders(OrdersList* ordersList) { this->ordersList = new OrdersList(*ordersList);}
 
+void Player::addToReinforcementPool(int num) { this->reinforcementPool+=num;}
+
+void Player::removeFromReinforcementPool(int num) {this->reinforcementPool-=num;}
+
+int Player::getReinforcementPool() const {return reinforcementPool;}
+
 void Player::setHandOfCards(Hand* handOfCards) { this->handOfCards = new Hand(*handOfCards);}
 
 string Player::getName()  { return this->name;}
+
+vector<Player *> Player::getPlayersBeingNegotiatedWith() const {return playersBeingNegotiatedWith; }
+
+void Player::addToPlayersBeingNegotiatedWith(Player *player) {playersBeingNegotiatedWith.push_back(player);}
+

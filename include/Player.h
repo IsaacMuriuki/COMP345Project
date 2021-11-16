@@ -1,5 +1,4 @@
-#ifndef COMP_345_PROJECT_PLAYER_H
-#define COMP_345_PROJECT_PLAYER_H
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -7,10 +6,12 @@
 #include <string>
 
 #include "map.h"
-#include "Cards.h"
 #include "OrdersList.h"
+#include "Cards.h"
 
 class Territory;
+class Order;
+class OrdersList;
 
 class Player{
 public:
@@ -28,6 +29,7 @@ public:
     // Helper methods
     void addOrder(Order* );
     void addTerritory(Territory* );
+    void removeTerritory(Territory*);
     vector<Territory*> getTerritories();
     OrdersList* getOrdersList();
     Hand* getHandOfCards();
@@ -35,6 +37,11 @@ public:
     void setHandOfCards(Hand* );
     void setTerritories(vector<Territory*> );
     void setOrders(OrdersList* );
+    void addToReinforcementPool(int);
+    void removeFromReinforcementPool(int);
+    int getReinforcementPool() const;
+    vector<Player *> getPlayersBeingNegotiatedWith() const;
+    void addToPlayersBeingNegotiatedWith(Player* player);
 
     // Overloading << and = operators
     friend std::ostream& operator<<(std::ostream &, const Player& );
@@ -44,6 +51,7 @@ private:
     vector<Territory*> territories;
     Hand* handOfCards;
     OrdersList* ordersList;
+    int reinforcementPool;
+    vector<Player*> playersBeingNegotiatedWith;
 };
 
-#endif //COMP_345_PROJECT_PLAYER_H
