@@ -104,26 +104,24 @@ std::ostream& operator<<(std::ostream &strm, const Player& player){
     return strm;
 }
 
-// Asked to return an arbitrary list of territories for this, so I just return the first half of the players territories
+// Returns the territories that the player controls
 vector<Territory*> Player::toDefend(){
-    vector<Territory*> firstHalf;
-    int half = territories.size()/2;
-
-    for (int i = 0; i < half; ++i) {
-        firstHalf.push_back(territories[i]);
-    }
-    return firstHalf;
+    return territories;
 }
 
 // Asked to return an arbitrary list of territories for this, so I just return the second half of the players territories
-vector<Territory*> Player::toAttack(){
-    vector<Territory*> secondHalf;
-    int half = territories.size()/2;
-
-    for (int i = half; i < territories.size(); ++i) {
-        secondHalf.push_back(territories[i]);
+vector<Territory*> Player::toAttack() {
+    vector<Territory*> attackableTerritories;
+    for (Territory* territory : territories) {
+        for (Territory* adjacentTerritory : territory->getAdjacentTerritories()) {
+            if (std::find(territories.begin(), territories.end(), adjacentTerritory) == territories.end()) {
+                if (std::find(attackableTerritories.begin(), attackableTerritories.end(), adjacentTerritory) == attackableTerritories.end()) {
+                    attackableTerritories.push_back(adjacentTerritory);
+                }
+            }
+        }
     }
-    return secondHalf;
+    return attackableTerritories;
 }
 
 
