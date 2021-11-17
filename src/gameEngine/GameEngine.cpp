@@ -319,7 +319,7 @@ void GameEngine::PrintMapFiles()
 string GameEngine::stringToLog()
 {
     stringstream ss;
-    ss << "Game Engine: " << *currentState;
+    ss << "Game Engine new state: " << *currentState;
     return ss.str();
 }
 

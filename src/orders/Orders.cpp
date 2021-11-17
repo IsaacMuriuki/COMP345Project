@@ -40,7 +40,7 @@ bool Order::isExecuted() const {
  * @return entry as a string.
  * */
 string Order::stringToLog(){
-    return "Executed " + this->getEffectApplied();
+    return "Order Executed: " + this->getEffectApplied();
 }
 
 std::ostream& operator<<(std::ostream &out, const Order& order) {
