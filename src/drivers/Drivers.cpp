@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <string>
 #include <filesystem>
 
 using std::cout, std::cin, std::endl;
@@ -207,41 +208,37 @@ void cardsDriver() {
 
 void commandsDriver(){
 
-    cout << "Menu - COMP 345 Project - Part 1 - Team DN7" << endl;
-    cout << "Here are the driver options for execution:" << endl;
-
     string option = ""; // Initial value must be an option.
-    string options = "ABCDEF";
+    
+    cout << "Choose commands source." << endl;
+    cout << "\tconsole" << endl;
+    cout << "\tfile <filename>" << endl;
 
-    if (options.find(option) != options.npos) {
-        cout << "Choose commands source." << endl;
-        cout << "\t-console" << endl;
-        cout << "\t-file <filename>" << endl;
-    }
+    cout << "\nEnter your option: " << flush;
+    //cin.clear(); 
+    //cin.sync();
+    
+    cin >> std::ws;
+    std::getline(cin, option);
+    cout << "Option: " << option << endl;
 
-    std::cout << "Enter your option: ";
-    cout.flush();
-    cin >> option;
+    vector<string> tokens = split(option, ' ');
 
     // read orders from the console using the CommandProcessor class 
-    if(option == "console"){
+    if(tokens[0] == "console"){
         CommandProcessor* cmdProcessor = new CommandProcessor();
         GameEngine* gameEngine = new GameEngine(cmdProcessor);
         gameEngine->Run();
     }
     // read orders from a saved text file using the FileCommandProcessorAdapter 
-    else if(option == "filename"){
-        FileCommandProcessorAdapter* cmdProcessor = new FileCommandProcessorAdapter("commandList.cmds");
-        GameEngine* gameEngine = new GameEngine(cmdProcessor);
-        gameEngine->Run();
+    else if(tokens[0] == "file" && tokens.size() > 1){
+        FileLineReader* flr = new FileLineReader();
+        if(flr->readFile(tokens[1])){
+            FileCommandProcessorAdapter* fileCmdAdapter = new FileCommandProcessorAdapter(flr);
+            GameEngine* gameEngine = new GameEngine(fileCmdAdapter);
+            gameEngine->Run();
+        }
     } else{
         cout << "Invalid option." << endl;
-    }
-
-    cout << "End of the commands driver." << endl;
-
-    
-    
-    // 3) commands that are invalid in the current game state are rejected, and valid commands result in the correct effect and state change
-    
+    }    
 }

@@ -10,14 +10,16 @@
 #include <algorithm>
 #include "CommandProcessor.h"
 
+using std::vector, std::string;
+
 class Command;
 class CommandProcessor;
 
 class GameState
 {
     protected:
-    std::string name;
-    std::vector<std::string> cmds;
+    string name;
+    vector<string> cmds;
 
     public:
     GameState(std::string _name = "gamestate");
@@ -25,7 +27,7 @@ class GameState
     ~GameState();
     GameState(const GameState& state);
     GameState& operator=(GameState&& state);
-    virtual void onStateEnter(Command* cmd);
+    virtual void onStateEnter(vector<string> params);
     virtual void onStateExit();
     friend std::ostream& operator<<(std::ostream& os, const GameState& state);
     std::string getName();
@@ -104,7 +106,8 @@ class GameEngine
     const std::string EXEC_ORDER_CMD = "execorder";
     const std::string END_EXEC_ORDERS_CMD = "endexecorders";
     const std::string WIN_CMD = "win";
-    const std::string END_CMD = "quit";
+    const std::string QUIT_CMD = "quit";
+    const std::string EXIT_CMD = "exit";
 
     StartState* startState;
     MapLoadedState* mapLoadedState;
@@ -121,8 +124,7 @@ class GameEngine
 
     void SetCommands();
     bool ExecuteCmd(Command* cmd);
-    void SetState(GameState* state, Command* cmd);
-    void TransitionTo(GameState* state, Command* cmd);
+    void SetState(GameState* state, vector<string> params);
 
     public:
 

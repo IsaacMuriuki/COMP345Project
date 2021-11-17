@@ -9,14 +9,14 @@ GameEngine::GameEngine(){
     
     //Initializing all pointers to their respective game states
 
-    startState = new StartState ("start", {LOAD_MAP_CMD});
-    mapLoadedState = new MapLoadedState("map loaded", {LOAD_MAP_CMD, VALIDATE_MAP_CMD});
-    mapValidatedState = new MapValidatedState("map validated", {ADD_PLAYER_CMD});
-    playersAddedState = new PlayersAddedState("players added", {ADD_PLAYER_CMD, GAMESTART_CMD});
-    assignReinforcementState = new AssignReinforcementState("gamestart", {ISSUE_ORDER_CMD});
-    issueOrdersState = new IssueOrdersState("issue orders", {ISSUE_ORDER_CMD, END_ISSUE_ORDERS_CMD});
-    executeOrdersState = new ExecuteOrdersState("execute orders", {EXEC_ORDER_CMD, END_EXEC_ORDERS_CMD, WIN_CMD});
-    winState = new WinState("win", {PLAY_CMD, END_CMD});
+    startState = new StartState ("start", {LOAD_MAP_CMD, EXIT_CMD});
+    mapLoadedState = new MapLoadedState("map loaded", {LOAD_MAP_CMD, VALIDATE_MAP_CMD, EXIT_CMD});
+    mapValidatedState = new MapValidatedState("map validated", {ADD_PLAYER_CMD, EXIT_CMD});
+    playersAddedState = new PlayersAddedState("players added", {ADD_PLAYER_CMD, GAMESTART_CMD, EXIT_CMD});
+    assignReinforcementState = new AssignReinforcementState("assign reinforcement", {ISSUE_ORDER_CMD, EXIT_CMD});
+    issueOrdersState = new IssueOrdersState("issue orders", {ISSUE_ORDER_CMD, END_ISSUE_ORDERS_CMD, EXIT_CMD});
+    executeOrdersState = new ExecuteOrdersState("execute orders", {EXEC_ORDER_CMD, END_EXEC_ORDERS_CMD, WIN_CMD, EXIT_CMD});
+    winState = new WinState("win", {PLAY_CMD, QUIT_CMD, EXIT_CMD});
 
     SetCommands();
 
@@ -106,7 +106,7 @@ void GameEngine::SetCommands(){
 void GameEngine::Run(){
 
     //Sets the startState as the current state
-    SetState(startState, nullptr);
+    SetState(startState, {});
     
     //Program loops until reaching the end command is executed 
     while(running){
@@ -130,14 +130,14 @@ bool GameEngine::ExecuteCmd(Command* command){
 
         std::string cmdID = command->getEffect();
 
-        if(cmdID == END_CMD){
+        if(cmdID == QUIT_CMD || cmdID == EXIT_CMD){
             running = false;
             return true;
         }
         
         std::map<std::string, GameState*>::iterator cmd = cmds.find(cmdID);
         if (cmd != cmds.end()){
-            SetState(cmd->second, command); //If the command is valid, transition to the state the command points to
+            SetState(cmd->second, command->getParams()); //If the command is valid, transition to the state the command points to
             return true;
         } else {
             std::cout << "Command '" << cmdID << "' not found." << std::endl; //Otherwise, prints an error message
@@ -148,10 +148,10 @@ bool GameEngine::ExecuteCmd(Command* command){
 /**
  * Sets the current game state of the GameEngine to a new state.
  **/
-void GameEngine::SetState(GameState* nextState, Command* cmd){
+void GameEngine::SetState(GameState* nextState, vector<string> params){
     if(currentState) currentState->onStateExit();
     currentState = nextState;
-    if(currentState) currentState->onStateEnter(cmd);
+    if(currentState) currentState->onStateEnter(params);
 }
 
 std::ostream& operator<<(std::ostream& os, const GameEngine& engine)
@@ -199,7 +199,7 @@ GameState& GameState::operator=(GameState&& state){
 /**
  * Method executed upon entering the state. Is meant to be overitten to implement the functionality specific to each game state.
  **/
-void GameState::onStateEnter(Command* cmd){
+void GameState::onStateEnter(vector<string> params){
     std::cout << "Entered gamestate '" << name << "'." << std::endl;
 }
 

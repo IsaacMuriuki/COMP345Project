@@ -44,7 +44,8 @@ void CommandProcessor::saveCommand(Command* cmd){
 /* Check if the command is valid in the current game state */
 bool CommandProcessor::validate(Command* cmd){
 
-    string cmdID = cmd->getEffect();
+    vector<string> tokens = cmd->getParams();
+    string cmdID = tokens[0];
 
     //Check if the command is valid in the current state
     vector<string> stateCmds = gameEngine->getCurrentState()->getCmds();
@@ -76,26 +77,32 @@ void CommandProcessor::setGameEngine(GameEngine* _gameEngine){
     gameEngine = _gameEngine;
 }
 
-// FileCommandProcessorAdapter class definition
+// FileLineReader class definition
 
-FileCommandProcessorAdapter::FileCommandProcessorAdapter(){
+FileLineReader::FileLineReader(){
     
 }
 
-FileCommandProcessorAdapter::FileCommandProcessorAdapter(string filename){
-    readFile(filename);
+FileLineReader::~FileLineReader(){
+    
 }
 
-FileCommandProcessorAdapter::~FileCommandProcessorAdapter(){
-    
+string FileLineReader::readLineFromFile(){
+    if(cmdstrings.empty()) return "";
+
+    string cmdstr = cmdstrings.front();
+    cout << "Read Command: " << cmdstr << endl;
+    cmdstrings.pop();
+    return cmdstr;
 }
 
 /**
  * Saves the content of a file into a vector of command strings.
  * 
  * @param filename the path to the commands file.
+ * @return wether or not the file was successfully parsed.
  **/
-void FileCommandProcessorAdapter::readFile(string filename, bool append){
+bool FileLineReader::readFile(string filename){
     
     string filepath = "../../cmds/" + filename; //for mac -> "../cmds/"
 
@@ -104,15 +111,13 @@ void FileCommandProcessorAdapter::readFile(string filename, bool append){
 
     if (!input) {
         cout << "\nInvalid filename..." << endl;
-        return;
+        return false;
     }
 
-    if(!append){
-        queue<string> empty;
-        std::swap(cmdstrings, empty);
-    }
+    queue<string> empty;
+    std::swap(cmdstrings, empty);
     
-    cout << "Reading from " << filename << " ..." << endl;
+    cout << "\nReading from " << filename << " ..." << endl;
 
     string cmdstr;
 	while (getline(input, cmdstr)) {
@@ -120,22 +125,31 @@ void FileCommandProcessorAdapter::readFile(string filename, bool append){
 		cmdstrings.push(cmdstr);
 	}
 
+    cmdstrings.push(EXIT_CMD); //Add exit command at the end
+
     cout << "\nEnd of file..." << endl;
+
+    return true;
 }
 
-void FileCommandProcessorAdapter::readFile(string filename){
-    readFile(filename, false);
+
+// FileCommandProcessorAdapter class definition
+
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(){
+    
+}
+
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(FileLineReader* _flr){
+    flr = _flr;
+}
+
+FileCommandProcessorAdapter::~FileCommandProcessorAdapter(){
+    
 }
 
 /* Gets commands from the console as a string */
 string FileCommandProcessorAdapter::readCommand(){
-    
-    if(cmdstrings.empty()) return "";
-
-    string cmdstr = cmdstrings.front();
-    cout << "Read Command: " << cmdstr << endl;
-    cmdstrings.pop();
-    return cmdstr;
+    return flr->readLineFromFile();
 }
 
 // Command class definition
@@ -158,4 +172,8 @@ void Command::saveEffect(string newEffect){
 
 string Command::getEffect(){
     return effect;
+}
+
+vector<string> Command::getParams(){
+    return split(getEffect(), ' ');
 }
