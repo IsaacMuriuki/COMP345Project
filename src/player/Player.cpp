@@ -136,6 +136,13 @@ vector<Territory*> Player::toAttack() {
 
 // Asks the user for input on which order to create, and creates the corresponding order objects and adds it to the player's ordersList
 void Player::issueOrder() {
+    int choiceDefend;
+    int choiceAttack;
+    int choiceCard;
+    if (this->getTerritories().size() == 0) {
+        std::cout << "This player no longer has countries and will be eliminated" << std::endl;
+        return;
+    }
     std::cout << this->getReinforcementPool() << "  " << this->getName() << std::endl;
     if (this->getReinforcementPool() > 0) {
         cout << "Player " << this->getName() << " still has has reinforcments and must deploy them" << std::endl;
@@ -155,15 +162,15 @@ void Player::issueOrder() {
 
         std::cout << "Creating a deployment order" << std::endl;
 
-        int choice;
-        std::cout << "Player " << this->getName() << " has the following countries to attack: " << std::endl;
-        for (Territory* territory : this->toAttack()) {
+        
+        std::cout << "Player " << this->getName() << " has the following countries to reinforce: " << std::endl;
+        for (Territory* territory : this->getTerritories()) {
             std::cout << territory->getName() << std::endl;
         }
         std::cout << "Choose by typing the index" << std::endl;
-        std::cin >> choice;
+        std::cin >> choiceDefend;
 
-        Deploy* deploy = new Deploy(numberOfDeployments, this, this->getTerritories()[0]);
+        Deploy* deploy = new Deploy(numberOfDeployments, this, this->getTerritories()[choiceDefend]);
         ordersList->add(deploy);
         return;
     }
@@ -179,9 +186,22 @@ void Player::issueOrder() {
         }
         else break;
     }
+    std::cout << "Player " << this->getName() << " has the following countries to attack: " << std::endl;
+    for (Territory* territory : this->toAttack()) {
+        std::cout << territory->getName() << std::endl;
+    }
+    std::cout << "Choose by typing the index" << std::endl;
+    std::cin >> choiceAttack;
+
+    std::cout << "Player " << this->getName() << " has the following countries to take an army from: " << std::endl;
+    for (Territory* territory : this->getTerritories()) {
+        std::cout << territory->getName() << std::endl;
+    }
+    std::cout << "Choose by typing the index" << std::endl;
+    std::cin >> choiceDefend;
 
     std::cout << "Creating an advance order" << std::endl;
-    Advance* advance = new Advance(this, numberOfAdvancements, this->getTerritories()[0], this->toAttack()[0]);
+    Advance* advance = new Advance(this, numberOfAdvancements, this->getTerritories().at(choiceDefend), this->toAttack().at(choiceAttack));
     ordersList->add(advance);
 
     cout << "These are the cards in " << this->getName() << "'s hand:";
@@ -189,29 +209,28 @@ void Player::issueOrder() {
         cout << " " << this->handOfCards->getHand(i);
     }
     std::cout << std::endl;
-    int choice;
     cout << "Choose a card based on its index or 9 for none ";
-    cin >> choice;
-    if (choice == 9) {
+    cin >> choiceCard;
+    if (choiceCard == 9) {
         std::cout << "No card played" << std::endl;
         return;
     }
-    if (this->handOfCards->getHand(choice).getCardType() == bomb) {
+    if (this->handOfCards->getHand(choiceCard).getCardType() == bomb) {
         std::cout << "Creating a bomb order" << std::endl;
         Bomb* bomb = new Bomb();
         ordersList->add(bomb);
     }
-    if (this->handOfCards->getHand(choice).getCardType() == blockade) {
+    if (this->handOfCards->getHand(choiceCard).getCardType() == blockade) {
         std::cout << "Creating a blockade order" << std::endl;
         Blockade* blockade = new Blockade();
         ordersList->add(blockade);
     }
-    if (this->handOfCards->getHand(choice).getCardType() == diplomacy) {
+    if (this->handOfCards->getHand(choiceCard).getCardType() == diplomacy) {
         std::cout << "Creating a diplomacy order" << std::endl;
         Negotiate* negotiate = new Negotiate();
         ordersList->add(negotiate);
     }
-    if (this->handOfCards->getHand(choice).getCardType() == airlift) {
+    if (this->handOfCards->getHand(choiceCard).getCardType() == airlift) {
         std::cout << "Creating a airlift order" << std::endl;
         Airlift* airlift = new Airlift();
         ordersList->add(airlift);
