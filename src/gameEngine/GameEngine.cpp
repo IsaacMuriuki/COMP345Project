@@ -39,7 +39,7 @@ GameEngine::GameEngine(){
 
     playerList.push_back(Player());
     playerList.push_back(Player());
-    playerList[0].addTerritory(&CANADA);
+    playerList[1].addTerritory(&CANADA);
     playerList[0].setName("Ted");
     playerList[1].addTerritory(&US);
     playerList[1].addTerritory(&MEXICO);
@@ -390,6 +390,24 @@ void ExecuteOrdersState::onStateEnter() {
 }
 void ExecuteOrdersState::onStateExit() {
     std::cout << "Exited gamestate '" << name << "'." << std::endl;
+    vector <int> indeces;
+    int index = 0;
+    for (Player player : playerList) {
+        if (player.getTerritories().size() == 0) {
+            std::cout << "Player " << player.getName() << " has no territories and has been eliminated from the game" << std::endl;
+            indeces.push_back(index);
+        }
+        index++;
+    }
+    int tempSize = indeces.size();
+    for (int i = 0; i < tempSize; i++) {
+        playerList.erase(playerList.begin() + indeces.back());
+        indeces.pop_back();
+    }
+    if (playerList.size() == 1) {
+        std::cout << "Player " << playerList.at(0).getName() << " has won the game!" << std::endl;
+        exit(0);
+    }
 }
 
 // IssueOrdersState class definition
