@@ -187,7 +187,10 @@ void Player::issueOrder() {
         ordersList->add(deploy);
         return;
     }
-
+    if (this->toAttack().size() == 0) {
+        std::cout << "No countries to attack" << std::endl;
+        return;
+    }
     int numberOfAdvancements;
     std::cout << "Enter how many troops(?) you want to advance: ";
     while (true) {

@@ -49,6 +49,7 @@ GameEngine::GameEngine(){
     }
     playerList.push_back(Player());
     playerList.push_back(Player());
+    playerList.push_back(Player());
     playerList[0].setHandOfCards(&hand1);
     playerList[1].setHandOfCards(&hand2);
     playerList[1].addTerritory(&CANADA);
@@ -56,6 +57,7 @@ GameEngine::GameEngine(){
     playerList[0].addTerritory(&US);
     playerList[1].addTerritory(&MEXICO);
     playerList[1].setName("Hillary");
+    playerList[2].setName("Terry");
 
 
     SetCommands();
