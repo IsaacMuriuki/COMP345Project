@@ -76,6 +76,16 @@ Command* CommandProcessor::getCommand(){
     else return nullptr;
 }
 
+/**
+ * Returns an entry of the command to be logged.
+ * 
+ * @return entry as a string.
+ * */
+string CommandProcessor::stringToLog(){
+    // WIP missing command name: return "Command: " + cmds[cmds.size() - 1]. OrderList;
+    return "Command: Command name";
+}
+
 void CommandProcessor::setGameEngine(GameEngine* _gameEngine){
     gameEngine = _gameEngine;
 }
@@ -109,7 +119,6 @@ string FileLineReader::readLineFromFile(){
     return cmdstr;
 }
 
-/**
  * Saves the content of a file into a vector of command strings.
  * 
  * @param filename the path to the commands file.
@@ -180,9 +189,17 @@ Command::~Command(){
 
 void Command::saveEffect(string newEffect){
     effect = newEffect;
+    Notify(this); // Notifies observer of the command's effect.
+}
 
-     // Notifies observer of the command's effect.
-    Notify(this);
+/**
+ * Returns an entry of the effect of a command to be logged.
+ * 
+ * @return entry as a string.
+ * */
+string Command::stringToLog(){
+    return "Command's Effect: " + effect;
+
 }
 
 string Command::getEffect(){

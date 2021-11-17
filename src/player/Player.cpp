@@ -39,6 +39,7 @@ Player::Player(string name)
  * @param ordersList
  * @param handOfCards
  */
+
 Player::Player(string name, vector<Territory*> territories, OrdersList* ordersList, Hand* handOfCards){
     this->name = name;
     this->territories = territories;
@@ -153,6 +154,7 @@ std::ostream &operator<<(std::ostream &strm, const Player &player)
 
     return strm;
 }
+
 
 // Returns the territories that the player controls
 vector<Territory*> Player::toDefend(){
@@ -278,7 +280,6 @@ void Player::issueOrder() {
         Airlift* airlift = new Airlift();
         ordersList->add(airlift);
     }
-
 }
 
 /**

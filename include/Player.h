@@ -30,6 +30,7 @@ public:
     void issueOrder();
 
     // Helper methods
+
     void addOrder(Order* );
     void addTerritory(Territory* );
     void removeTerritory(Territory*);

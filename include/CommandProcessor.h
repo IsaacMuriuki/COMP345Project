@@ -19,11 +19,12 @@ class Command : public ILoggable, public Subject{
         Command();
         Command(std::string _effect);
         ~Command();
-        void saveEffect(std::string newEffect);
         string getEffect();
         vector<string> getParams();
+        void saveEffect(std::string newEffect);
         string stringToLog();
 };
+
 class CommandProcessor : public ILoggable, public Subject{
     protected:
         GameEngine* gameEngine;

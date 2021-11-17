@@ -28,6 +28,19 @@ Order& Order::operator=(Order&& order) {
 // Shallow copy of player
 Order::Order(const Order& order) : executed(order.executed), player(order.player) {}
 
+/**
+ * The order is executed if it is valid.
+ **/
+void Order::execute() {
+    if (validate()) {
+        onExecute();
+        _executed = true;
+
+        // Notifies observer of the effect of the order executed.
+        Notify(this);
+    }
+}
+
 int Order::getOrderID() {return this->orderID;}
 
 bool Order::isExecuted() const {

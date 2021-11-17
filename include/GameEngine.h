@@ -5,7 +5,6 @@
 #include "LoggingObserver.h"
 #include "map.h"
 #include "Player.h"
-#include "map.h"
 #include "Orders.h"
 #include "OrdersList.h"
 
@@ -18,8 +17,8 @@
 #include <algorithm>
 #include <sstream>
 #include <filesystem>
-namespace fs = std::filesystem;
 
+namespace fs = std::filesystem;
 using std::vector, std::string;
 
 class Command;
@@ -27,13 +26,12 @@ class CommandProcessor;
 class GameEngine;
 class GameState
 {
-    protected:
+protected:
     string name;
     vector<string> cmds;
-
 public:
     GameState(std::string _name = "gamestate");
-    GameState(std::string _name, std::vector<std::string> _cmds);
+    GameState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     ~GameState();
     GameState(const GameState& state);
     GameState& operator=(GameState&& state);
@@ -48,7 +46,7 @@ public:
 class StartState : public GameState
 {
 public:
-    StartState(std::string _name, std::vector<std::string> _cmds);
+    StartState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     StartState(const StartState &state);
     ~StartState();
 };
@@ -56,7 +54,7 @@ public:
 class MapLoadedState : public GameState
 {
 public:
-    MapLoadedState(std::string _name, std::vector<std::string> _cmds);
+    MapLoadedState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     MapLoadedState(const MapLoadedState &state);
     ~MapLoadedState();
 };
@@ -64,6 +62,7 @@ public:
 class MapValidatedState : public GameState
 {
 public:
+    MapValidatedState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     MapValidatedState(std::string _name, std::vector<std::string> _cmds);
     MapValidatedState(const MapValidatedState &state);
     ~MapValidatedState();
@@ -72,7 +71,7 @@ public:
 class PlayersAddedState : public GameState
 {
 public:
-    PlayersAddedState(std::string _name, std::vector<std::string> _cmds);
+    PlayersAddedState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     PlayersAddedState(const PlayersAddedState &state);
     ~PlayersAddedState();
 };
@@ -80,7 +79,7 @@ public:
 class AssignReinforcementState : public GameState
 {
 public:
-    AssignReinforcementState(std::string _name, std::vector<std::string> _cmds);
+    AssignReinforcementState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     AssignReinforcementState(const AssignReinforcementState &state);
     ~AssignReinforcementState();
     virtual void onStateEnter();
@@ -90,7 +89,7 @@ public:
 class IssueOrdersState : public GameState
 {
 public:
-    IssueOrdersState(std::string _name, std::vector<std::string> _cmds);
+    IssueOrdersState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     IssueOrdersState(const IssueOrdersState &state);
     ~IssueOrdersState();
     virtual void onStateEnter();
@@ -100,7 +99,7 @@ public:
 class ExecuteOrdersState : public GameState
 {
 public:
-    ExecuteOrdersState(std::string _name, std::vector<std::string> _cmds);
+    ExecuteOrdersState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     ExecuteOrdersState(const ExecuteOrdersState &state);
     ~ExecuteOrdersState();
     virtual void onStateEnter();
@@ -110,7 +109,7 @@ public:
 class WinState : public GameState
 {
 public:
-    WinState(std::string _name, std::vector<std::string> _cmds);
+    WinState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     WinState(const WinState &state);
     ~WinState();
 };
@@ -154,7 +153,6 @@ class GameEngine : public ILoggable, public Subject
     void SetState(GameState* state, vector<string> params);
     void PrintMapFiles();
 
-
 public:
     GameEngine();
     GameEngine(CommandProcessor* _cmdProcessor);
@@ -165,6 +163,7 @@ public:
     void Run();
     friend std::ostream &operator<<(std::ostream &os, const GameEngine &engine);
     bool isRunning();
+
     GameState *getCurrentState();
     std::map<std::string, GameState *> getCmds();
     Map *getMap();

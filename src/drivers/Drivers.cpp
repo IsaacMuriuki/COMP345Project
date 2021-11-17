@@ -56,7 +56,6 @@ void orderExecutionDriver() {
     player2->addToReinforcementPool(1);
     player1->addOrder(deploy);
     player2->addOrder(deploy1);
-
     deploy->execute();
     deploy1->execute();
 
@@ -336,19 +335,15 @@ void territoryValuesDriver() {
         }
     }
 
-}
-
-void commandsDriver(){
+void commandsDriver()
+{
 
     string option = ""; // Initial value must be an option.
     
     cout << "Choose commands source." << endl;
     cout << "\tconsole" << endl;
     cout << "\tfile <filename>" << endl;
-
     cout << "\nEnter your option: " << flush;
-    //cin.clear(); 
-    //cin.sync();
     
     cin >> std::ws;
     std::getline(cin, option);

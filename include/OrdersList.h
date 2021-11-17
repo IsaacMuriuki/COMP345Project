@@ -1,10 +1,12 @@
 #pragma once
 
 #include <vector>
+#include <typeinfo>
 #include "Orders.h"
 #include "LoggingObserver.h"
 
 class Order;
+
 class OrdersList : public ILoggable, public Subject {
     private:
     std::vector<Order*> _orders;
