@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <typeinfo>
 #include "Orders.h"
 #include "LoggingObserver.h"
 

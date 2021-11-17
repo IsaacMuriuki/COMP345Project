@@ -126,6 +126,5 @@ int OrdersList::size() {
  * @return entry as a string.
  * */
 string OrdersList::stringToLog(){
-    string className = typeid(_orders[_orders.size() - 1]).name();
-    return "Order Issued: " + className;
+    return "Order Issued: " + _orders[_orders.size() - 1]->getType();
 }

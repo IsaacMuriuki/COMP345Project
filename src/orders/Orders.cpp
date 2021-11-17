@@ -40,7 +40,7 @@ bool Order::isExecuted() const {
  * @return entry as a string.
  * */
 string Order::stringToLog(){
-    return "Order Executed: " + this->getEffectApplied();
+    return "Executed " + this->getEffectApplied();
 }
 
 std::ostream& operator<<(std::ostream &out, const Order& order) {
@@ -82,17 +82,24 @@ std::string Deploy::getDescription() const {
 }
 
 std::string Deploy::getEffectApplied() const {
-    return "Placed " + std::to_string(units) + " units on ";
+    return effectsApplied;
+}
+
+std::string Deploy::getType() {
+    return "Deploy";
 }
 
 void Deploy::execute() {
     // If the player owns the territory, add selected number of armies to the territory
     if(validate()){
+        stringstream ss;
         territory->setUnits(territory->getUnits() + units);
         player->removeFromReinforcementPool(units);
 
-        std::cout << "Execute Deploy Order: " << units << " units moved from " << player->getName() << "'s reinforcement pool to "
-                  << territory->getName() << " (units: " << territory->getUnits() << ")." << std::endl;
+        ss << "Execute Deploy Order: " << units << " units moved from " << player->getName() << "'s reinforcement pool to "
+                  << territory->getName() << " (units: " << to_string(territory->getUnits()) << ").";
+        std::cout << ss.str() << std::endl;
+        effectsApplied = ss.str();
 
         // Notifies observer of the effect of the order executed.
         Notify(this);
@@ -177,14 +184,22 @@ std::string Advance::getDescription() const {
 }
 
 std::string Advance::getEffectApplied() const {
-    return "Moved " + std::to_string(units) + " units to ";
+    return effectsApplied;
+}
+
+std::string Advance::getType() {
+    return "Advance";
 }
 
 void Advance::execute() {
     if(validate()){
+        stringstream ss;
+
         // If the player owns both source and target territories
         if(targetTerritory->getOwner() == sourceTerritory->getOwner()){
-            std::cout << "Advance order: The player " << player->getName() << " owns both territories, moving " << units << " from " << sourceTerritory->getName() << " to " << targetTerritory->getName() << std::endl;
+            ss << "Advance order: The player " << player->getName() << " owns both territories, moving " << units << " from " << sourceTerritory->getName() << " to " << targetTerritory->getName();
+            std::cout << ss.str() << std::endl;
+            effectsApplied = ss.str();
             sourceTerritory->setUnits(sourceTerritory->getUnits() - units);
             targetTerritory->setUnits(targetTerritory->getUnits() + units);
         }
@@ -218,8 +233,10 @@ void Advance::execute() {
             bool hasSuccessfullyAttacked = false;
             // All of the defender's armies are eliminated - successful attack
             if(deadDefendingUnits == defendingUnitsCount){
-                std::cout << "Advance order success: The target territory " << targetTerritory->getName() << " has been defeated and is now owned by Player " << player->getName() << ". Advancing "
-                          << attackingUnitsCount-deadAttackingUnits << " surviving attacking units from " << sourceTerritory->getName() << " to " << targetTerritory->getName() << std::endl;
+                ss << "Advance order success: The target territory " << targetTerritory->getName() << " has been defeated and is now owned by Player " << player->getName() << ". Advancing "
+                          << attackingUnitsCount-deadAttackingUnits << " surviving attacking units from " << sourceTerritory->getName() << " to " << targetTerritory->getName();
+                std::cout << ss.str() << std::endl;
+                effectsApplied = ss.str();
 
                 hasSuccessfullyAttacked = true;
                 player->addTerritory(targetTerritory);
@@ -238,14 +255,19 @@ void Advance::execute() {
                     player->getHandOfCards()->addCardToHand(card);
                 }
             }
-                // Unsuccessful attack
+            // Unsuccessful attack
             else{
-                std::cout << "Advance order unsuccessful: Player " << player->getName() << " lost all attacking armies from " << sourceTerritory->getName()
-                          << ", while " << defendingUnitsCount - deadDefendingUnits << " remain alive on the target territory " << targetTerritory->getName() << std::endl;
+                ss << "Advance order unsuccessful: Player " << player->getName() << " lost all attacking armies from " << sourceTerritory->getName()
+                          << ", while " << defendingUnitsCount - deadDefendingUnits << " remain alive on the target territory " << targetTerritory->getName();
+                std::cout << ss.str() << std::endl;
+                effectsApplied = ss.str();   
                 sourceTerritory->setUnits(attackingUnitsCount - deadAttackingUnits);
                 targetTerritory->setUnits(defendingUnitsCount - deadDefendingUnits);
             }
         }
+
+        // Notifies observer of the effect of the order executed.
+        Notify(this);
     }
     if(!player->getOrdersList()->remove(this)){
         std::cout << "Could not remove order from " << player->getName() << "'s order list." << std::endl;
@@ -366,14 +388,21 @@ Airlift::Airlift(const Airlift& airlift) : Order(airlift.player), units(airlift.
 
 void Airlift::execute() {
     if (validate()) {
+        stringstream ss;
+
         // Player owns both territories
         if (sourceTerritory->getOwner() == player && targetTerritory->getOwner() == player) {
-            std::cout << "Airlift order: Moving player " << player->getName() << "'s units (" << units << "), from " <<
-                      sourceTerritory->getName() << " to " << targetTerritory->getName() << std::endl;
+            ss << "Airlift order: Moving player " << player->getName() << "'s units (" << units << "), from " <<
+                      sourceTerritory->getName() << " to " << targetTerritory->getName();
+            std::cout << ss.str() << std::endl;
+            effectsApplied = ss.str();
 
             sourceTerritory->setUnits(sourceTerritory->getUnits() - units);
             targetTerritory->setUnits(targetTerritory->getUnits() + units);
         }
+
+        // Notifies observer of the effect of the order executed.
+        Notify(this);
     }
     if(!player->getOrdersList()->remove(this)){
         std::cout << "Could not remove order from " << player->getName() << "'s order list." << std::endl;
@@ -409,7 +438,11 @@ std::string Airlift::getDescription() const {
 }
 
 std::string Airlift::getEffectApplied() const {
-    return "Moving ... units from ... to ....";
+    return effectsApplied;
+}
+
+std::string Airlift::getType() {
+    return "Airlift";
 }
 
 void Airlift::onExecute() {
@@ -441,8 +474,14 @@ Bomb::Bomb(const Bomb& bomb) : Order(bomb.player), targetTerritory(bomb.targetTe
 
 void Bomb::execute() {
     if(validate()){
+        stringstream ss;
         targetTerritory->setUnits(targetTerritory->getUnits() / 2);
-        std::cout << "Bomb order: Removing half the armies in target territory " << targetTerritory->getName() << std::endl;
+        ss << "Bomb order: Removing half the armies in target territory " << targetTerritory->getName();
+        std::cout << ss.str() << std::endl;
+        effectsApplied = ss.str();
+
+        // Notifies observer of the effect of the order executed.
+        Notify(this);
     }
     if(!player->getOrdersList()->remove(this)){
         std::cout << "Could not remove order from " << player->getName() << "'s order list." << std::endl;
@@ -490,7 +529,11 @@ std::string Bomb::getDescription() const {
 }
 
 std::string Bomb::getEffectApplied() const {
-    return "Kill x units located on ";
+    return effectsApplied;
+}
+
+std::string Bomb::getType() {
+    return "Bomb";
 }
 
 void Bomb::onExecute() {
@@ -534,8 +577,10 @@ Order* Blockade::clone() {
 void Blockade::execute() {
     if(validate()){
         if(targetTerritory->getOwner() == player){
-            std::cout << "Blockade order: Doubling the number of armies in " << targetTerritory->getName() << ", and transferring its ownership to the Neutral player (** NOT IMPLEMENTED **)." << std::endl;
-
+            stringstream ss;
+            ss << "Blockade order: Doubling the number of armies in " << targetTerritory->getName() << ", and transferring its ownership to the Neutral player.";
+            std::cout << ss.str() << std::endl;
+            effectsApplied = ss.str();
             targetTerritory->setUnits(targetTerritory->getUnits() * 2);
 
 //            if(/* neutral player does not exist */){
@@ -543,6 +588,9 @@ void Blockade::execute() {
 //            }
 //            targetTerritory->setOwner(/* Created Neutral Player */);
         }
+
+        // Notifies observer of the effect of the order executed.
+        Notify(this);
     }
     if(!player->getOrdersList()->remove(this)){
         std::cout << "Could not remove order from " << player->getName() << "'s order list." << std::endl;
@@ -567,7 +615,11 @@ std::string Blockade::getDescription() const {
 }
 
 std::string Blockade::getEffectApplied() const {
-    return "A blockade setup on ... of size ...";
+    return effectsApplied;
+}
+
+std::string Blockade::getType() {
+    return "Blockade";
 }
 
 void Blockade::onExecute() {
@@ -600,9 +652,15 @@ Negotiate::Negotiate(const Negotiate& negotiate) : Order(negotiate.player), targ
  */
 void Negotiate::execute() {
     if(validate()){
+        stringstream ss;
         targetPlayer->addToPlayersBeingNegotiatedWith(player);
         player->addToPlayersBeingNegotiatedWith(targetPlayer);
-        cout << "Negotiate order executed ! " << player->getName() << " is now negotiating with " << targetPlayer->getName() << endl;
+        ss << "Negotiate order executed ! " << player->getName() << " is now negotiating with " << targetPlayer->getName();
+        std::cout << ss.str() << std::endl;
+        effectsApplied = ss.str();
+
+        // Notifies observer of the effect of the order executed.
+        Notify(this);
     }
     if(!player->getOrdersList()->remove(this)){
         std::cout << "Could not remove order from " << player->getName() << "'s order list." << std::endl;
@@ -629,7 +687,11 @@ std::string Negotiate::getDescription() const {
 }
 
 std::string Negotiate::getEffectApplied() const {
-    return "Attacks prevented with ...";
+    return effectsApplied;
+}
+
+std::string Negotiate::getType() {
+    return "Negotiate";
 }
 
 void Negotiate::onExecute() {

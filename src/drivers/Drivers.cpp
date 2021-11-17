@@ -283,7 +283,7 @@ void commandsDriver()
 
 void logObserverDriver()
 {
-    cout << "\n\nHello" << endl;
+   /* cout << "\n\nHello" << endl;
     LogObserver *logObserver = new LogObserver();
     vector<Territory *> territories;
     Player *player = new Player("Henry", territories, new OrdersList(), new Hand());
@@ -307,5 +307,5 @@ void logObserverDriver()
     for (int i = 0; i < orderList->size(); i++)
     {
         orderList->get(i)->execute();
-    }
+    }*/
 }
