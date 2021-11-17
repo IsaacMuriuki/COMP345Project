@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <sstream>
 
 #include "Player.h"
 #include "map.h"
@@ -68,6 +69,18 @@ public:
     virtual void onExecute() = 0;
 
     /**
+     * Get type of Order.
+     * */
+    virtual string getType() = 0;
+
+    /**
+     * Returns an entry of the effect of the order executed to be logged.
+     * 
+     * @return entry as a string.
+     * */
+    string stringToLog();
+
+    /**
      * Outputs a description and the effects of the order after the order is executed.
      **/
     friend std::ostream& operator<<(std::ostream &out, const Order& order);
@@ -75,6 +88,7 @@ public:
 protected:
     bool executed;
     Player* player;
+    string effectsApplied;
     static int ID;
     int orderID;
 
@@ -104,6 +118,7 @@ public:
     Deploy& operator=(Deploy&& order);
     Deploy(const Deploy& order);
     void execute();
+    string getType();
 
     /**
      * Gets a deep copy of the order itself.
@@ -153,6 +168,7 @@ public:
     Advance& operator=(Advance&& order);
     Advance(const Advance& order);
     void execute();
+    string getType();
 
     /**
      * Gets a deep copy of the order itself.
@@ -207,6 +223,7 @@ public:
     Airlift& operator=(Airlift&& order);
     Airlift(const Airlift& order);
     void execute();
+    string getType();
 
     /**
      * Gets a deep copy of the order itself.
@@ -258,6 +275,7 @@ public:
     Bomb& operator=(Bomb&& order);
     Bomb(const Bomb& order);
     void execute();
+    string getType();
 
     /**
      * Gets a deep copy of the order itself.
@@ -305,6 +323,7 @@ public:
     Blockade& operator=(Blockade&& order);
     Blockade(const Blockade& order);
     void execute();
+    string getType();
 
     /**
      * Gets a deep copy of the order itself.
@@ -353,6 +372,7 @@ public:
     Negotiate& operator=(Negotiate&& order);
     Negotiate(const Negotiate& order);
     void execute();
+    string getType();
 
     /**
      * Gets a deep copy of the order itself.

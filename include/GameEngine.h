@@ -1,14 +1,14 @@
 #ifndef GAME_ENGINE_H
 #define GAME_ENGINE_H
 
-#include "Player.h"
-#include "map.h"
-#include "Orders.h"
-#include "OrdersList.h"
 #include "CommandProcessor.h"
 #include "LoggingObserver.h"
+#include "map.h"
+#include "Player.h"
+#include "Orders.h"
+#include "OrdersList.h"
 
-#include < iostream>
+#include <iostream>
 #include <stdio.h>
 #include <string>
 #include <map>
@@ -16,18 +16,17 @@
 #include <functional>
 #include <algorithm>
 #include <sstream>
+#include <filesystem>
 
-#include < filesystem>
 namespace fs = std::filesystem;
-
 using std::vector, std::string;
 
 class Command;
 class CommandProcessor;
-
+class GameEngine;
 class GameState
 {
-    protected:
+protected:
     string name;
     vector<string> cmds;
 public:
@@ -64,6 +63,7 @@ class MapValidatedState : public GameState
 {
 public:
     MapValidatedState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
+    MapValidatedState(std::string _name, std::vector<std::string> _cmds);
     MapValidatedState(const MapValidatedState &state);
     ~MapValidatedState();
 };
@@ -152,7 +152,7 @@ class GameEngine : public ILoggable, public Subject
     bool ExecuteCmd(Command* cmd);
     void SetState(GameState* state, vector<string> params);
     void PrintMapFiles();
-  
+
 public:
     GameEngine();
     GameEngine(CommandProcessor* _cmdProcessor);
@@ -164,16 +164,15 @@ public:
     friend std::ostream &operator<<(std::ostream &os, const GameEngine &engine);
     bool isRunning();
 
-    GameState* getCurrentState();
-    std::map<std::string, GameState*> getCmds();
-    GameEngine* clone();
-    void SetCmdProcessor(CommandProcessor* _cmdProcessor);
+    GameState *getCurrentState();
+    std::map<std::string, GameState *> getCmds();
     Map *getMap();
     void setMap(Map *);
     vector<Player *> getPlayers();
     void addPlayer(Player *);
     GameEngine *clone();
     void startupPhase();
+    void SetCmdProcessor(CommandProcessor* _cmdProcessor);
     string stringToLog();
 };
 

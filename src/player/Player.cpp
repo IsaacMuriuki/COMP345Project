@@ -9,6 +9,8 @@ Player::Player()
     this->territories = vector<Territory *>();
     this->ordersList = new OrdersList();
     this->handOfCards = new Hand();
+    this->reinforcementPool = 0;
+    this->isNeutral = false;
 }
 
 /**
@@ -95,6 +97,7 @@ Player::Player(const Player &player)
  * @param player
  * @return
  */
+
 Player& Player::operator=(const Player& player){
     if(&player != this) {
         delete ordersList;
@@ -303,7 +306,6 @@ Hand *Player::getHandOfCards() { return this->handOfCards; }
 void Player::setTerritories(vector<Territory *> territories) { this->territories = territories; }
 
 void Player::setOrders(OrdersList *ordersList) { this->ordersList = new OrdersList(*ordersList); }
-
 
 void Player::setReinforcementPool(int amount)
 {

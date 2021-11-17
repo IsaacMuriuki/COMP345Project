@@ -25,7 +25,7 @@ class Command : public ILoggable, public Subject{
         string stringToLog();
 };
 
-class CommandProcessor: public ILoggable, public Subject{
+class CommandProcessor : public ILoggable, public Subject{
     protected:
         GameEngine* gameEngine;
         vector<Command*> savedCmds;

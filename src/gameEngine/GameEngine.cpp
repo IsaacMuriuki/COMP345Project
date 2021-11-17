@@ -146,7 +146,6 @@ void GameEngine::SetCommands()
 /**
  * Starts the main GameEngine loop.
  **/
-  
   void GameEngine::Run(){
     
     startupPhase();
@@ -155,6 +154,7 @@ void GameEngine::SetCommands()
     while(running){
         
         Command* cmd = cmdProcessor->getCommand();
+
         //Validates the command and execute the appropriate state transition
         if(cmd) ExecuteCmd(cmd);
     }
@@ -167,10 +167,9 @@ void GameEngine::SetCommands()
  * If the command is valid, executes it.
  * 
  * @return true if the command was validated and executed; false otherwise.
- **/  
+**/  
   bool GameEngine::ExecuteCmd(Command* command){
-
-        std::string cmdID = command->getEffect();
+    std::string cmdID = command->getEffect();
 
         if(cmdID == QUIT_CMD || cmdID == EXIT_CMD){
             running = false;
@@ -194,8 +193,9 @@ void GameEngine::SetCommands()
 void GameEngine::SetState(GameState* nextState, vector<string> params){
     if(currentState) currentState->onStateExit();
     currentState = nextState;
+
     if(currentState) currentState->onStateEnter(params);
-    
+
     // Notifies observer of the new game state.
     Notify(this);
 }
@@ -234,9 +234,9 @@ void GameEngine::startupPhase()
     Map *map;
     bool gameStarted = false;
 
-  //Sets the startState as the current state
+    //Sets the startState as the current state
     SetState(startState, {});
-  
+
     PrintMapFiles();
 
     //Program loops until reaching the end command is executed
@@ -307,7 +307,7 @@ void GameEngine::PrintMapFiles()
 string GameEngine::stringToLog()
 {
     stringstream ss;
-    ss << "Game Engine: " << *currentState;
+    ss << "Game Engine new state: " << *currentState;
     return ss.str();
 }
 
@@ -385,6 +385,7 @@ StartState::StartState(const StartState &state) : StartState(state.name, state.c
 MapLoadedState::MapLoadedState(std::string _name, std::vector<std::string> _cmds) : GameState(_name, _cmds) {}
 MapLoadedState::~MapLoadedState(){};
 MapLoadedState::MapLoadedState(const MapLoadedState &state) : MapLoadedState(state.name, state.cmds) {}
+
 MapLoadedState::OnStateEnter(vector<string> params){
 
       

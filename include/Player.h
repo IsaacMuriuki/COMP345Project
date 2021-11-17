@@ -19,7 +19,7 @@ public:
     // Constructors, destructor and copy constructor
     Player();
     Player(string);
-    Player(string, vector<Territory *>, OrdersList *, Hand *);
+    Player(string, vector<Territory*> , OrdersList*, Hand* );
     Player(string, bool, vector<Territory*> , OrdersList*, Hand* );
     ~Player();
     Player(const Player &player);
