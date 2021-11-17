@@ -8,6 +8,10 @@
 #include <vector>
 #include <functional>
 #include <algorithm>
+#include "CommandProcessor.h"
+
+class Command;
+class CommandProcessor;
 
 class GameState
 {
@@ -21,7 +25,7 @@ class GameState
     ~GameState();
     GameState(const GameState& state);
     GameState& operator=(GameState&& state);
-    virtual void onStateEnter();
+    virtual void onStateEnter(Command* cmd);
     virtual void onStateExit();
     friend std::ostream& operator<<(std::ostream& os, const GameState& state);
     std::string getName();
@@ -88,6 +92,7 @@ class WinState : public GameState {
 class GameEngine
 {
     private:
+    CommandProcessor* cmdProcessor;
 
     const std::string PLAY_CMD = "play";
     const std::string LOAD_MAP_CMD = "loadmap";
@@ -115,14 +120,16 @@ class GameEngine
     std::map<std::string, GameState*> cmds;
 
     void SetCommands();
-    bool ExecuteCmd(std::string);
-    void SetState(GameState* );
-    void TransitionTo(GameState* );
+    bool ExecuteCmd(Command* cmd);
+    void SetState(GameState* state, Command* cmd);
+    void TransitionTo(GameState* state, Command* cmd);
 
     public:
 
     GameEngine();
+    GameEngine(CommandProcessor* _cmdProcessor);
     ~GameEngine();
+    
     GameEngine(const GameEngine& engine);
     GameEngine& operator=(GameEngine&& gameEngine);
 
@@ -132,6 +139,7 @@ class GameEngine
     GameState* getCurrentState();
     std::map<std::string, GameState*> getCmds();
     GameEngine* clone();
+    void SetCmdProcessor(CommandProcessor* _cmdProcessor);
 };
 
 #endif

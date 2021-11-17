@@ -20,8 +20,7 @@ int main() {
             std::cout << "B- Player (Isaac)" << std::endl;
             std::cout << "C- Orders List (Thomas)" << std::endl;
             std::cout << "D- Cards/Deck (Tyler)" << std::endl;
-            std::cout << "E- Game Engine (Salaheddine)" << std::endl;
-            std::cout << "F- Commands (Salaheddine)" << std::endl;
+            std::cout << "E- Commands (Salaheddine)" << std::endl;
             std::cout << "G- Stop the program" << std::endl;
         }
 
@@ -50,10 +49,6 @@ int main() {
                 cardsDriver();
                 break;
             case 'E':
-                // GameEngineDriver
-                gameEngineDriver();
-                break;
-            case 'F':
                 // Commands
                 commandsDriver();
                 break;

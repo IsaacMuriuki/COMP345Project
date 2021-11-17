@@ -204,11 +204,6 @@ void cardsDriver() {
     }
 }
 
-void gameEngineDriver(){
-    GameEngine gameEngine;
-    gameEngine.Run();
-}
-
 void commandsDriver(){
 
     cout << "Menu - COMP 345 Project - Part 1 - Team DN7" << endl;
@@ -229,7 +224,9 @@ void commandsDriver(){
 
     // read orders from the console using the CommandProcessor class 
     if(option == "console"){
-        CommandProcessor processor;
+        CommandProcessor* processor = new CommandProcessor();
+        GameEngine* gameEngine = new GameEngine(processor);
+        gameEngine->Run();
     }
     // read orders from a saved text file using the FileCommandProcessorAdapter 
     else if(option == "filename"){
