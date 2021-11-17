@@ -9,6 +9,7 @@ Player::Player() {
     this->ordersList = new OrdersList();
     this->handOfCards = new Hand();
     this->reinforcementPool = 0;
+    this->isNeutral = false;
 }
 
 /**
@@ -28,6 +29,16 @@ Player::Player(string name, vector<Territory*> territories, OrdersList* ordersLi
     this->ordersList = new OrdersList(*ordersList);
     this->handOfCards = new Hand(*handOfCards);
     this->reinforcementPool = 0;
+    this->isNeutral = false;
+}
+
+Player::Player(string name, bool isNeutral, vector<Territory*> territories, OrdersList* ordersList, Hand* handOfCards){
+    this->name = name;
+    this->territories = territories;
+    this->ordersList = new OrdersList(*ordersList);
+    this->handOfCards = new Hand(*handOfCards);
+    this->reinforcementPool = 0;
+    this->isNeutral = isNeutral;
 }
 
 // Destructor
@@ -55,6 +66,7 @@ Player::Player(const Player& player){
     this->handOfCards = new Hand(*player.handOfCards);
     this->playersBeingNegotiatedWith = player.playersBeingNegotiatedWith;
     this->reinforcementPool = player.reinforcementPool;
+    this->isNeutral = player.isNeutral;
 }
 
 /**
@@ -72,6 +84,7 @@ Player& Player::operator=(const Player& player){
         this->ordersList = new OrdersList(*player.ordersList);
         this->handOfCards = new Hand(*player.handOfCards);
         this->playersBeingNegotiatedWith = player.playersBeingNegotiatedWith;
+        this->isNeutral = player.isNeutral;
     }
     return *this;
 }
@@ -86,7 +99,9 @@ Player& Player::operator=(const Player& player){
 std::ostream& operator<<(std::ostream &strm, const Player& player){
     strm << "\nPlayer Data:\n";
 
-    strm << "Name : " << player.name << "\n\n";
+    strm << "Name : " << player.name <<"\n\n";
+
+    if(player.isNeutral) strm << "NEUTRAL PLAYER" << "\n";
 
     strm << "Territories: \n";
     for (int i = 0; i < player.territories.size(); ++i) {
@@ -102,9 +117,7 @@ std::ostream& operator<<(std::ostream &strm, const Player& player){
             strm << *player.ordersList->get(i) << "\n";
         }
     }
-    /**
-     * will need to change this once hand is a vector
-     */
+
     strm << "\nCards \n";
     for (int i =0; i <player.handOfCards->size(); ++i){
         strm << player.handOfCards->getHand(i).toString() << "\n";

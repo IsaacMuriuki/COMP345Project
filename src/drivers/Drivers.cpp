@@ -25,13 +25,16 @@ void orderExecutionDriver() {
     Deck* deck = new Deck();
     Hand* hand = new Hand(deck);
     Hand* hand1 = new Hand(deck);
+    Hand* hand2 = new Hand(deck);
 
     vector<Territory*> territories = brasilMap->getTerritories();
     vector<Territory*> player1Territories;
     vector<Territory*> player2Territories;
+    vector<Territory*> neutralPlayerTerritories;
 
     Player* player1 = new Player("player 1", player1Territories, new OrdersList, hand);
     Player* player2 = new Player("player 2", player2Territories, new OrdersList, hand1);
+    Player* neutral = new Player("neutral player", true, neutralPlayerTerritories, new OrdersList, hand2);
 
     for (int i = 0; i < territories.size(); ++i) {
         if(i % 2 == 0){
@@ -90,13 +93,12 @@ void orderExecutionDriver() {
     advance->execute();
 
     cout << endl << "\n************* BLOCKADE ORDER *************\n";
-    Blockade* blockade = new Blockade(player1, player1->getTerritories()[0]);
+    Blockade* blockade = new Blockade(player1, neutral, player1->getTerritories()[0]);
     player1->addOrder(blockade);
     Territory* t = player1->getTerritories()[0];
     cout << "Number of armies in " << t->getName() << " before blockade order : " << t->getUnits() << ". Owner : " << t->getOwner()->getName() << endl;
     blockade->execute();
     cout << "Number of armies in " << t->getName() << " after blockade order : " << t->getUnits() << ". Owner : " << t->getOwner()->getName() << endl;
-
 
 //    cout << endl << "\n************* AIRLIFT ORDER *************\n";
 //    cout << endl << "\n************* BOMB ORDER *************\n";
