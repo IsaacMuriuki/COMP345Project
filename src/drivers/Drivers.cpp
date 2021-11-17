@@ -7,9 +7,11 @@
 #include "OrdersList.h"
 #include "Player.h"
 #include "LoggingObserver.h"
+#include "Utilities.h"
 
 #include <stdio.h>
 #include <iostream>
+#include <string>
 #include <filesystem>
 
 using std::cout, std::cin, std::endl;
@@ -104,9 +106,8 @@ void orderExecutionDriver() {
 //    cout << endl << "\n************* BOMB ORDER *************\n";
 }
 
-void mapDriver()
-{
-    const string MAPS_FOLDER = "../../maps/"; // for mac this works ->   const string MAPS_FOLDER = "../maps";
+void mapDriver() {
+    const string MAPS_FOLDER = "../../maps/"; // for mac this works -> const string MAPS_FOLDER = "../maps";
     MapLoader loader;
 
     // read all files in valid maps folder
@@ -337,45 +338,41 @@ void territoryValuesDriver() {
 
 }
 
-void gameEngineDriver(){
-    GameEngine gameEngine;
-    gameEngine.Run();
-}
-
 void commandsDriver(){
-    cout << "Menu - COMP 345 Project - Part 1 - Team DN7" << endl;
-    cout << "Here are the driver options for execution:" << endl;
 
     string option = ""; // Initial value must be an option.
-    string options = "ABCDEF";
+    
+    cout << "Choose commands source." << endl;
+    cout << "\tconsole" << endl;
+    cout << "\tfile <filename>" << endl;
 
-    if (options.find(option) != options.npos)
-    {
-        cout << "Choose commands source." << endl;
-        cout << "\t-console" << endl;
-        cout << "\t-file <filename>" << endl;
-    }
+    cout << "\nEnter your option: " << flush;
+    //cin.clear(); 
+    //cin.sync();
+    
+    cin >> std::ws;
+    std::getline(cin, option);
+    cout << "Option: " << option << endl;
 
-    std::cout << "Enter your option: ";
-    cout.flush();
-    cin >> option;
+    vector<string> tokens = split(option, ' ');
 
     // read orders from the console using the CommandProcessor class 
-    if(option == "console"){
-        CommandProcessor* processor = new CommandProcessor();
-        GameEngine* gameEngine = new GameEngine(processor);
+    if(tokens[0] == "console"){
+        CommandProcessor* cmdProcessor = new CommandProcessor();
+        GameEngine* gameEngine = new GameEngine(cmdProcessor);
         gameEngine->Run();
     }
-    // read orders from a saved text file using the FileCommandProcessorAdapter
-    else if(option == "filename"){
-
+    // read orders from a saved text file using the FileCommandProcessorAdapter 
+    else if(tokens[0] == "file" && tokens.size() > 1){
+        FileLineReader* flr = new FileLineReader();
+        if(flr->readFile(tokens[1])){
+            FileCommandProcessorAdapter* fileCmdAdapter = new FileCommandProcessorAdapter(flr);
+            GameEngine* gameEngine = new GameEngine(fileCmdAdapter);
+            gameEngine->Run();
+        }
     } else{
         cout << "Invalid option." << endl;
-    }
-
-    cout << "End of the commands driver." << endl;
-
-    // 3) commands that are invalid in the current game state are rejected, and valid commands result in the correct effect and state change
+    }  
 }
 
 void logObserverDriver()
