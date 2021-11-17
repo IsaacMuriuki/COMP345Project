@@ -1,10 +1,12 @@
 #include "GameEngine.h"
+#include "CommandProcessor.h"
 
 // GameEngine class definition
 
-GameEngine::GameEngine()
-{
+using std::cout, std::cin, std::endl, std::vector, std::string;
 
+GameEngine::GameEngine(){
+    
     //Initializing all pointers to their respective game states
 
     startState = new StartState("start", {LOAD_MAP_CMD}, this);
@@ -18,11 +20,17 @@ GameEngine::GameEngine()
 
     SetCommands();
 
+    currentState = nullptr;
+
     std::cout << "\nGame Engine initialized." << std::endl;
 };
 
-GameEngine::~GameEngine()
-{
+
+GameEngine::GameEngine(CommandProcessor* _cmdProcessor) : GameEngine(){
+    SetCmdProcessor(_cmdProcessor);
+}
+
+GameEngine::~GameEngine(){
 
     delete startState;
     delete mapLoadedState;
@@ -99,26 +107,21 @@ void GameEngine::SetCommands()
 /**
  * Starts the main GameEngine loop.
  **/
+void GameEngine::Run(){
 
-void GameEngine::Run()
-{
-    startupPhase();
+    //startupPhase();
 
-    //Program loops until reaching the end command is executed
-    while (running)
-    {
-
-        //Take in the user input
-        std::string cmd;
-        std::cout << "\nEnter your command: " << std::endl;
-        std::cin.clear();
-        std::cin.sync();
-
-        std::cin >> cmd;
-        std::cout << std::endl;
+    //Sets the startState as the current state
+    SetState(startState, nullptr);
+    
+    //Program loops until reaching the end command is executed 
+    while(running){
+        
+        Command* cmd = cmdProcessor->getCommand();
+        cout << "got command " << endl;
 
         //Validates the command and execute the appropriate state transition
-        ExecuteCmd(cmd);
+        if(cmd) ExecuteCmd(cmd);
     }
 
     std::cout << "\nEnd of program." << std::endl;
@@ -130,38 +133,23 @@ void GameEngine::Run()
  * 
  * @return true if the command was validated and executed; false otherwise.
  **/
+bool GameEngine::ExecuteCmd(Command* command){
 
-bool GameEngine::ExecuteCmd(std::string cmdID)
-{
+    std::string cmdID = command->getEffect();
 
-    //Check if the current state has a matching command ID
-    std::vector<std::string> stateCmds = currentState->getCmds();
-    if (std::find(stateCmds.begin(), stateCmds.end(), cmdID) != stateCmds.end())
-    {
-
-        //Check if the current state considers the command valid
-        if (cmdID == END_CMD)
-        {
-            running = false;
-            return true;
-        }
-
-        std::map<std::string, GameState *>::iterator cmd = cmds.find(cmdID);
-        if (cmd != cmds.end())
-        {
-            TransitionTo(cmd->second); //If the command is valid, transition to the state the command points to
-            return true;
-        }
-        else
-        {
-            std::cout << "Command '" << cmdID << "' not found." << std::endl; //Otherwise, prints an error message
-            return false;
-        }
+    if(cmdID == END_CMD){
+        running = false;
+        return true;
+    }
+    
+    std::map<std::string, GameState*>::iterator cmd = cmds.find(cmdID);
+    if (cmd != cmds.end()){
+        SetState(cmd->second, command); //If the command is valid, transition to the state the command points to
+        return true;
     }
     else
     {
-        //If the current state does not consider the command valid, prints an error message
-        std::cout << "State '" << currentState->getName() << "' doesn't recognize command '" << cmdID << "'." << std::endl;
+        std::cout << "Command '" << cmdID << "' not found." << std::endl; //Otherwise, prints an error message
         return false;
     }
 }
@@ -169,23 +157,10 @@ bool GameEngine::ExecuteCmd(std::string cmdID)
 /**
  * Sets the current game state of the GameEngine to a new state.
  **/
-
-void GameEngine::SetState(GameState *nextState)
-{
+void GameEngine::SetState(GameState* nextState, Command* cmd){
+    if(currentState) currentState->onStateExit();
     currentState = nextState;
-    if (currentState != nullptr)
-        currentState->onStateEnter();
-}
-
-/**
- * Exit the current game state and sets a new state as the current game state of the GameEngine.
- **/
-
-void GameEngine::TransitionTo(GameState *nextState)
-{
-    if (currentState != nullptr)
-        currentState->onStateExit();
-    SetState(nextState);
+    if(currentState) currentState->onStateEnter(cmd);
 
     // Notifies observer of the new game state.
     Notify(this);
@@ -226,7 +201,7 @@ void GameEngine::startupPhase()
     bool gameStarted = false;
     ;
     //Sets the startState as the current state
-    SetState(startState);
+    //SetState(startState);
     PrintMapFiles();
 
     //Program loops until reaching the end command is executed
@@ -298,7 +273,7 @@ void GameEngine::startupPhase()
         }
 
         //Validates the command and execute the appropriate state transition
-        ExecuteCmd(cmd);
+        //ExecuteCmd(cmd);
     }
 }
 
@@ -321,6 +296,11 @@ string GameEngine::stringToLog()
     stringstream ss;
     ss << "Game Engine new state: " << *currentState;
     return ss.str();
+}
+
+void GameEngine::SetCmdProcessor(CommandProcessor* _cmdProcessor){
+    cmdProcessor = _cmdProcessor;
+    cmdProcessor->setGameEngine(this);
 }
 
 // GameState class definition
@@ -358,8 +338,7 @@ GameState &GameState::operator=(GameState &&state)
 /**
  * Method executed upon entering the state. Is meant to be overitten to implement the functionality specific to each game state.
  **/
-void GameState::onStateEnter()
-{
+void GameState::onStateEnter(Command* cmd){
     std::cout << "Entered gamestate '" << name << "'." << std::endl;
 }
 

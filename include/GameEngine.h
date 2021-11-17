@@ -1,6 +1,7 @@
 #ifndef GAME_ENGINE_H
 #define GAME_ENGINE_H
 
+#include "CommandProcessor.h"
 #include "LoggingObserver.h"
 #include "map.h"
 
@@ -12,10 +13,11 @@
 #include <functional>
 #include <algorithm>
 #include <sstream>
-
 #include < filesystem>
 namespace fs = std::filesystem;
 
+class Command;
+class CommandProcessor;
 class GameEngine;
 class GameState
 {
@@ -28,9 +30,9 @@ public:
     GameState(std::string _name = "gamestate");
     GameState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     ~GameState();
-    GameState(const GameState &state);
-    GameState &operator=(GameState &&state);
-    virtual void onStateEnter();
+    GameState(const GameState& state);
+    GameState& operator=(GameState&& state);
+    virtual void onStateEnter(Command* cmd);
     virtual void onStateExit();
     friend std::ostream &operator<<(std::ostream &os, const GameState &state);
     std::string getName();
@@ -104,7 +106,9 @@ public:
 
 class GameEngine : public ILoggable, public Subject
 {
-private:
+    private:
+    CommandProcessor* cmdProcessor;
+
     const std::string PLAY_CMD = "play";
     const std::string LOAD_MAP_CMD = "loadmap";
     const std::string VALIDATE_MAP_CMD = "validatemap";
@@ -134,21 +138,21 @@ private:
     std::map<std::string, GameState *> cmds;
 
     void SetCommands();
-    bool ExecuteCmd(std::string);
-    void SetState(GameState *);
-    void TransitionTo(GameState *);
+    bool ExecuteCmd(Command* cmd);
+    void SetState(GameState* state, Command* cmd);
+    void TransitionTo(GameState* state, Command* cmd);
     void PrintMapFiles();
 
 public:
     GameEngine();
+    GameEngine(CommandProcessor* _cmdProcessor);
     ~GameEngine();
-    GameEngine(const GameEngine &engine);
-    GameEngine &operator=(GameEngine &&gameEngine);
+    GameEngine(const GameEngine& engine);
+    GameEngine& operator=(GameEngine&& gameEngine);
 
     void Run();
     friend std::ostream &operator<<(std::ostream &os, const GameEngine &engine);
     bool isRunning();
-
     GameState *getCurrentState();
     std::map<std::string, GameState *> getCmds();
     Map *getMap();
@@ -157,6 +161,7 @@ public:
     void addPlayer(Player *);
     GameEngine *clone();
     void startupPhase();
+    void SetCmdProcessor(CommandProcessor* _cmdProcessor);
     string stringToLog();
 };
 
