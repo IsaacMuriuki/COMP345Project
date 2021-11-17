@@ -95,6 +95,19 @@ bool OrdersList::remove(int index) {
     return true;
 }
 
+bool OrdersList::remove(Order * order) {
+    bool hasremovedOrder = false;
+    for(int i =0; _orders.size(); i++ ){
+        if (_orders.at(i)->getOrderID() == order->getOrderID()) {
+            delete _orders.at(i);
+            _orders.erase(_orders.begin() + i);
+            _orders.shrink_to_fit();
+            hasremovedOrder = true;
+        }
+    }
+    return hasremovedOrder;
+}
+
 /**
  * Gets the size of the orders list.
  * 

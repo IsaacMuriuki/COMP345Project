@@ -1,5 +1,4 @@
-#ifndef COMP_345_PROJECT_PLAYER_H
-#define COMP_345_PROJECT_PLAYER_H
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -7,16 +6,19 @@
 #include <string>
 
 #include "map.h"
-#include "Cards.h"
 #include "OrdersList.h"
+#include "Cards.h"
 
 class Territory;
+class Order;
+class OrdersList;
 
 class Player{
 public:
     // Constructors, destructor and copy constructor
     Player();
     Player(string, vector<Territory*> , OrdersList*, Hand* );
+    Player(string, bool, vector<Territory*> , OrdersList*, Hand* );
     ~Player();
     Player(const Player& player);
 
@@ -28,13 +30,22 @@ public:
     // Helper methods
     void addOrder(Order* );
     void addTerritory(Territory* );
+    void removeTerritory(Territory*);
     vector<Territory*> getTerritories();
     OrdersList* getOrdersList();
     Hand* getHandOfCards();
     string getName();
+    int getReinforcementPool();
+    void setName(string Name);
     void setHandOfCards(Hand* );
     void setTerritories(vector<Territory*> );
     void setOrders(OrdersList* );
+    void setReinforcementPool(int amount);
+    void addToReinforcementPool(int);
+    void removeFromReinforcementPool(int);
+    int getReinforcementPool() const;
+    vector<Player *> getPlayersBeingNegotiatedWith();
+    void addToPlayersBeingNegotiatedWith(Player* player);
 
     // Overloading << and = operators
     friend std::ostream& operator<<(std::ostream &, const Player& );
@@ -43,7 +54,9 @@ private:
     string name;
     vector<Territory*> territories;
     Hand* handOfCards;
-    OrdersList* ordersList;
+    OrdersList* ordersList; 
+    int reinforcementPool;
+    vector<Player*> playersBeingNegotiatedWith;
+    bool isNeutral;
 };
 
-#endif //COMP_345_PROJECT_PLAYER_H
