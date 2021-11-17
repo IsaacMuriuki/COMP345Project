@@ -524,7 +524,7 @@ Order* Blockade::clone() {
 void Blockade::execute() {
     if(validate()){
         if(targetTerritory->getOwner() == player){
-            std::cout << "Blockade order: Doubling the number of armies in " << targetTerritory->getName() << ", and transferring its ownership to the Neutral player (** NOT IMPLEMENTED **)." << std::endl;
+            std::cout << "Blockade order: Doubling the number of armies in " << targetTerritory->getName() << ", and transferring its ownership to the Neutral player." << std::endl;
 
             targetTerritory->setUnits(targetTerritory->getUnits() * 2);
 

@@ -347,21 +347,25 @@ void AssignReinforcementState::onStateExit() {
 }
 
 void IssueOrdersState::onStateEnter() {
+    for(Player player: playerList){
+        player.getPlayersBeingNegotiatedWith().clear();
+    }
+
     for (Player player : playerList) {
         std::cout << "Player " << player.getName() << " has the following countries to attack: " << std::endl;
         for (Territory* territory : player.toAttack()) {
             std::cout << territory->getName() << std::endl;
         }
     }
-        for (Player player : playerList) {
+    for (Player player : playerList) {
         std::cout << "Player " << player.getName() << " has the following countries to defend: " << std::endl;
         for (Territory* territory : player.toDefend()) {
             std::cout << territory->getName() << std::endl;
         }
     }
-        for (Player player : playerList) {
-            player.issueOrder();            
-        }
+    for (Player player : playerList) {
+        player.issueOrder();
+    }
 }
 void IssueOrdersState::onStateExit() {
     std::cout << "Exited gamestate '" << name << "'." << std::endl;

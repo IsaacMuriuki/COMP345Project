@@ -44,7 +44,7 @@ public:
     void addToReinforcementPool(int);
     void removeFromReinforcementPool(int);
     int getReinforcementPool() const;
-    vector<Player *> getPlayersBeingNegotiatedWith() const;
+    vector<Player *> getPlayersBeingNegotiatedWith();
     void addToPlayersBeingNegotiatedWith(Player* player);
 
     // Overloading << and = operators

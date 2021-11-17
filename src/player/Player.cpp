@@ -297,7 +297,7 @@ void Player::setName(string Name) { this->name = Name; }
 string Player::getName()  { return this->name;}
 
 int Player::getReinforcementPool() { return this->reinforcementPool; }
-vector<Player *> Player::getPlayersBeingNegotiatedWith() const {return playersBeingNegotiatedWith; }
+vector<Player *> Player::getPlayersBeingNegotiatedWith() {return playersBeingNegotiatedWith; }
 
 void Player::addToPlayersBeingNegotiatedWith(Player *player) {playersBeingNegotiatedWith.push_back(player);}
 
