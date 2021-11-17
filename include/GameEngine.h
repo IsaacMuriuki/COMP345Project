@@ -83,8 +83,8 @@ public:
     AssignReinforcementState(std::string _name, std::vector<std::string> _cmds);
     AssignReinforcementState(const AssignReinforcementState &state);
     ~AssignReinforcementState();
-    virtual void onStateEnter();
-    virtual void onStateExit();
+    void onStateEnter(vector<string> params) override;
+    void onStateExit() override;
 };
 
 class IssueOrdersState : public GameState
@@ -93,8 +93,8 @@ public:
     IssueOrdersState(std::string _name, std::vector<std::string> _cmds);
     IssueOrdersState(const IssueOrdersState &state);
     ~IssueOrdersState();
-    virtual void onStateEnter();
-    virtual void onStateExit();
+    void onStateEnter(vector<string> params) override;
+    void onStateExit() override;
 };
 
 class ExecuteOrdersState : public GameState
@@ -103,8 +103,8 @@ public:
     ExecuteOrdersState(std::string _name, std::vector<std::string> _cmds);
     ExecuteOrdersState(const ExecuteOrdersState &state);
     ~ExecuteOrdersState();
-    virtual void onStateEnter();
-    virtual void onStateExit();
+    void onStateEnter(vector<string> params) override;
+    void onStateExit() override;
 };
 
 class WinState : public GameState

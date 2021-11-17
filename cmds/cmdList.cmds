@@ -3,6 +3,10 @@ validatemap
 addplayer
 gamestart
 issueorder
-issueordersend
+endissueorders
+execorder
+endexecorders
+issueorder
+endissueorders
 win
 quit
