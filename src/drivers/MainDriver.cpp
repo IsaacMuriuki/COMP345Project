@@ -9,19 +9,20 @@ int main() {
     std::cout << "Here are the driver options for execution:" << std::endl;
 
     char option = 'A'; // Initial value must be an option.
-    std::string options = "ABCDEF";
+    std::string options = "ABCDEFGH";
 
     while (option != 'F') {
         std::cout << std::endl;
         if (options.find(option) != options.npos) {
             std::cout << "Enter a driver to execute." << std::endl;
             std::cout << "A- Map (Chris + Henry)" << std::endl;
-            std::cout << "B- Player (Isaac)" << std::endl;
-            std::cout << "C- Order Execution (Isaac)" << std::endl;
-            std::cout << "D- Cards/Deck (Tyler)" << std::endl;
-            std::cout << "E- Game Engine (Salaheddine)" << std::endl;
-            std::cout << "F- Commands (Salaheddine)" << std::endl;
-            std::cout << "G- Stop the program" << std::endl;
+            std::cout << "B- Order Execution (Isaac)" << std::endl;
+            std::cout << "C- Game Engine (Salaheddine)" << std::endl;
+            std::cout << "D- Commands Driver" << std::endl;
+            std::cout << "E- Territory Reinforcements" << std::endl;
+            std::cout << "F- Command Processor" << std::endl;
+            std::cout << "G- Game Log Observer" << std::endl;
+            std::cout << "H- Stop the program" << std::endl;
         }
 
         std::cout << "Enter your option: ";
@@ -31,37 +32,27 @@ int main() {
 
         switch (option) {
             case 'A':
-                // MapDriver
                 mapDriver();
                 break;
             case 'B':{
-                // PlayerDriver
-                playerDriver();
+                orderExecutionDriver();
                 break;
             }
             case 'C': {
-                // OrdersDriver
-                orderExecutionDriver();
+                gameEngineDriver();
                 break;
             }
             case 'D':
-                // CardsDriver
-                cardsDriver();
-                break;
-            case 'E':
-                // GameEngineDriver
-                gameEngineDriver();
-                break;
-            case 'F':
-                // Commands
                 commandsDriver();
                 break;
+            case 'E':
+                territoryValuesDriver();
+                break;
+            case 'F':
+                break;
             case 'G':
-                // Order execution
-                orderExecutionDriver();
                 break;
             case 'H':
-                // Ignore.
                 return EXIT_SUCCESS;
                 break;
             default:

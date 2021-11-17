@@ -18,6 +18,7 @@ public:
     // Constructors, destructor and copy constructor
     Player();
     Player(string, vector<Territory*> , OrdersList*, Hand* );
+    Player(string, bool, vector<Territory*> , OrdersList*, Hand* );
     ~Player();
     Player(const Player& player);
 
@@ -34,13 +35,16 @@ public:
     OrdersList* getOrdersList();
     Hand* getHandOfCards();
     string getName();
+    int getReinforcementPool();
+    void setName(string Name);
     void setHandOfCards(Hand* );
     void setTerritories(vector<Territory*> );
     void setOrders(OrdersList* );
+    void setReinforcementPool(int amount);
     void addToReinforcementPool(int);
     void removeFromReinforcementPool(int);
     int getReinforcementPool() const;
-    vector<Player *> getPlayersBeingNegotiatedWith() const;
+    vector<Player *> getPlayersBeingNegotiatedWith();
     void addToPlayersBeingNegotiatedWith(Player* player);
 
     // Overloading << and = operators
@@ -50,8 +54,9 @@ private:
     string name;
     vector<Territory*> territories;
     Hand* handOfCards;
-    OrdersList* ordersList;
+    OrdersList* ordersList; 
     int reinforcementPool;
     vector<Player*> playersBeingNegotiatedWith;
+    bool isNeutral;
 };
 
