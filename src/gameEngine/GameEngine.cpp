@@ -37,8 +37,20 @@ GameEngine::GameEngine(){
     NA.addTerritory(&CANADA);
     NA.addTerritory(&MEXICO);
 
+    Deck deck = Deck();
+    Hand hand1 = Hand();
+    Hand hand2 = Hand();
+    CardType temp;
+    for (int i = 0; i < 5; i++) {
+        temp = deck.draw();
+        hand1.setHand(i, temp);
+        temp = deck.draw();
+        hand2.setHand(i, temp);
+    }
     playerList.push_back(Player());
     playerList.push_back(Player());
+    playerList[0].setHandOfCards(&hand1);
+    playerList[1].setHandOfCards(&hand2);
     playerList[1].addTerritory(&CANADA);
     playerList[0].setName("Ted");
     playerList[1].addTerritory(&US);
@@ -321,35 +333,8 @@ void AssignReinforcementState::onStateEnter() {
         }
         if (fullContinent == true) { reinforcementCount = reinforcementCount + NA.getArmyValue(); }
         if (reinforcementCount < 3) reinforcementCount = 3;
-        std::cout << "These are your countries: ";
-        for (Territory *territory : player.getTerritories()) {
-            std::cout << territory->getName() << " ";
-        }
-        std::cout << std::endl;
-        while (reinforcementCount > 0) {
-            std::cout << "You have " << reinforcementCount << " to add (choose by index)" << std::endl;
-            std::cin >> choice;
-            if (choice >= player.getTerritories().size() || choice < 0) {
-                std::cout << "Invalid choice" << std::endl;
-            }
-            else {
-                player.getTerritories().at(choice)->setUnits(player.getTerritories().at(choice)->getUnits() + 1);
-                reinforcementCount--;
-            }
-            
-        }
-        std::cout << reinforcementCount << std::endl;
+        player.setReinforcementPool(player.getReinforcementPool() + reinforcementCount);
     }
-    //displays the countries and their updated unit counts  to the console
-    for (Player player : playerList) {
-        std::cout << "Player " << player.getName() << " has the following countries with these army counts: " << std::endl;
-        for (Territory* territory : player.getTerritories()) {
-            std::cout << territory->getName() << " with " << territory->getUnits() << std::endl;
-        }
-    }
-
-
-
 }
 
 /**

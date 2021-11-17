@@ -10,7 +10,7 @@ int main() {
     std::cout << "Here are the driver options for execution:" << std::endl;
 
     char option = 'A'; // Initial value must be an option.
-    std::string options = "ABCDEF";
+    std::string options = "ABCDEFGH";
 
     while (option != 'F') {
         std::cout << std::endl;
@@ -22,7 +22,8 @@ int main() {
             std::cout << "D- Cards/Deck (Tyler)" << std::endl;
             std::cout << "E- Game Engine (Salaheddine)" << std::endl;
             std::cout << "F- Commands (Salaheddine)" << std::endl;
-            std::cout << "G- Stop the program" << std::endl;
+            std::cout << "G- Territory Reinforcements" << std::endl;
+            std::cout << "H- Stop the program" << std::endl;
         }
 
         std::cout << "Enter your option: ";
@@ -58,6 +59,10 @@ int main() {
                 commandsDriver();
                 break;
             case 'G':
+                // Ignore.
+                territoryValuesDriver();
+                break;
+            case 'H':
                 // Ignore.
                 return EXIT_SUCCESS;
                 break;
