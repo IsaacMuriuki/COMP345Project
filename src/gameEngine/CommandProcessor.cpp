@@ -19,10 +19,31 @@ CommandProcessor::CommandProcessor(GameEngine* _gameEngine) : CommandProcessor::
 }
 
 CommandProcessor::~CommandProcessor(){
+
+    gameEngine->SetCmdProcessor(nullptr);
     gameEngine = nullptr;
 }
 
-/* Gets commands from the console as a string */
+CommandProcessor& CommandProcessor::operator=(CommandProcessor&& cmdProcessor){
+    
+    if(this != &cmdProcessor){
+        setGameEngine(cmdProcessor.gameEngine);
+        savedCmds = cmdProcessor.savedCmds;
+    }
+    
+    return *this;
+}
+
+CommandProcessor::CommandProcessor(const CommandProcessor &cmdProcessor) : CommandProcessor(cmdProcessor.gameEngine)
+{
+    for(Command* cmd : cmdProcessor.savedCmds)
+        savedCmds.push_back(cmd->clone());
+}
+
+/**
+ * Reads commands from the console as a string
+ * @return command string read from the console
+ **/
 string CommandProcessor::readCommand(){
     //Take in the user input
     string cmdstr;
@@ -36,7 +57,9 @@ string CommandProcessor::readCommand(){
     return cmdstr;
 }
 
-/* Stores the command internally in a collection of Command objects */
+/** 
+ * Stores the command internally in a collection of Command objects 
+**/
 void CommandProcessor::saveCommand(Command* cmd){
     savedCmds.push_back(cmd);
 
@@ -44,7 +67,11 @@ void CommandProcessor::saveCommand(Command* cmd){
     Notify(this);
 }
 
-/* Check if the command is valid in the current game state */
+/** 
+ * Check if the command is valid in the current game state 
+ * @return true if the command is valid
+ * @param cmd Command object to validate
+**/
 bool CommandProcessor::validate(Command* cmd){
 
     vector<string> tokens = cmd->getParams();
@@ -65,6 +92,10 @@ bool CommandProcessor::validate(Command* cmd){
     }
 }
 
+/**
+ * Read, process, validate and save commands
+ * @return validated command
+ **/
 Command* CommandProcessor::getCommand(){
 
     string cmdstr = readCommand();
@@ -76,6 +107,10 @@ Command* CommandProcessor::getCommand(){
     else return nullptr;
 }
 
+/**
+ * Assign a game engine to this command processor
+ * @param _gameEngine game engine to assign
+ **/
 void CommandProcessor::setGameEngine(GameEngine* _gameEngine){
     gameEngine = _gameEngine;
 }
@@ -89,6 +124,8 @@ string CommandProcessor::stringToLog(){
     return "Command: " + savedCmds[savedCmds.size() - 1]->getEffect();
 }
 
+CommandProcessor *CommandProcessor::clone(){ return new CommandProcessor(*this);}
+
 // FileLineReader class definition
 
 FileLineReader::FileLineReader(){
@@ -99,12 +136,29 @@ FileLineReader::~FileLineReader(){
     
 }
 
+FileLineReader::FileLineReader(const FileLineReader& flr){
+    cmdstrings = flr.cmdstrings;
+}
+
+FileLineReader& FileLineReader::operator=(FileLineReader&& flr){
+    
+    if(this != &flr){
+        cmdstrings = flr.cmdstrings;
+    }
+    
+    return *this;
+}
+
+/**
+ * Reads the next line from the content of the file saved prior
+ * @return string read from the content of the file
+ **/
 string FileLineReader::readLineFromFile(){
     if(cmdstrings.empty()) return "";
 
     string cmdstr = cmdstrings.front();
     cout << "Read Command: " << cmdstr << endl;
-    cmdstrings.pop();
+    cmdstrings.pop_front();
     return cmdstr;
 }
 
@@ -125,24 +179,23 @@ bool FileLineReader::readFile(string filename){
         cout << "\nInvalid filename..." << endl;
         return false;
     }
-
-    queue<string> empty;
-    std::swap(cmdstrings, empty);
     
     cout << "\nReading from " << filename << " ..." << endl;
 
     string cmdstr;
 	while (getline(input, cmdstr)) {
         cout << cmdstr << endl;
-		cmdstrings.push(cmdstr);
+		cmdstrings.push_back(cmdstr);
 	}
 
-    cmdstrings.push(EXIT_CMD); //Add exit command at the end
+    cmdstrings.push_back(EXIT_CMD); //Add exit command at the end
 
     cout << "\nEnd of file..." << endl;
 
     return true;
 }
+
+FileLineReader *FileLineReader::clone(){ return new FileLineReader(*this);}
 
 // FileCommandProcessorAdapter class definition
 
@@ -155,13 +208,28 @@ FileCommandProcessorAdapter::FileCommandProcessorAdapter(FileLineReader* _flr){
 }
 
 FileCommandProcessorAdapter::~FileCommandProcessorAdapter(){
-    
+    delete flr;
 }
 
-/* Gets commands from the console as a string */
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(const FileCommandProcessorAdapter& flrToCmdAdapter) : FileCommandProcessorAdapter(flrToCmdAdapter.flr->clone()) { }
+
+FileCommandProcessorAdapter& FileCommandProcessorAdapter::operator=(FileCommandProcessorAdapter&& flrToCmdAdapter){
+    if(this != &flrToCmdAdapter){
+        flr = flrToCmdAdapter.flr;
+    }
+    
+    return *this;
+}
+
+/**
+ * Reads commands from a saved file as a string
+ * @return command string read from a saved file
+ **/
 string FileCommandProcessorAdapter::readCommand(){
     return flr->readLineFromFile();
 }
+
+FileCommandProcessorAdapter *FileCommandProcessorAdapter::clone(){ return new FileCommandProcessorAdapter(*this);}
 
 // Command class definition
 
@@ -177,6 +245,27 @@ Command::~Command(){
 
 }
 
+Command::Command(const Command& cmd) : Command(cmd.effect) {}
+
+Command& Command::operator=(Command&& cmd)
+{   
+    if(this != &cmd){
+        saveEffect(cmd.effect);
+    }
+    
+    return *this;
+}
+
+std::ostream &operator<<(std::ostream &os, const Command &cmd)
+{
+    os << cmd.effect;
+    return os;
+}
+
+/**
+ * Reads commands from a saved file as a string
+ * @param newEffect new effect to save in the command
+ **/
 void Command::saveEffect(string newEffect){
     effect = newEffect;
 
@@ -184,10 +273,18 @@ void Command::saveEffect(string newEffect){
     Notify(this);
 }
 
+/**
+ * Effect accessor
+ * @return effect
+ **/
 string Command::getEffect(){
     return effect;
 }
 
+/**
+ * Geat command's effect description
+ * @return effect description
+ **/
 string Command::getDescription(){
     string cmd = split(effect, ' ')[0];
     if(cmd == "loadmap"){
@@ -207,6 +304,10 @@ string Command::getDescription(){
     }
 }
 
+/**
+ * Method to split the command into parameters
+ * @return a vector of string parameters
+ **/
 vector<string> Command::getParams(){
     return split(getEffect(), ' ');
 }
@@ -219,3 +320,5 @@ vector<string> Command::getParams(){
 string Command::stringToLog(){
     return "Command's Effect: " + getDescription();
 }
+
+Command *Command::clone(){ return new Command(*this);}

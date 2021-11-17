@@ -65,12 +65,13 @@ GameEngine::GameEngine(){
     std::cout << "\nGame Engine initialized." << std::endl;
 };
 
-
 GameEngine::GameEngine(CommandProcessor* _cmdProcessor) : GameEngine(){
     SetCmdProcessor(_cmdProcessor);
 }
 
 GameEngine::~GameEngine(){
+
+    delete cmdProcessor;
 
     delete startState;
     delete mapLoadedState;
@@ -157,6 +158,8 @@ void GameEngine::Run(){
     //Program loops until reaching the end command is executed 
     while(running){
         
+        if(!cmdProcessor) break;
+
         Command* cmd = cmdProcessor->getCommand();
 
         //Validates the command and execute the appropriate state transition
@@ -338,7 +341,7 @@ string GameEngine::stringToLog()
 
 void GameEngine::SetCmdProcessor(CommandProcessor* _cmdProcessor){
     cmdProcessor = _cmdProcessor;
-    cmdProcessor->setGameEngine(this);
+    if(cmdProcessor) cmdProcessor->setGameEngine(this);
 }
 
 // GameState class definition
