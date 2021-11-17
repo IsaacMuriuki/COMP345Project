@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+
 #include "Player.h"
 using namespace std;
 
@@ -167,9 +168,12 @@ public:
     Map& operator=(const Map &map);
     friend std::ostream &operator<<(std::ostream &stream, const Map& map);
 
+    vector<Territory*> getTerritories() const;
+    vector<Continent*> getContinents() const;
+
     /**
      * Finds a continent in the map by id.
-     * 
+     *
      * @param id the id of the continent to find.
      * @return the continent if found; NULL otherwise.
      **/
@@ -177,7 +181,7 @@ public:
 
     /**
      * Finds a territory in the map by id.
-     * 
+     *
      * @param id the id of the territory to find.
      * @return the territory if found; NULL otherwise.
      **/
@@ -185,7 +189,7 @@ public:
 
     /**
      * Finds a territory on a specific continent in the map by id.
-     * 
+     *
      * @param territoryId the id of the territory to find.
      * @param continentId the id of the continent to find in.
      * @return the territory if found; NULL otherwise.
@@ -194,14 +198,14 @@ public:
 
     /**
      * Checks if the map is valid.
-     * 
+     *
      * @return true if map is valid; false otherwise.
      **/
     bool validate();
 
     /**
      * Performs DFS traversal on class member _territories.
-     * 
+     *
      * @param indexOfTerritory index of starting territory.
      * @param visited keeps track if whether territories are visited or not.
      **/
@@ -209,7 +213,7 @@ public:
 
     /**
      * Performs DFS traversal on a specific subgraph.
-     * 
+     *
      * @param subgraph the subgraph.
      * @param indexOfTerritory index of starting territory.
      * @param visited keeps track if whether territories are visited or not.
@@ -235,8 +239,3 @@ public:
      **/
     Map* loadMap(string filePath);
 };
-
-// For split() function https://stackoverflow.com/questions/236129/how-do-i-iterate-over-the-words-of-a-string
-template<typename Out>
-void split(const std::string &s, char delim, Out result);
-vector<string> split(const string &s, char delim);

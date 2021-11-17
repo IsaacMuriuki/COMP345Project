@@ -3,27 +3,24 @@
 #include <string>
 #include "Drivers.h"
 
-#include "GameEngine.h"
-
 int main() {
+
     std::cout << "Menu - COMP 345 Project - Part 1 - Team DN7" << std::endl;
     std::cout << "Here are the driver options for execution:" << std::endl;
 
     char option = 'A'; // Initial value must be an option.
-    std::string options = "ABCDEF?";
+
+    std::string options = "ABCDE";
 
     while (option != 'F') {
         std::cout << std::endl;
         if (options.find(option) != options.npos) {
-            std::cout << "Enter a driver to execute." << std::endl;
-            std::cout << "A- Map (Chris + Henry)" << std::endl;
-            std::cout << "B- Player (Isaac)" << std::endl;
-            std::cout << "C- Orders List (Thomas)" << std::endl;
-            std::cout << "D- Cards/Deck (Tyler)" << std::endl;
-            std::cout << "E- Game Engine (Salaheddine)" << std::endl;
-            std::cout << "F- Commands (Salaheddine)" << std::endl;
-            std::cout << "?- Log Observer (Henry)" << std::endl;
-            std::cout << "G- Stop the program" << std::endl;
+          std::cout << "Enter a driver to execute." << std::endl;
+          std::cout << "A- Order Execution" << std::endl;
+          std::cout << "B- Commands" << std::endl;
+          std::cout << "C- Territory Reinforcements" << std::endl;
+          std::cout << "D- Game Log Observer" << std::endl;
+          std::cout << "E- Stop the program" << std::endl;
         }
 
         std::cout << "Enter your option: ";
@@ -33,42 +30,26 @@ int main() {
 
         switch (option) {
             case 'A':
-                // MapDriver
-                mapDriver();
+                orderExecutionDriver();
                 break;
             case 'B':{
-                // PlayerDriver
-                playerDriver();
+                commandsDriver();
                 break;
             }
             case 'C': {
-                // OrdersDriver
-                ordersDriver();
+                territoryValuesDriver();
                 break;
             }
             case 'D':
-                // CardsDriver
-                cardsDriver();
-                break;
-            case 'E':
-                // GameEngineDriver
-                gameEngineDriver();
-                break;
-            case 'F':
-                // Commands
-                commandsDriver();
-                break;
-            case '?':
-                // LogObserverDriver
                 logObserverDriver();
                 break;
-            case 'G':
-                // Ignore.
+            case 'E':
                 return EXIT_SUCCESS;
                 break;
             default:
                 std::cout << "Please double check your selection." << std::endl;
         }
     }
+
     return 0;
 }

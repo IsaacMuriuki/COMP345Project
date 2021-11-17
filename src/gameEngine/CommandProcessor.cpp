@@ -1,53 +1,79 @@
-#include "CommandProcessor.h"
-
 #include <iostream>
 #include <stdio.h>
-#include<string>
-#include <filesystem>
+#include <string>
+#include <fstream>
+#include "CommandProcessor.h"
+#include "Utilities.h"
 
-using std::string, std::cout, std::cin, std::endl;
+using std::string, std::cout, std::cin, std::endl, std::ifstream;
 namespace fs = std::filesystem;
 
 // CommandProcessor class definition
 
 CommandProcessor::CommandProcessor(){
+    std::cout << "\nCommand Processor initialized." << std::endl;
+}
 
+CommandProcessor::CommandProcessor(GameEngine* _gameEngine) : CommandProcessor::CommandProcessor(){
+    gameEngine = _gameEngine;
 }
 
 CommandProcessor::~CommandProcessor(){
-    
+    gameEngine = nullptr;
 }
 
 /* Gets commands from the console as a string */
-void CommandProcessor::readCommand(string cmdName){
+string CommandProcessor::readCommand(){
     //Take in the user input
-    std::string cmd;
-    cout << "\nEnter your command: " << std::endl;
+    string cmdstr;
+    cout << "\nEnter your command: " << endl;
     cin.clear(); 
     cin.sync();
     
-    cin >> cmd; 
-    cout << std::endl;
+    cin >> cmdstr; 
+    cout << endl;
     
-    //Validates the command and execute the appropriate state transition
-    saveCommand(cmd);
+    return cmdstr;
 }
 
 /* Stores the command internally in a collection of Command objects */
-void CommandProcessor::saveCommand(string cmdName){
-    Command* cmd = new Command(cmdName);
-    cmds.push_back(cmd);
-
+void CommandProcessor::saveCommand(Command* cmd){
+    savedCmds.push_back(cmd);
+    
     // Notifies observer of the command.
     Notify(this);
 }
+
 /* Check if the command is valid in the current game state */
-bool CommandProcessor::validate(Command cmd){
-    return true;
+bool CommandProcessor::validate(Command* cmd){
+
+    vector<string> tokens = cmd->getParams();
+    string cmdID = tokens[0];
+
+    //Check if the command is valid in the current state
+    vector<string> stateCmds = gameEngine->getCurrentState()->getCmds();
+    if(std::find(stateCmds.begin(), stateCmds.end(), cmdID) != stateCmds.end()) {
+        return true;    
+    } 
+    else
+    {
+        //If the current state does not consider the command valid, prints an error message
+        string errorMsg =  "Error: Command '" + cmd->getEffect() + "' not recognized in state '" + gameEngine->getCurrentState()->getName() + "'";
+        cmd->saveEffect(errorMsg);
+        cout << errorMsg << endl; 
+        return false;
+    }
 }
 
 Command* CommandProcessor::getCommand(){
-    return new Command();
+
+    string cmdstr = readCommand();
+    Command* cmd = new Command(cmdstr);
+    bool validCmd = validate(cmd); //Validates the command and execute the appropriate state transition
+    saveCommand(cmd);
+    
+    if(validCmd) return cmd;
+    else return nullptr;
 }
 
 /**
@@ -60,51 +86,91 @@ string CommandProcessor::stringToLog(){
     return "Command: Command name";
 }
 
+void CommandProcessor::setGameEngine(GameEngine* _gameEngine){
+    gameEngine = _gameEngine;
+}
+
+// FileLineReader class definition
+
+FileLineReader::FileLineReader(){
+    
+}
+
+FileLineReader::~FileLineReader(){
+    
+}
+
+string FileLineReader::readLineFromFile(){
+    if(cmdstrings.empty()) return "";
+
+    string cmdstr = cmdstrings.front();
+    cout << "Read Command: " << cmdstr << endl;
+    cmdstrings.pop();
+    return cmdstr;
+}
+
+ * Saves the content of a file into a vector of command strings.
+ * 
+ * @param filename the path to the commands file.
+ * @return wether or not the file was successfully parsed.
+ **/
+bool FileLineReader::readFile(string filename){
+    
+    string filepath = "../../cmds/" + filename; //for mac -> "../cmds/"
+
+    std::ifstream input;
+    input.open(filepath.c_str());
+
+    if (!input) {
+        cout << "\nInvalid filename..." << endl;
+        return false;
+    }
+
+    queue<string> empty;
+    std::swap(cmdstrings, empty);
+    
+    cout << "\nReading from " << filename << " ..." << endl;
+
+    string cmdstr;
+	while (getline(input, cmdstr)) {
+        cout << cmdstr << endl;
+		cmdstrings.push(cmdstr);
+	}
+
+    cmdstrings.push(EXIT_CMD); //Add exit command at the end
+
+    cout << "\nEnd of file..." << endl;
+
+    return true;
+}
+
 // FileCommandProcessorAdapter class definition
 
 FileCommandProcessorAdapter::FileCommandProcessorAdapter(){
     
 }
 
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(FileLineReader* _flr){
+    flr = _flr;
+}
+
 FileCommandProcessorAdapter::~FileCommandProcessorAdapter(){
     
 }
 
-void FileCommandProcessorAdapter::readFile(){
-    /*
-    const string MAPS_FOLDER = "../../maps/"; // for mac this works ->   const string MAPS_FOLDER = "../maps";
-    MapLoader loader;
-    // read all files in valid maps folder
-    try{
-        for (const auto & entry : fs::directory_iterator(MAPS_FOLDER)){
-            cout << "\nLoading map: " << entry.path().filename() << endl;
-            cout << "Validating..." << endl;
-            Map* m = loader.loadMap(entry.path().string());
-            // check if file is valid
-            if(m != NULL){
-                // check if map is valid
-                if(m->validate()){
-                    cout << *m << endl;
-                } else {
-                    cout << "Invalid map" << endl;
-                }
-            } else {
-                cout << "The file " << entry.path().filename() << " is not a valid .map file." << endl;
-            }
-        }
-    } catch(const fs::filesystem_error){
-        cout << "\nInvalid folder..." << endl;
-    }*/
+/* Gets commands from the console as a string */
+string FileCommandProcessorAdapter::readCommand(){
+    return flr->readLineFromFile();
 }
 
 // Command class definition
 
 Command::Command(){
-
+    effect = "null";
 }
 
-Command::Command(string cmdName){
-
+Command::Command(string _effect){
+    saveEffect(effect = _effect);
 }
 
 Command::~Command(){
@@ -113,8 +179,6 @@ Command::~Command(){
 
 void Command::saveEffect(string newEffect){
     effect = newEffect;
-
-     // Notifies observer of the command's effect.
     Notify(this);
 }
 
@@ -125,4 +189,12 @@ void Command::saveEffect(string newEffect){
  * */
 string Command::stringToLog(){
     return "Command's Effect: " + effect;
+}
+
+string Command::getEffect(){
+    return effect;
+}
+
+vector<string> Command::getParams(){
+    return split(getEffect(), ' ');
 }

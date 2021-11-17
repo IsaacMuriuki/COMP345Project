@@ -1,3 +1,10 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include "Utilities.h"
 #include "map.h"
 
 Territory::Territory() {
@@ -21,7 +28,7 @@ Territory::Territory(int id, string name, Continent* continent) {
 Territory::~Territory(){
     delete _continent; _continent = NULL;
     delete _owner; _owner = NULL;
-    for ( int i = 0; i < _adjacentTerritories.size(); i++ ) {
+    for ( int i = 0; i < _adjacentTerritories.size(); i++) {
         _adjacentTerritories[i] = NULL;
     }
 }
@@ -220,6 +227,9 @@ std::ostream& operator<<(std::ostream& stream, const Map& map){
 	stream << "Number of continents: " << map._continents.size() << endl;
 	return stream;
 }
+
+vector<Continent*> Map::getContinents() const {return _continents;}
+vector<Territory*> Map::getTerritories() const {return _territories;}
 
 /**
  * Finds a continent in the map by id.
@@ -520,21 +530,4 @@ Map* MapLoader::loadMap(string filePath){
 	}
 
     return NULL;
-}
-
-// SPLIT() FUNCTION from https://stackoverflow.com/questions/236129/how-do-i-iterate-over-the-words-of-a-string
-template<typename Out>
-void split(const std::string &s, char delim, Out result) {
-	stringstream ss;
-	ss.str(s);
-	string item;
-	while (std::getline(ss, item, delim)) {
-		*(result++) = item;
-	}
-}
-
-vector<string> split(const string &s, char delim) {
-	vector<string> elems;
-	split(s, delim, back_inserter(elems));
-	return elems;
 }

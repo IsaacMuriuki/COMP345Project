@@ -38,26 +38,29 @@ class Card {
 class Deck {
 	//Need to add getter and setters
 	private:
-		vector<Card> deck;
+		vector<Card*> deck;
 	public:
 		Deck();
 		Deck(const Deck &deck);
 		CardType draw();
 		void reshuffleIntoDeck(CardType cardType);
 		int size();
-
-		
+		vector<Card*> getDeckOfCards();
 };
 
 class Hand {
 
 private:
 	//Hand size is limited to 5 at the moment
-	vector<Card> hand;
+	vector<Card*> hand;
+    Deck* deck;
 public:
 	Hand();
+    Hand(Deck*);
 	Hand(const Hand& hand);
 	Card getHand(int index);
 	void setHand(int index, CardType cardType);
 	int size();
+    Deck* getDeck();
+    void addCardToHand(CardType card);
 };

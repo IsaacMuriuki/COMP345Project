@@ -4,18 +4,28 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
+
+#include "Player.h"
+#include "map.h"
+using std::vector;
+
+class Player;
+class Territory;
+
 
 class Order : public ILoggable, public Subject{
-    private:
+private:
     bool _executed;
     // TODO: might need Player* here.
-    public:
+public:
     Order();
+    Order(Player*);
     virtual ~Order();
     Order(const Order& order);
     virtual Order& operator=(Order&& order);
     friend std::ostream& operator<<(std::ostream &out, const Order& order);
-
+    int getOrderID();
     /**
      * Gets a deep copy of the order itself.
      * 
@@ -26,7 +36,7 @@ class Order : public ILoggable, public Subject{
     /**
      * The order is executed if it is valid.
      **/
-    void execute();
+    virtual void execute() = 0;
 
     /**
      * Check if the order has been executed previously.
@@ -40,8 +50,9 @@ class Order : public ILoggable, public Subject{
      * 
      * @return true if not execute and valid; false otherwise.
      **/
-    bool validate() const;
 
+    virtual bool validate() const = 0;
+    
     /**
      * Returns an entry of the effect of the order executed to be logged.
      * 
@@ -54,7 +65,19 @@ class Order : public ILoggable, public Subject{
      **/
     friend std::ostream& operator<<(std::ostream &out, const Order& order);
 
-    protected:
+    virtual void onExecute() = 0;
+
+    /**
+     * Outputs a description and the effects of the order after the order is executed.
+     **/
+    friend std::ostream& operator<<(std::ostream &out, const Order& order);
+
+protected:
+    bool executed;
+    Player* player;
+    static int ID;
+    int orderID;
+
     /**
      * Gets the description of the order.
      * 
@@ -68,76 +91,19 @@ class Order : public ILoggable, public Subject{
      * @return results of the order.
      **/
     virtual std::string getEffectApplied() const = 0;
-
-    /**
-     * Additional actions taken for when the order gets executed.
-     **/
-    virtual void onExecute() = 0;
-
-    /**
-     * Additional checks for validation of the order.
-     **/
-    virtual bool onValidate() const = 0;
-};
-
-/**
- * Order caused by using a card.
- **/
-class CardOrder : public Order {
-    protected:
-    // TODO: add Player* and/or Card* as class field.
-    public:
-    CardOrder();
-    ~CardOrder();
-    virtual CardOrder& operator=(CardOrder&& order);
-    CardOrder(const CardOrder& order);
-
-    /**
-     * Gets a deep copy of the order itself.
-     * 
-     * @return deep copy of the order.
-     **/
-    virtual Order* clone() = 0;
-
-    protected:
-    /**
-     * Gets the description of the order.
-     * Used for stream operator.
-     * 
-     * @return description of the order.
-     **/
-    virtual std::string getDescription() const = 0;
-
-    /**
-     * Gets the results of the order when it executed.
-     * Used for stream operator.
-     * 
-     * @return results of the order.
-     **/
-    virtual std::string getEffectApplied() const = 0;
-
-    /**
-     * Additional actions taken for when the order gets executed.
-     **/
-    virtual void onExecute() = 0;
-
-    /**
-     * Additional checks for validation of the order.
-     * 
-     * @return true if the additional validations pass; false otherwise.
-     **/
-    virtual bool onValidate() const = 0;
 };
 
 class Deploy : public Order {
-    private:
-    int _units;
-    // TODO: add territory as class field.
-    public:
-    Deploy(int units); // Add territory to constructor.
+private:
+    int units;
+    Territory* territory;
+public:
+    Deploy();
+    Deploy(int units, Player*, Territory*);
     ~Deploy();
     Deploy& operator=(Deploy&& order);
     Deploy(const Deploy& order);
+    void execute();
 
     /**
      * Gets a deep copy of the order itself.
@@ -146,7 +112,7 @@ class Deploy : public Order {
      **/
     Order* clone();
 
-    protected:
+protected:
     /**
      * Gets the description of the order.
      * Used for stream operator.
@@ -164,28 +130,29 @@ class Deploy : public Order {
     std::string getEffectApplied() const;
 
     /**
-     * Additional actions taken for when the order gets executed.
-     **/
-    void onExecute();
-
-    /**
      * Additional checks for validation of the order.
      * 
      * @return true if the additional validations pass; false otherwise.
      **/
-    bool onValidate() const;
+    bool validate() const;
+
+    void setUnitsToBeDeployed(int);
+
+    void onExecute();
 };
 
 class Advance : public Order {
-    private:
-    int _units;
-    // TODO: add territory (from) as class field.
-    // TODO: add territory (to) as class field.
-    public:
-    Advance(int units); // Add territories to constructor.
+private:
+    int units;
+    Territory* sourceTerritory;
+    Territory* targetTerritory;
+public:
+    Advance();
     ~Advance();
+    Advance(Player* player, int units, Territory* fromTerritory, Territory* toTerritory);
     Advance& operator=(Advance&& order);
     Advance(const Advance& order);
+    void execute();
 
     /**
      * Gets a deep copy of the order itself.
@@ -194,7 +161,7 @@ class Advance : public Order {
      **/
     Order* clone();
 
-    protected:
+protected:
     /**
      * Gets the description of the order.
      * Used for stream operator.
@@ -212,121 +179,85 @@ class Advance : public Order {
     std::string getEffectApplied() const;
 
     /**
-     * Additional actions taken for when the order gets executed.
-     **/
-    void onExecute();
-
-    /**
      * Additional checks for validation of the order.
      * 
      * @return true if the additional validations pass; false otherwise.
      **/
-    bool onValidate() const;
+    bool validate() const;
+
+    Territory *getSourceTerritory() const;
+
+    void setSourceTerritory(Territory *fromTerritory);
+
+    Territory *getTargetTerritory() const;
+
+    void setTargetTerritory(Territory *toTerritory);
+
+    void onExecute();
 };
 
 /**
  * Order caused by using a card.
  **/
-class Bomb : public CardOrder {
-    public:
-    Bomb();
-    ~Bomb();
-    Bomb& operator=(Bomb&& order);
-    Bomb(const Bomb& order);
-
-    /**
-     * Gets a deep copy of the order itself.
-     * 
-     * @return deep copy of the order.
-     **/
-    Order* clone();
-
-    protected:
-    /**
-     * Gets the description of the order.
-     * Used for stream operator.
-     * 
-     * @return description of the order.
-     **/
-    std::string getDescription() const;
-
-    /**
-     * Gets the results of the order when it executed.
-     * Used for stream operator.
-     * 
-     * @return results of the order.
-     **/
-    std::string getEffectApplied() const;
-
-    /**
-     * Additional actions taken for when the order gets executed.
-     **/
-    void onExecute();
-
-    /**
-     * Additional checks for validation of the order.
-     * 
-     * @return true if the additional validations pass; false otherwise.
-     **/
-    bool onValidate() const;
-};
-
-/**
- * Order caused by using a card.
- **/
-class Blockade : public CardOrder {
-    public:
-    Blockade();
-    ~Blockade();
-    Blockade& operator=(Blockade&& order);
-    Blockade(const Blockade& order);
-
-    /**
-     * Gets a deep copy of the order itself.
-     * 
-     * @return deep copy of the order.
-     **/
-    Order* clone();
-
-    protected:
-    /**
-     * Gets the description of the order.
-     * Used for stream operator.
-     * 
-     * @return description of the order.
-     **/
-    std::string getDescription() const;
-
-    /**
-     * Gets the results of the order when it executed.
-     * Used for stream operator.
-     * 
-     * @return results of the order.
-     **/
-    std::string getEffectApplied() const;
-
-    /**
-     * Additional actions taken for when the order gets executed.
-     **/
-    void onExecute();
-
-    /**
-     * Additional checks for validation of the order.
-     * 
-     * @return true if the additional validations pass; false otherwise.
-     **/
-    bool onValidate() const;
-};
-
-/**
- * Order caused by using a card.
- **/
-class Airlift : public CardOrder {
-    public:
+class Airlift : public Order {
+public:
     Airlift();
+    Airlift(Player* player, int units, Territory* sourceTerritory, Territory* targetTerritory);
     ~Airlift();
     Airlift& operator=(Airlift&& order);
     Airlift(const Airlift& order);
+    void execute();
+
+    /**
+     * Gets a deep copy of the order itself.
+     *
+     * @return deep copy of the order.
+     **/
+    Order* clone();
+
+private:
+    int units;
+    Territory* sourceTerritory;
+    Territory* targetTerritory;
+
+protected:
+    /**
+     * Gets the description of the order.
+     * Used for stream operator.
+     *
+     * @return description of the order.
+     **/
+    std::string getDescription() const;
+
+    /**
+     * Gets the results of the order when it executed.
+     * Used for stream operator.
+     *
+     * @return results of the order.
+     **/
+    std::string getEffectApplied() const;
+
+    /**
+     * Additional checks for validation of the order.
+     *
+     * @return true if the additional validations pass; false otherwise.
+     **/
+    bool validate() const;
+
+    void onExecute();
+};
+
+/**
+ * Order caused by using a card.
+ **/
+class Bomb : public Order {
+public:
+    Bomb();
+    Bomb(Player* player, Territory* targetTerritory);
+    ~Bomb();
+    Bomb& operator=(Bomb&& order);
+    Bomb(const Bomb& order);
+    void execute();
 
     /**
      * Gets a deep copy of the order itself.
@@ -335,7 +266,57 @@ class Airlift : public CardOrder {
      **/
     Order* clone();
 
-    protected:
+private:
+    Territory* targetTerritory;
+protected:
+    /**
+     * Gets the description of the order.
+     * Used for stream operator.
+     * 
+     * @return description of the order.
+     **/
+    std::string getDescription() const;
+
+    /**
+     * Gets the results of the order when it executed.
+     * Used for stream operator.
+     * 
+     * @return results of the order.
+     **/
+    std::string getEffectApplied() const;
+    /**
+     * Additional checks for validation of the order.
+     * 
+     * @return true if the additional validations pass; false otherwise.
+     **/
+    bool validate() const;
+
+    void onExecute();
+};
+
+/**
+ * Order caused by using a card.
+ **/
+class Blockade : public Order {
+public:
+    Blockade();
+    Blockade(Player* player, Player* neutralPlayer, Territory* targetTerritory);
+    ~Blockade();
+    Blockade& operator=(Blockade&& order);
+    Blockade(const Blockade& order);
+    void execute();
+
+    /**
+     * Gets a deep copy of the order itself.
+     * 
+     * @return deep copy of the order.
+     **/
+    Order* clone();
+
+private:
+    Territory* targetTerritory;
+    Player* neutralPlayer;
+protected:
     /**
      * Gets the description of the order.
      * Used for stream operator.
@@ -353,24 +334,25 @@ class Airlift : public CardOrder {
     std::string getEffectApplied() const;
 
     /**
-     * Additional actions taken for when the order gets executed.
-     **/
-    void onExecute();
-
-    /**
      * Additional checks for validation of the order.
      * 
      * @return true if the additional validations pass; false otherwise.
      **/
-    bool onValidate() const;
+    bool validate() const;
+
+    void onExecute();
 };
 
+
+
 class Negotiate : public Order {
-    public:
+public:
     Negotiate();
+    Negotiate(Player* player, Player* targetPlayer);
     ~Negotiate();
     Negotiate& operator=(Negotiate&& order);
     Negotiate(const Negotiate& order);
+    void execute();
 
     /**
      * Gets a deep copy of the order itself.
@@ -378,8 +360,10 @@ class Negotiate : public Order {
      * @return deep copy of the order.
      **/
     Order* clone();
-    
-    protected:
+
+private:
+    Player* targetPlayer;
+protected:
     /**
      * Gets the description of the order.
      * Used for stream operator.
@@ -397,14 +381,11 @@ class Negotiate : public Order {
     std::string getEffectApplied() const;
 
     /**
-     * Additional actions taken for when the order gets executed.
-     **/
-    void onExecute();
-
-    /**
      * Additional checks for validation of the order.
      * 
      * @return true if the additional validations pass; false otherwise.
      **/
-    bool onValidate() const;
+    bool validate() const;
+
+    void onExecute();
 };
