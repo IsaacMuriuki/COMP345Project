@@ -154,7 +154,7 @@ void Player::issueOrder() {
         }
 
         std::cout << "Creating a deployment order" << std::endl;
-        Deploy* deploy = new Deploy(numberOfDeployments);
+        Deploy* deploy = new Deploy(numberOfDeployments, this, this->getTerritories()[0]);
         ordersList->add(deploy);
         return;
     }
@@ -172,7 +172,7 @@ void Player::issueOrder() {
     }
 
     std::cout << "Creating an advance order" << std::endl;
-    Advance* advance = new Advance(numberOfAdvancements);
+    Advance* advance = new Advance(this, numberOfAdvancements, this->getTerritories()[0], this->toAttack()[0]);
     ordersList->add(advance);
 
     cout << "These are the cards in " << this->getName() << "'s hand:";
