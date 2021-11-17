@@ -86,8 +86,7 @@ void CommandProcessor::setGameEngine(GameEngine* _gameEngine){
  * @return entry as a string.
  * */
 string CommandProcessor::stringToLog(){
-    // WIP missing command name: return "Command: " + cmds[cmds.size() - 1]. OrderList;
-    return "Command: Command name";
+    return "Command: " + savedCmds[savedCmds.size() - 1]->getEffect();
 }
 
 // FileLineReader class definition
@@ -189,6 +188,25 @@ string Command::getEffect(){
     return effect;
 }
 
+string Command::getDescription(){
+    string cmd = split(effect, ' ')[0];
+    if(cmd == "loadmap"){
+        return "Loaded a map.";
+    } else if(cmd == "validatemap"){
+        return "Validated a map.";
+    } else if(cmd == "addplayer"){
+        return "Added a player.";
+    } else if(cmd == "gamestart"){
+        return "Game started.";
+    } else if(cmd == "replay"){
+        return "Replaying the game.";
+    } else if (cmd == "quit"){
+        return "Quit game";
+    } else {
+        return cmd;
+    }
+}
+
 vector<string> Command::getParams(){
     return split(getEffect(), ' ');
 }
@@ -199,5 +217,5 @@ vector<string> Command::getParams(){
  * @return entry as a string.
  * */
 string Command::stringToLog(){
-    return "Command's Effect: " + effect;
+    return "Command's Effect: " + getDescription();
 }
