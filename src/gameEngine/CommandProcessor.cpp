@@ -47,15 +47,14 @@ bool CommandProcessor::validate(Command* cmd){
     string cmdID = cmd->getEffect();
 
     //Check if the command is valid in the current state
-    GameState* currentState = gameEngine->getCurrentState();
-    vector<string> stateCmds = currentState->getCmds();
+    vector<string> stateCmds = gameEngine->getCurrentState()->getCmds();
     if(std::find(stateCmds.begin(), stateCmds.end(), cmdID) != stateCmds.end()) {
         return true;    
     } 
     else
     {
         //If the current state does not consider the command valid, prints an error message
-        string errorMsg =  "Error: Command '" + cmd->getEffect() + "' not recognized in state '" + currentState->getName() + "'";
+        string errorMsg =  "Error: Command '" + cmd->getEffect() + "' not recognized in state '" + gameEngine->getCurrentState()->getName() + "'";
         cmd->saveEffect(errorMsg);
         cout << errorMsg << endl; 
         return false;
@@ -66,9 +65,8 @@ Command* CommandProcessor::getCommand(){
 
     string cmdstr = readCommand();
     Command* cmd = new Command(cmdstr);
-    bool validCmd = validate(cmd);
+    bool validCmd = validate(cmd); //Validates the command and execute the appropriate state transition
     saveCommand(cmd);
-    //Validates the command and execute the appropriate state transition
     
     if(validCmd) return cmd;
     else return nullptr;
@@ -118,11 +116,11 @@ void FileCommandProcessorAdapter::readFile(){
 // Command class definition
 
 Command::Command(){
-
+    effect = "null";
 }
 
-Command::Command(string cmdName){
-
+Command::Command(string _effect){
+    saveEffect(effect = _effect);
 }
 
 Command::~Command(){

@@ -14,7 +14,7 @@ class Command{
         string effect;
     public:
         Command();
-        Command(std::string effect);
+        Command(std::string _effect);
         ~Command();
         void saveEffect(std::string newEffect);
         std::string getEffect();

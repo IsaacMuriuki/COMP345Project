@@ -112,9 +112,9 @@ void GameEngine::Run(){
     while(running){
         
         Command* cmd = cmdProcessor->getCommand();
-        
+        cout << "got command " << endl;
         //Validates the command and execute the appropriate state transition
-        ExecuteCmd(cmd);
+        if(cmd) ExecuteCmd(cmd);
     }
 
     std::cout << "\nEnd of program." << std::endl;
