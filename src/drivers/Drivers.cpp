@@ -219,6 +219,203 @@ void cardsDriver() {
     }
 }
 
+void territoryValuesDriver() {
+    Continent NA = Continent(0, "NA", 4);
+    Territory CANADA = Territory(0, "CANADA", &NA);
+    Territory US = Territory(1, "US", &NA);
+    Territory MEXICO = Territory(2, "MEXICO", &NA);
+    std::vector<Player> playerList;
+
+    CANADA.addAdjacentTerritory(&US);
+    US.addAdjacentTerritory(&CANADA);
+    US.addAdjacentTerritory(&MEXICO);
+    MEXICO.addAdjacentTerritory(&US);
+
+    NA.addTerritory(&US);
+    NA.addTerritory(&CANADA);
+    NA.addTerritory(&MEXICO);
+
+    Deck deck = Deck();
+    Hand hand1 = Hand();
+    Hand hand2 = Hand();
+    CardType temp;
+    for (int i = 0; i < 5; i++) {
+        temp = deck.draw();
+        hand1.setHand(i, temp);
+        temp = deck.draw();
+        hand2.setHand(i, temp);
+    }
+
+    playerList.push_back(Player());
+    playerList.push_back(Player());
+    playerList[0].setHandOfCards(&hand1);
+    playerList[1].setHandOfCards(&hand2);
+    playerList[1].addTerritory(&CANADA);
+    playerList[0].setName("Ted");
+    playerList[1].addTerritory(&US);
+    playerList[1].addTerritory(&MEXICO);
+    playerList[1].setName("Hillary");
+
+
+    //the ammount of reinforcements a player will have
+    int reinforcementCount = 0;
+    //displays the countries and their units to the console
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries with these army counts: " << std::endl;
+        for (Territory* territory : player.getTerritories()) {
+            std::cout << territory->getName() << " with " << territory->getUnits() << std::endl;
+        }
+    }
+    //Iterates through the players to let them add units to their country
+    bool fullContinent = true;
+    for (Player player : playerList) {
+        if (player.getTerritories().size() == 0) { continue; }
+        fullContinent = true;
+        reinforcementCount = (player.getTerritories().size()) / 3;
+        //checks to see for full continents (right now just NA)
+        for (Territory* territory : NA.getTerritories()) {
+            bool inContinent = false;
+            for (Territory* territoryPlayer : player.getTerritories()) {
+                if (territory->getId() == territoryPlayer->getId()) { inContinent = true; }
+            }
+            if (inContinent == false) { fullContinent = false; }
+
+        }
+        if (fullContinent == true) { reinforcementCount = reinforcementCount + NA.getArmyValue(); }
+        if (reinforcementCount < 3) { reinforcementCount = 3; }
+        std::cout << " Player " << player.getName() << " has " << reinforcementCount << " reinforcements." << std::endl;
+    }
+
+    Continent EU = Continent(1, "EU", 6);
+    Territory FRANCE = Territory(5, "FRANCE", &EU);
+    Territory POLAND = Territory(6, "POLAND", &EU);
+    Territory SPAIN = Territory(7, "SPAIN", &EU);
+    Territory GERMANY = Territory(8, "GERMANY", &EU);
+
+    FRANCE.addAdjacentTerritory(&POLAND);
+    POLAND.addAdjacentTerritory(&FRANCE);
+    POLAND.addAdjacentTerritory(&GERMANY);
+    GERMANY.addAdjacentTerritory(&POLAND);
+    SPAIN.addAdjacentTerritory(&GERMANY);
+    GERMANY.addAdjacentTerritory(&SPAIN);
+
+    EU.addTerritory(&POLAND);
+    EU.addTerritory(&FRANCE);
+    EU.addTerritory(&GERMANY);
+    EU.addTerritory(&SPAIN);
+
+
+    playerList[0].addTerritory(&POLAND);
+    playerList[0].addTerritory(&FRANCE);
+    playerList[0].addTerritory(&SPAIN);
+    playerList[0].addTerritory(&GERMANY);
+
+
+    //the ammount of reinforcements a player will have
+    reinforcementCount = 0;
+    //displays the countries and their units to the console
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries with these army counts: " << std::endl;
+        for (Territory* territory : player.getTerritories()) {
+            std::cout << territory->getName() << " with " << territory->getUnits() << std::endl;
+        }
+    }
+    //Iterates through the players to let them add units to their country
+    bool fullContinentNA = true;
+    bool fullContinentEU = true;
+    for (Player player : playerList) {
+        if (player.getTerritories().size() == 0) { continue; }
+        fullContinentNA = true;
+        fullContinentEU = true;
+        reinforcementCount = (player.getTerritories().size()) / 3;
+        //checks to see for full continents
+        for (Territory* territory : NA.getTerritories()) {
+            bool inContinent = false;
+            for (Territory* territoryPlayer : player.getTerritories()) {
+                if (territory->getId() == territoryPlayer->getId()) { inContinent = true; }
+            }
+            if (inContinent == false) { fullContinentNA = false; }
+        }
+        
+        for (Territory* territory : EU.getTerritories()) {
+            bool inContinent = false;
+            for (Territory* territoryPlayer : player.getTerritories()) {
+                if (territory->getId() == territoryPlayer->getId()) { inContinent = true; }
+            }
+            if (inContinent == false) { fullContinentEU = false; }
+
+        }
+        if (fullContinentEU == true) { reinforcementCount = reinforcementCount + EU.getArmyValue(); }
+        if (fullContinentNA == true) { reinforcementCount = reinforcementCount + NA.getArmyValue(); }
+        if (reinforcementCount < 3) { reinforcementCount = 3; }
+        std::cout << " Player " << player.getName() << " has " << reinforcementCount << " reinforcements." << std::endl;
+
+    }
+
+    Territory PORTUGAL = Territory(9, "PORTUGAL", &EU);
+    Territory UK = Territory(10, "UK", &EU);
+    Territory TEMP = Territory(11, "TEMP", &EU);
+    SPAIN.addAdjacentTerritory(&PORTUGAL);
+    PORTUGAL.addAdjacentTerritory(&SPAIN);
+    EU.addTerritory(&PORTUGAL);
+    EU.addTerritory(&UK);
+    EU.addTerritory(&TEMP);
+    playerList[1].addTerritory(&PORTUGAL);
+    playerList[0].addTerritory(&UK);
+    playerList[0].addTerritory(&TEMP);
+    //the ammount of reinforcements a player will have
+    reinforcementCount = 0;
+    //displays the countries and their units to the console
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries with these army counts: " << std::endl;
+        for (Territory* territory : player.getTerritories()) {
+            std::cout << territory->getName() << " with " << territory->getUnits() << std::endl;
+        }
+    }
+    for (Player player : playerList) {
+        if (player.getTerritories().size() == 0) { continue; }
+        fullContinentNA = true;
+        fullContinentEU = true;
+        reinforcementCount = (player.getTerritories().size()) / 3;
+        //checks to see for full continents
+        for (Territory* territory : NA.getTerritories()) {
+            bool inContinent = false;
+            for (Territory* territoryPlayer : player.getTerritories()) {
+                if (territory->getId() == territoryPlayer->getId()) { inContinent = true; }
+            }
+            if (inContinent == false) { fullContinentNA = false; }
+        }
+
+        for (Territory* territory : EU.getTerritories()) {
+            bool inContinent = false;
+            for (Territory* territoryPlayer : player.getTerritories()) {
+                if (territory->getId() == territoryPlayer->getId()) { inContinent = true; }
+            }
+            if (inContinent == false) { fullContinentEU = false; }
+
+        }
+        if (fullContinentEU == true) { reinforcementCount = reinforcementCount + EU.getArmyValue(); }
+        if (fullContinentNA == true) { reinforcementCount = reinforcementCount + NA.getArmyValue(); }
+        if (reinforcementCount < 3) { reinforcementCount = 3; }
+        std::cout << " Player " << player.getName() << " has " << reinforcementCount << " reinforcements." << std::endl;
+
+    }
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries to attack: " << std::endl;
+        for (Territory* territory : player.toAttack()) {
+            std::cout << territory->getName() << std::endl;
+        }
+    }
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries to defend: " << std::endl;
+        for (Territory* territory : player.toDefend()) {
+            std::cout << territory->getName() << std::endl;
+        }
+    }
+
+}
+
+
 void gameEngineDriver(){
     GameEngine gameEngine;
     gameEngine.Run();

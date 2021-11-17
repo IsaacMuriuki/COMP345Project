@@ -34,9 +34,12 @@ public:
     OrdersList* getOrdersList();
     Hand* getHandOfCards();
     string getName();
+    int getReinforcementPool();
+    void setName(string Name);
     void setHandOfCards(Hand* );
     void setTerritories(vector<Territory*> );
     void setOrders(OrdersList* );
+    void setReinforcementPool(int amount);
     void addToReinforcementPool(int);
     void removeFromReinforcementPool(int);
     int getReinforcementPool() const;
@@ -50,7 +53,7 @@ private:
     string name;
     vector<Territory*> territories;
     Hand* handOfCards;
-    OrdersList* ordersList;
+    OrdersList* ordersList; 
     int reinforcementPool;
     vector<Player*> playersBeingNegotiatedWith;
 };
