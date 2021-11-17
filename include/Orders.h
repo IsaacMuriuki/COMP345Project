@@ -1,5 +1,7 @@
 #pragma once
 
+#include "LoggingObserver.h"
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -11,7 +13,11 @@ using std::vector;
 class Player;
 class Territory;
 
-class Order {
+
+class Order : public ILoggable, public Subject{
+private:
+    bool _executed;
+    // TODO: might need Player* here.
 public:
     Order();
     Order(Player*);
@@ -44,7 +50,20 @@ public:
      * 
      * @return true if not execute and valid; false otherwise.
      **/
+
     virtual bool validate() const = 0;
+    
+    /**
+     * Returns an entry of the effect of the order executed to be logged.
+     * 
+     * @return entry as a string.
+     * */
+    string stringToLog();
+
+    /**
+     * Outputs a description and the effects of the order after the order is executed.
+     **/
+    friend std::ostream& operator<<(std::ostream &out, const Order& order);
 
     virtual void onExecute() = 0;
 

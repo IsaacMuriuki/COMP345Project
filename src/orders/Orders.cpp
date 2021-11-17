@@ -28,10 +28,32 @@ Order& Order::operator=(Order&& order) {
 // Shallow copy of player
 Order::Order(const Order& order) : executed(order.executed), player(order.player) {}
 
+/**
+ * The order is executed if it is valid.
+ **/
+void Order::execute() {
+    if (validate()) {
+        onExecute();
+        _executed = true;
+
+        // Notifies observer of the effect of the order executed.
+        Notify(this);
+    }
+}
+
 int Order::getOrderID() {return this->orderID;}
 
 bool Order::isExecuted() const {
     return executed;
+}
+
+/**
+ * Returns an entry of the effect of the order executed to be logged.
+ * 
+ * @return entry as a string.
+ * */
+string Order::stringToLog(){
+    return "Order Executed: " + this->getEffectApplied();
 }
 
 std::ostream& operator<<(std::ostream &out, const Order& order) {

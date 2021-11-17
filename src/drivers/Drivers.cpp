@@ -6,6 +6,7 @@
 #include "Orders.h"
 #include "OrdersList.h"
 #include "Player.h"
+#include "LoggingObserver.h"
 #include "Utilities.h"
 
 #include <stdio.h>
@@ -15,8 +16,7 @@
 
 using std::cout, std::cin, std::endl;
 namespace fs = std::filesystem;
-
-
+  
 void orderExecutionDriver() {
     const string BRASIL_MAP = "../maps/brasil.map";
     cout << endl << "\n************* DEPLOY ORDER *************\n";
@@ -56,7 +56,6 @@ void orderExecutionDriver() {
     player2->addToReinforcementPool(1);
     player1->addOrder(deploy);
     player2->addOrder(deploy1);
-
     deploy->execute();
     deploy1->execute();
 
@@ -106,31 +105,39 @@ void orderExecutionDriver() {
 //    cout << endl << "\n************* BOMB ORDER *************\n";
 }
 
-
-
 void mapDriver() {
     const string MAPS_FOLDER = "../../maps/"; // for mac this works -> const string MAPS_FOLDER = "../maps";
-  
     MapLoader loader;
+
     // read all files in valid maps folder
-    try{
-        for (const auto & entry : fs::directory_iterator(MAPS_FOLDER)){
+    try
+    {
+        for (const auto &entry : fs::directory_iterator(MAPS_FOLDER))
+        {
             cout << "\nLoading map: " << entry.path().filename() << endl;
             cout << "Validating..." << endl;
-            Map* m = loader.loadMap(entry.path().string());
+            Map *m = loader.loadMap(entry.path().string());
             // check if file is valid
-            if(m != NULL){
+            if (m != NULL)
+            {
                 // check if map is valid
-                if(m->validate()){
+                if (m->validate())
+                {
                     cout << *m << endl;
-                } else {
+                }
+                else
+                {
                     cout << "Invalid map" << endl;
                 }
-            } else {
+            }
+            else
+            {
                 cout << "The file " << entry.path().filename() << " is not a valid .map file." << endl;
             }
         }
-    } catch(const fs::filesystem_error){
+    }
+    catch (const fs::filesystem_error)
+    {
         cout << "\nInvalid folder..." << endl;
     }
 }
@@ -195,7 +202,6 @@ void territoryValuesDriver() {
                 if (territory->getId() == territoryPlayer->getId()) { inContinent = true; }
             }
             if (inContinent == false) { fullContinent = false; }
-
         }
         if (fullContinent == true) { reinforcementCount = reinforcementCount + NA.getArmyValue(); }
         if (reinforcementCount < 3) { reinforcementCount = 3; }
@@ -329,19 +335,15 @@ void territoryValuesDriver() {
         }
     }
 
-}
-
-void commandsDriver(){
+void commandsDriver()
+{
 
     string option = ""; // Initial value must be an option.
     
     cout << "Choose commands source." << endl;
     cout << "\tconsole" << endl;
     cout << "\tfile <filename>" << endl;
-
     cout << "\nEnter your option: " << flush;
-    //cin.clear(); 
-    //cin.sync();
     
     cin >> std::ws;
     std::getline(cin, option);
