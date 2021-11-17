@@ -12,8 +12,8 @@ GameEngine::GameEngine(){
     startState = new StartState ("start", {LOAD_MAP_CMD});
     mapLoadedState = new MapLoadedState("map loaded", {LOAD_MAP_CMD, VALIDATE_MAP_CMD});
     mapValidatedState = new MapValidatedState("map validated", {ADD_PLAYER_CMD});
-    playersAddedState = new PlayersAddedState("players added", {ADD_PLAYER_CMD, ASSIGN_COUNTRIES_CMD});
-    assignReinforcementState = new AssignReinforcementState("assign reinforcement", {ISSUE_ORDER_CMD});
+    playersAddedState = new PlayersAddedState("players added", {ADD_PLAYER_CMD, GAMESTART_CMD});
+    assignReinforcementState = new AssignReinforcementState("gamestart", {ISSUE_ORDER_CMD});
     issueOrdersState = new IssueOrdersState("issue orders", {ISSUE_ORDER_CMD, END_ISSUE_ORDERS_CMD});
     executeOrdersState = new ExecuteOrdersState("execute orders", {EXEC_ORDER_CMD, END_EXEC_ORDERS_CMD, WIN_CMD});
     winState = new WinState("win", {PLAY_CMD, END_CMD});
@@ -91,7 +91,7 @@ void GameEngine::SetCommands(){
     cmds[LOAD_MAP_CMD] = mapLoadedState;
     cmds[VALIDATE_MAP_CMD] = mapValidatedState;
     cmds[ADD_PLAYER_CMD] = playersAddedState;
-    cmds[ASSIGN_COUNTRIES_CMD] = assignReinforcementState;
+    cmds[GAMESTART_CMD] = assignReinforcementState;
     cmds[ISSUE_ORDER_CMD] = issueOrdersState;
     cmds[END_ISSUE_ORDERS_CMD] = executeOrdersState;
     cmds[EXEC_ORDER_CMD] = executeOrdersState;
@@ -112,7 +112,6 @@ void GameEngine::Run(){
     while(running){
         
         Command* cmd = cmdProcessor->getCommand();
-        cout << "got command " << endl;
         //Validates the command and execute the appropriate state transition
         if(cmd) ExecuteCmd(cmd);
     }

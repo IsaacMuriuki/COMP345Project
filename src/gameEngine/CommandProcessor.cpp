@@ -1,11 +1,11 @@
-#include "CommandProcessor.h"
-
 #include <iostream>
 #include <stdio.h>
-#include<string>
-#include <filesystem>
+#include <string>
+#include <fstream>
+#include "CommandProcessor.h"
+#include "Utilities.h"
 
-using std::string, std::cout, std::cin, std::endl;
+using std::string, std::cout, std::cin, std::endl, std::ifstream;
 namespace fs = std::filesystem;
 
 // CommandProcessor class definition
@@ -38,7 +38,7 @@ string CommandProcessor::readCommand(){
 
 /* Stores the command internally in a collection of Command objects */
 void CommandProcessor::saveCommand(Command* cmd){
-    cmds.push_back(cmd);
+    savedCmds.push_back(cmd);
 }
 
 /* Check if the command is valid in the current game state */
@@ -82,35 +82,60 @@ FileCommandProcessorAdapter::FileCommandProcessorAdapter(){
     
 }
 
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(string filename){
+    readFile(filename);
+}
+
 FileCommandProcessorAdapter::~FileCommandProcessorAdapter(){
     
 }
 
-void FileCommandProcessorAdapter::readFile(){
-    /*
-    const string MAPS_FOLDER = "../../maps/"; // for mac this works ->   const string MAPS_FOLDER = "../maps";
-    MapLoader loader;
-    // read all files in valid maps folder
-    try{
-        for (const auto & entry : fs::directory_iterator(MAPS_FOLDER)){
-            cout << "\nLoading map: " << entry.path().filename() << endl;
-            cout << "Validating..." << endl;
-            Map* m = loader.loadMap(entry.path().string());
-            // check if file is valid
-            if(m != NULL){
-                // check if map is valid
-                if(m->validate()){
-                    cout << *m << endl;
-                } else {
-                    cout << "Invalid map" << endl;
-                }
-            } else {
-                cout << "The file " << entry.path().filename() << " is not a valid .map file." << endl;
-            }
-        }
-    } catch(const fs::filesystem_error){
-        cout << "\nInvalid folder..." << endl;
-    }*/
+/**
+ * Saves the content of a file into a vector of command strings.
+ * 
+ * @param filename the path to the commands file.
+ **/
+void FileCommandProcessorAdapter::readFile(string filename, bool append){
+    
+    string filepath = "../../cmds/" + filename; //for mac -> "../cmds/"
+
+    std::ifstream input;
+    input.open(filepath.c_str());
+
+    if (!input) {
+        cout << "\nInvalid filename..." << endl;
+        return;
+    }
+
+    if(!append){
+        queue<string> empty;
+        std::swap(cmdstrings, empty);
+    }
+    
+    cout << "Reading from " << filename << " ..." << endl;
+
+    string cmdstr;
+	while (getline(input, cmdstr)) {
+        cout << cmdstr << endl;
+		cmdstrings.push(cmdstr);
+	}
+
+    cout << "\nEnd of file..." << endl;
+}
+
+void FileCommandProcessorAdapter::readFile(string filename){
+    readFile(filename, false);
+}
+
+/* Gets commands from the console as a string */
+string FileCommandProcessorAdapter::readCommand(){
+    
+    if(cmdstrings.empty()) return "";
+
+    string cmdstr = cmdstrings.front();
+    cout << "Read Command: " << cmdstr << endl;
+    cmdstrings.pop();
+    return cmdstr;
 }
 
 // Command class definition

@@ -6,6 +6,7 @@
 #include "Orders.h"
 #include "OrdersList.h"
 #include "Player.h"
+#include "Utilities.h"
 
 #include <stdio.h>
 #include <iostream>
@@ -55,7 +56,7 @@ void playerDriver(){
     // Player's issueOrder()
     player->issueOrder();
 
-    std:cout << "Orders issued : " << std::endl;
+    std::cout << "Orders issued : " << std::endl;
     for(int i =0; i < player->getOrdersList()->size(); ++i){
         std::cout << *player->getOrdersList()->get(i) << endl;
     }
@@ -141,7 +142,7 @@ void ordersDriver() {
 }
 
 void mapDriver() {
-    const string MAPS_FOLDER = "../../maps/"; // for mac this works ->   const string MAPS_FOLDER = "../maps";
+    const string MAPS_FOLDER = "../../maps/"; // for mac this works -> const string MAPS_FOLDER = "../maps";
     MapLoader loader;
     // read all files in valid maps folder
     try{
@@ -224,13 +225,15 @@ void commandsDriver(){
 
     // read orders from the console using the CommandProcessor class 
     if(option == "console"){
-        CommandProcessor* processor = new CommandProcessor();
-        GameEngine* gameEngine = new GameEngine(processor);
+        CommandProcessor* cmdProcessor = new CommandProcessor();
+        GameEngine* gameEngine = new GameEngine(cmdProcessor);
         gameEngine->Run();
     }
     // read orders from a saved text file using the FileCommandProcessorAdapter 
     else if(option == "filename"){
-
+        FileCommandProcessorAdapter* cmdProcessor = new FileCommandProcessorAdapter("commandList.cmds");
+        GameEngine* gameEngine = new GameEngine(cmdProcessor);
+        gameEngine->Run();
     } else{
         cout << "Invalid option." << endl;
     }

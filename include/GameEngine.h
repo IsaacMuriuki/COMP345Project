@@ -98,13 +98,13 @@ class GameEngine
     const std::string LOAD_MAP_CMD = "loadmap";
     const std::string VALIDATE_MAP_CMD = "validatemap";
     const std::string ADD_PLAYER_CMD = "addplayer";
-    const std::string ASSIGN_COUNTRIES_CMD = "assigncountries";
+    const std::string GAMESTART_CMD = "gamestart";
     const std::string ISSUE_ORDER_CMD = "issueorder";
     const std::string END_ISSUE_ORDERS_CMD = "endissueorders";
     const std::string EXEC_ORDER_CMD = "execorder";
     const std::string END_EXEC_ORDERS_CMD = "endexecorders";
     const std::string WIN_CMD = "win";
-    const std::string END_CMD = "end";
+    const std::string END_CMD = "quit";
 
     StartState* startState;
     MapLoadedState* mapLoadedState;

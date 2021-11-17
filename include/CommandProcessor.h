@@ -3,9 +3,10 @@
 
 #include<vector>
 #include<string>
+#include<queue>
 #include"GameEngine.h"
 
-using std::string, std::vector;
+using std::string, std::vector, std::queue;
 
 class GameEngine;
 
@@ -21,9 +22,9 @@ class Command{
 };
 
 class CommandProcessor{
-    private:
+    protected:
         GameEngine* gameEngine;
-        vector<Command*> cmds;
+        vector<Command*> savedCmds;
         string readCommand(); //Gets commands from the console as a string
         void saveCommand(Command* cmd); //Stores the command internally in a collection of Command objects
         bool validate(Command* cmd); //Check if the command is valid in the current game state
@@ -35,11 +36,16 @@ class CommandProcessor{
         void setGameEngine(GameEngine* _gameEngine);
 };
 
-class FileCommandProcessorAdapter{
+class FileCommandProcessorAdapter : public CommandProcessor{
+    private: 
+        queue<string> cmdstrings;
+        string readCommand(); //Gets commands from the command queue
     public:
         FileCommandProcessorAdapter();
+        FileCommandProcessorAdapter(string filename);
         ~FileCommandProcessorAdapter();
-        void readFile();
+        void readFile(string filename);
+        void readFile(string filename, bool append);
 };
 
 #endif
