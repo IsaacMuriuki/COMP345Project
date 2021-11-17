@@ -21,6 +21,7 @@ class Command : public ILoggable, public Subject{
         ~Command();
         void saveEffect(std::string newEffect);
         string getEffect();
+        string getDescription();
         vector<string> getParams();
         string stringToLog();
 };

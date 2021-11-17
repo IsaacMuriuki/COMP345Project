@@ -434,14 +434,49 @@ void logObserverDriver()
     player1->addOrder(advance);
     advance->execute();
 
-    // GameEngine
-    GameEngine gameEngine;
+    // Commands & GameEngine
+    Command* cmd1 = new Command();
+    cmd1->Attach(logObserver);
+    cmd1->saveEffect("loadmap test.map");
+    Command* cmd2 = new Command();
+    cmd2->Attach(logObserver);
+    cmd2->saveEffect("validatemap");
 
-    // attach GameEngine
-    gameEngine.Attach(logObserver);
+    string option = "";
+    cout << "Choose commands source." << endl;
+    cout << "\tconsole" << endl;
+    cout << "\tfile <filename>" << endl;
+    cout << "\nEnter your option: " << flush;
+    //cin.clear(); 
+    //cin.sync();
+    
+    cin >> std::ws;
+    std::getline(cin, option);
+    cout << "Option: " << option << endl;
 
-    gameEngine.Run();
+    vector<string> tokens = split(option, ' ');
 
-
-    // Commands
+    // read orders from the console using the CommandProcessor class 
+    if(tokens[0] == "console"){
+        // attach command processor and gameengine
+        CommandProcessor* cmdProcessor = new CommandProcessor();
+        cmdProcessor->Attach(logObserver);
+        GameEngine* gameEngine = new GameEngine(cmdProcessor);
+        gameEngine->Attach(logObserver);
+        gameEngine->Run();
+    }
+    // read orders from a saved text file using the FileCommandProcessorAdapter 
+    else if(tokens[0] == "file" && tokens.size() > 1){
+        // attach command processor and gameengine
+        FileLineReader* flr = new FileLineReader();
+        if(flr->readFile(tokens[1])){
+            FileCommandProcessorAdapter* fileCmdAdapter = new FileCommandProcessorAdapter(flr);
+            fileCmdAdapter->Attach(logObserver);
+            GameEngine* gameEngine = new GameEngine(fileCmdAdapter);
+            gameEngine->Attach(logObserver);
+            gameEngine->Run();
+        }
+    } else{
+        cout << "Invalid option." << endl;
+    }  
 }
