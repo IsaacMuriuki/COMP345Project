@@ -154,6 +154,15 @@ void Player::issueOrder() {
         }
 
         std::cout << "Creating a deployment order" << std::endl;
+
+        int choice;
+        std::cout << "Player " << this->getName() << " has the following countries to attack: " << std::endl;
+        for (Territory* territory : this->toAttack()) {
+            std::cout << territory->getName() << std::endl;
+        }
+        std::cout << "Choose by typing the index" << std::endl;
+        std::cin >> choice;
+
         Deploy* deploy = new Deploy(numberOfDeployments, this, this->getTerritories()[0]);
         ordersList->add(deploy);
         return;

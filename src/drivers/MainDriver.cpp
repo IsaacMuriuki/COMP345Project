@@ -18,7 +18,7 @@ int main() {
             std::cout << "A- Map (Chris + Henry)" << std::endl;
             std::cout << "B- Order Execution (Isaac)" << std::endl;
             std::cout << "C- Game Engine (Salaheddine)" << std::endl;
-            std::cout << "D- Commands (Salaheddine)" << std::endl;
+            std::cout << "D- Commands Driver" << std::endl;
             std::cout << "E- Territory Reinforcements" << std::endl;
             std::cout << "F- Command Processor" << std::endl;
             std::cout << "G- Game Log Observer" << std::endl;
