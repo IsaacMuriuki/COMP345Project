@@ -35,6 +35,9 @@ OrdersList::OrdersList(const OrdersList& orders) : OrdersList() {
 void OrdersList::add(Order* order) {
     // std::vector adds the same reference to the same object.
     _orders.push_back(order);
+
+    // Notifies observer of the order issued.
+    Notify(this);
 }
 
 /**
@@ -115,4 +118,13 @@ bool OrdersList::remove(Order * order) {
  **/
 int OrdersList::size() {
     return _orders.size();
+}
+
+/**
+ * Returns an entry of the order issued to be logged.
+ * 
+ * @return entry as a string.
+ * */
+string OrdersList::stringToLog(){
+    return "Order Issued: " + _orders[_orders.size() - 1]->getType();
 }

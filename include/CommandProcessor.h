@@ -1,6 +1,8 @@
 #ifndef COMMAND_PROCESSOR_H
 #define COMMAND_PROCESSOR_H
 
+#include "LoggingObserver.h"
+
 #include<vector>
 #include<string>
 #include<queue>
@@ -10,7 +12,7 @@ using std::string, std::vector, std::queue;
 
 class GameEngine;
 
-class Command{
+class Command : public ILoggable, public Subject{
     private:
         string effect;
     public:
@@ -20,9 +22,9 @@ class Command{
         void saveEffect(std::string newEffect);
         string getEffect();
         vector<string> getParams();
+        string stringToLog();
 };
-
-class CommandProcessor{
+class CommandProcessor : public ILoggable, public Subject{
     protected:
         GameEngine* gameEngine;
         vector<Command*> savedCmds;
@@ -35,6 +37,7 @@ class CommandProcessor{
         ~CommandProcessor();
         Command* getCommand();
         void setGameEngine(GameEngine* _gameEngine);
+        string stringToLog();
 };
 
 class FileLineReader {

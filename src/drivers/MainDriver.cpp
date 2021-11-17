@@ -51,6 +51,7 @@ int main() {
             case 'F':
                 break;
             case 'G':
+                logObserverDriver();
                 break;
             case 'H':
                 return EXIT_SUCCESS;

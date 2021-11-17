@@ -39,6 +39,9 @@ string CommandProcessor::readCommand(){
 /* Stores the command internally in a collection of Command objects */
 void CommandProcessor::saveCommand(Command* cmd){
     savedCmds.push_back(cmd);
+
+    // Notifies observer of the command.
+    Notify(this);
 }
 
 /* Check if the command is valid in the current game state */
@@ -75,6 +78,16 @@ Command* CommandProcessor::getCommand(){
 
 void CommandProcessor::setGameEngine(GameEngine* _gameEngine){
     gameEngine = _gameEngine;
+}
+
+/**
+ * Returns an entry of the command to be logged.
+ * 
+ * @return entry as a string.
+ * */
+string CommandProcessor::stringToLog(){
+    // WIP missing command name: return "Command: " + cmds[cmds.size() - 1]. OrderList;
+    return "Command: Command name";
 }
 
 // FileLineReader class definition
@@ -132,7 +145,6 @@ bool FileLineReader::readFile(string filename){
     return true;
 }
 
-
 // FileCommandProcessorAdapter class definition
 
 FileCommandProcessorAdapter::FileCommandProcessorAdapter(){
@@ -168,6 +180,9 @@ Command::~Command(){
 
 void Command::saveEffect(string newEffect){
     effect = newEffect;
+
+     // Notifies observer of the command's effect.
+    Notify(this);
 }
 
 string Command::getEffect(){
@@ -176,4 +191,13 @@ string Command::getEffect(){
 
 vector<string> Command::getParams(){
     return split(getEffect(), ' ');
+}
+
+/**
+ * Returns an entry of the effect of a command to be logged.
+ * 
+ * @return entry as a string.
+ * */
+string Command::stringToLog(){
+    return "Command's Effect: " + effect;
 }

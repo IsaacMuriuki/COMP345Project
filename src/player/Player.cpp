@@ -1,11 +1,27 @@
 #include "Player.h"
 
 // Default constructor
-Player::Player() {
+Player::Player()
+{
     //std::cout << "Player default constructor" << std::endl;
 
     this->name = "";
-    this->territories = vector<Territory*>();
+    this->territories = vector<Territory *>();
+    this->ordersList = new OrdersList();
+    this->handOfCards = new Hand();
+    this->reinforcementPool = 0;
+    this->isNeutral = false;
+}
+
+/**
+ * Name parameterized constructor
+ *
+ * @param name
+ */
+Player::Player(string name)
+{
+    this->name = name;
+    this->territories = vector<Territory *>();
     this->ordersList = new OrdersList();
     this->handOfCards = new Hand();
     this->reinforcementPool = 0;
@@ -42,12 +58,16 @@ Player::Player(string name, bool isNeutral, vector<Territory*> territories, Orde
 }
 
 // Destructor
-Player::~Player(){
-    delete handOfCards; handOfCards = NULL;
-    delete ordersList; ordersList = NULL;
+Player::~Player()
+{
+    delete handOfCards;
+    handOfCards = NULL;
+    delete ordersList;
+    ordersList = NULL;
 
     // territories are not deleted because they are unique and therefore the vector of territories is a shallow copy
-    for (int i = 0; i < territories.size(); ++i) {
+    for (int i = 0; i < territories.size(); ++i)
+    {
         territories[i] = NULL;
     }
 
@@ -59,7 +79,8 @@ Player::~Player(){
  *
  * @param player
  */
-Player::Player(const Player& player){
+Player::Player(const Player &player)
+{
     this->name = player.name;
     this->territories = player.territories;
     this->ordersList = new OrdersList(*player.ordersList);
@@ -75,6 +96,7 @@ Player::Player(const Player& player){
  * @param player
  * @return
  */
+
 Player& Player::operator=(const Player& player){
     if(&player != this) {
         delete ordersList;
@@ -96,7 +118,8 @@ Player& Player::operator=(const Player& player){
  * @param player
  * @return
  */
-std::ostream& operator<<(std::ostream &strm, const Player& player){
+std::ostream &operator<<(std::ostream &strm, const Player &player)
+{
     strm << "\nPlayer Data:\n";
 
     strm << "Name : " << player.name <<"\n\n";
@@ -104,22 +127,27 @@ std::ostream& operator<<(std::ostream &strm, const Player& player){
     if(player.isNeutral) strm << "NEUTRAL PLAYER" << "\n";
 
     strm << "Territories: \n";
-    for (int i = 0; i < player.territories.size(); ++i) {
-        strm << i+1 << ". " << *player.territories[i] << "\n";
+    for (int i = 0; i < player.territories.size(); ++i)
+    {
+        strm << i + 1 << ". " << *player.territories[i] << "\n";
     }
 
     strm << "Orders List:\n";
-    if(player.ordersList->size() == 0){
+    if (player.ordersList->size() == 0)
+    {
         strm << "Player " << player.name << "'s order list is empty.\n";
     }
-    else {
-        for (int i = 0; i < player.ordersList->size(); ++i) {
+    else
+    {
+        for (int i = 0; i < player.ordersList->size(); ++i)
+        {
             strm << *player.ordersList->get(i) << "\n";
         }
     }
 
     strm << "\nCards \n";
-    for (int i =0; i <player.handOfCards->size(); ++i){
+    for (int i = 0; i < player.handOfCards->size(); ++i)
+    {
         strm << player.handOfCards->getHand(i).toString() << "\n";
     }
 
@@ -145,7 +173,6 @@ vector<Territory*> Player::toAttack() {
     }
     return attackableTerritories;
 }
-
 
 // Asks the user for input on which order to create, and creates the corresponding order objects and adds it to the player's ordersList
 void Player::issueOrder() {
@@ -257,9 +284,9 @@ void Player::issueOrder() {
 /**
  * Setters and Getters
  */
-void Player::addOrder(Order *order) { ordersList->add(order);}
+void Player::addOrder(Order *order) { ordersList->add(order); }
 
-void Player::addTerritory(Territory *territory) { territories.push_back(territory);}
+void Player::addTerritory(Territory *territory) { territories.push_back(territory); }
 
 void Player::removeTerritory(Territory* territory) {
     for(int i = 0; i < territories.size(); ++i){
@@ -271,13 +298,13 @@ void Player::removeTerritory(Territory* territory) {
 
 vector<Territory *> Player::getTerritories() { return this->territories;}
 
-OrdersList* Player::getOrdersList() { return this->ordersList;}
+OrdersList *Player::getOrdersList() { return this->ordersList; }
 
-Hand* Player::getHandOfCards() { return this->handOfCards;}
+Hand *Player::getHandOfCards() { return this->handOfCards; }
 
-void Player::setTerritories(vector<Territory *> territories) { this->territories = territories;}
+void Player::setTerritories(vector<Territory *> territories) { this->territories = territories; }
 
-void Player::setOrders(OrdersList* ordersList) { this->ordersList = new OrdersList(*ordersList);}
+void Player::setOrders(OrdersList *ordersList) { this->ordersList = new OrdersList(*ordersList); }
 
 void Player::setReinforcementPool(int amount)
 {
@@ -300,4 +327,3 @@ int Player::getReinforcementPool() { return this->reinforcementPool; }
 vector<Player *> Player::getPlayersBeingNegotiatedWith() {return playersBeingNegotiatedWith; }
 
 void Player::addToPlayersBeingNegotiatedWith(Player *player) {playersBeingNegotiatedWith.push_back(player);}
-

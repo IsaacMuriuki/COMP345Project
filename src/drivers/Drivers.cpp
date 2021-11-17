@@ -6,6 +6,7 @@
 #include "Orders.h"
 #include "OrdersList.h"
 #include "Player.h"
+#include "LoggingObserver.h"
 #include "Utilities.h"
 
 #include <stdio.h>
@@ -15,7 +16,6 @@
 
 using std::cout, std::cin, std::endl;
 namespace fs = std::filesystem;
-
 
 void orderExecutionDriver() {
     const string BRASIL_MAP = "../maps/brasil.map";
@@ -106,34 +106,43 @@ void orderExecutionDriver() {
 //    cout << endl << "\n************* BOMB ORDER *************\n";
 }
 
-
-
 void mapDriver() {
     const string MAPS_FOLDER = "../../maps/"; // for mac this works -> const string MAPS_FOLDER = "../maps";
-  
     MapLoader loader;
+
     // read all files in valid maps folder
-    try{
-        for (const auto & entry : fs::directory_iterator(MAPS_FOLDER)){
+    try
+    {
+        for (const auto &entry : fs::directory_iterator(MAPS_FOLDER))
+        {
             cout << "\nLoading map: " << entry.path().filename() << endl;
             cout << "Validating..." << endl;
-            Map* m = loader.loadMap(entry.path().string());
+            Map *m = loader.loadMap(entry.path().string());
             // check if file is valid
-            if(m != NULL){
+            if (m != NULL)
+            {
                 // check if map is valid
-                if(m->validate()){
+                if (m->validate())
+                {
                     cout << *m << endl;
-                } else {
+                }
+                else
+                {
                     cout << "Invalid map" << endl;
                 }
-            } else {
+            }
+            else
+            {
                 cout << "The file " << entry.path().filename() << " is not a valid .map file." << endl;
             }
         }
-    } catch(const fs::filesystem_error){
+    }
+    catch (const fs::filesystem_error)
+    {
         cout << "\nInvalid folder..." << endl;
     }
 }
+
 
 void territoryValuesDriver() {
     Continent NA = Continent(0, "NA", 4);
@@ -172,7 +181,6 @@ void territoryValuesDriver() {
     playerList[1].addTerritory(&MEXICO);
     playerList[1].setName("Hillary");
 
-
     //the ammount of reinforcements a player will have
     int reinforcementCount = 0;
     //displays the countries and their units to the console
@@ -195,7 +203,6 @@ void territoryValuesDriver() {
                 if (territory->getId() == territoryPlayer->getId()) { inContinent = true; }
             }
             if (inContinent == false) { fullContinent = false; }
-
         }
         if (fullContinent == true) { reinforcementCount = reinforcementCount + NA.getArmyValue(); }
         if (reinforcementCount < 3) { reinforcementCount = 3; }
@@ -365,5 +372,76 @@ void commandsDriver(){
         }
     } else{
         cout << "Invalid option." << endl;
-    }    
+    }  
+}
+
+void logObserverDriver()
+{
+    cout << "\n\nLog Observer Driver" << endl;
+    LogObserver* logObserver = new LogObserver();
+
+    // Orders
+    const string BRASIL_MAP = "../../maps/brasil.map";
+    MapLoader loader;
+    Map *brasilMap = loader.loadMap(BRASIL_MAP);
+
+    Deck* deck = new Deck();
+    Hand* hand1 = new Hand(deck);
+    Hand* hand2 = new Hand(deck);
+
+    vector<Territory*> territories = brasilMap->getTerritories();
+    vector<Territory*> player1Territories;
+    vector<Territory*> player2Territories;
+
+    Player* player1 = new Player("player 1", player1Territories, new OrdersList, hand1);
+    Player* player2 = new Player("player 2", player2Territories, new OrdersList, hand2);
+
+    for (int i = 0; i < territories.size(); ++i) {
+        if(i % 2 == 0){
+            territories[i]->setOwner(player1);
+            player1->addTerritory(territories[i]);
+            territories.at(i)->setUnits(10);
+        } else{
+            territories[i]->setOwner(player2);
+            player2->addTerritory(territories[i]);
+            territories.at(i)->setUnits(5);
+        }
+    }
+    player1->addToReinforcementPool(5);
+    player2->addToReinforcementPool(1);
+
+    cout << endl << "\n************* DEPLOY ORDER *************\n";
+    Deploy* deploy1 = new Deploy(5, player1, territories[0]);
+    Deploy* deploy2 = new Deploy(2, player2, territories[2]);
+
+    // attach observer to player's orderlist and deploy orders
+    player1->getOrdersList()->Attach(logObserver);
+    player2->getOrdersList()->Attach(logObserver);
+    deploy1->Attach(logObserver);
+    deploy2->Attach(logObserver);
+    // add and execute deply orders
+    player1->addOrder(deploy1);
+    player2->addOrder(deploy2);
+    deploy1->execute();
+    deploy2->execute();
+
+    cout << endl << "\n************* ADVANCE ORDER *************\n";
+    Advance* advance = new Advance(player1, 10, player1->getTerritories()[0], player2->getTerritories()[0]);
+    
+    // attach observer to advance order
+    advance->Attach(logObserver);
+    // add and execute advance order
+    player1->addOrder(advance);
+    advance->execute();
+
+    // GameEngine
+    GameEngine gameEngine;
+
+    // attach GameEngine
+    gameEngine.Attach(logObserver);
+
+    gameEngine.Run();
+
+
+    // Commands
 }
