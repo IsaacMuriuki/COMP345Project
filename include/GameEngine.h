@@ -8,16 +8,23 @@
 #include <vector>
 #include <functional>
 #include <algorithm>
+
 #include "Player.h"
 #include "map.h"
 #include "Orders.h"
 #include "OrdersList.h"
+#include "CommandProcessor.h"
+
+using std::vector, std::string;
+
+class Command;
+class CommandProcessor;
 
 class GameState
 {
     protected:
-    std::string name;
-    std::vector<std::string> cmds;
+    string name;
+    vector<string> cmds;
 
     public:
     GameState(std::string _name = "gamestate");
@@ -25,7 +32,7 @@ class GameState
     ~GameState();
     GameState(const GameState& state);
     GameState& operator=(GameState&& state);
-    virtual void onStateEnter();
+    virtual void onStateEnter(vector<string> params);
     virtual void onStateExit();
     friend std::ostream& operator<<(std::ostream& os, const GameState& state);
     std::string getName();
@@ -98,18 +105,20 @@ class WinState : public GameState {
 class GameEngine
 {
     private:
+    CommandProcessor* cmdProcessor;
 
     const std::string PLAY_CMD = "play";
     const std::string LOAD_MAP_CMD = "loadmap";
     const std::string VALIDATE_MAP_CMD = "validatemap";
     const std::string ADD_PLAYER_CMD = "addplayer";
-    const std::string ASSIGN_COUNTRIES_CMD = "assigncountries";
+    const std::string GAMESTART_CMD = "gamestart";
     const std::string ISSUE_ORDER_CMD = "issueorder";
     const std::string END_ISSUE_ORDERS_CMD = "endissueorders";
     const std::string EXEC_ORDER_CMD = "execorder";
     const std::string END_EXEC_ORDERS_CMD = "endexecorders";
     const std::string WIN_CMD = "win";
-    const std::string END_CMD = "end";
+    const std::string QUIT_CMD = "quit";
+    const std::string EXIT_CMD = "exit";
 
     StartState* startState;
     MapLoadedState* mapLoadedState;
@@ -125,14 +134,15 @@ class GameEngine
     std::map<std::string, GameState*> cmds;
 
     void SetCommands();
-    bool ExecuteCmd(std::string);
-    void SetState(GameState* );
-    void TransitionTo(GameState* );
+    bool ExecuteCmd(Command* cmd);
+    void SetState(GameState* state, vector<string> params);
 
     public:
 
     GameEngine();
+    GameEngine(CommandProcessor* _cmdProcessor);
     ~GameEngine();
+    
     GameEngine(const GameEngine& engine);
     GameEngine& operator=(GameEngine&& gameEngine);
 
@@ -142,7 +152,7 @@ class GameEngine
     GameState* getCurrentState();
     std::map<std::string, GameState*> getCmds();
     GameEngine* clone();
-    
+    void SetCmdProcessor(CommandProcessor* _cmdProcessor);
 };
 
 #endif

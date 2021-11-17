@@ -17,7 +17,7 @@ int main() {
             std::cout << "Enter a driver to execute." << std::endl;
             std::cout << "A- Map (Chris + Henry)" << std::endl;
             std::cout << "B- Order Execution (Isaac)" << std::endl;
-            std::cout << "C- Game Engine (Salaheddine)" << std::endl;
+            std::cout << "C- Commands (Salaheddine)" << std::endl;
             std::cout << "D- Commands Driver" << std::endl;
             std::cout << "E- Territory Reinforcements" << std::endl;
             std::cout << "F- Command Processor" << std::endl;
@@ -39,7 +39,7 @@ int main() {
                 break;
             }
             case 'C': {
-                gameEngineDriver();
+                commandsDriver();
                 break;
             }
             case 'D':
