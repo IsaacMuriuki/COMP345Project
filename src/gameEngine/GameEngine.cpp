@@ -2,6 +2,19 @@
 #include "CommandProcessor.h"
 
 // GameEngine class definition
+// 
+//Dummy Data
+
+Continent NA = Continent(0, "NA", 4);
+Territory CANADA = Territory(0, "CANADA", &NA);
+Territory US = Territory(1, "US", &NA);
+Territory MEXICO = Territory(2, "MEXICO", &NA);
+std::vector<Player> playerList;
+
+
+
+
+
 
 using std::cout, std::cin, std::endl, std::vector, std::string;
 
@@ -17,6 +30,38 @@ GameEngine::GameEngine(){
     issueOrdersState = new IssueOrdersState("issue orders", {ISSUE_ORDER_CMD, END_ISSUE_ORDERS_CMD}, this);
     executeOrdersState = new ExecuteOrdersState("execute orders", {EXEC_ORDER_CMD, END_EXEC_ORDERS_CMD, WIN_CMD}, this);
     winState = new WinState("win", {PLAY_CMD, END_CMD}, this);
+
+    CANADA.addAdjacentTerritory(&US);
+    US.addAdjacentTerritory(&CANADA);
+    US.addAdjacentTerritory(&MEXICO);
+    MEXICO.addAdjacentTerritory(&US);
+
+    NA.addTerritory(&US);
+    NA.addTerritory(&CANADA);
+    NA.addTerritory(&MEXICO);
+
+    Deck deck = Deck();
+    Hand hand1 = Hand();
+    Hand hand2 = Hand();
+    CardType temp;
+    for (int i = 0; i < 5; i++) {
+        temp = deck.draw();
+        hand1.setHand(i, temp);
+        temp = deck.draw();
+        hand2.setHand(i, temp);
+    }
+    playerList.push_back(Player());
+    playerList.push_back(Player());
+    playerList.push_back(Player());
+    playerList[0].setHandOfCards(&hand1);
+    playerList[1].setHandOfCards(&hand2);
+    playerList[1].addTerritory(&CANADA);
+    playerList[0].setName("Ted");
+    playerList[0].addTerritory(&US);
+    playerList[1].addTerritory(&MEXICO);
+    playerList[1].setName("Hillary");
+    playerList[2].setName("Terry");
+
 
     SetCommands();
 
@@ -199,7 +244,7 @@ void GameEngine::startupPhase()
     MapLoader loader;
     Map *map;
     bool gameStarted = false;
-    ;
+    
     //Sets the startState as the current state
     //SetState(startState);
     PrintMapFiles();
@@ -389,6 +434,100 @@ PlayersAddedState::PlayersAddedState(const PlayersAddedState &state) : PlayersAd
 AssignReinforcementState::AssignReinforcementState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine) : GameState(_name, _cmds, _gameEngine) {}
 AssignReinforcementState::~AssignReinforcementState(){};
 AssignReinforcementState::AssignReinforcementState(const AssignReinforcementState &state) : AssignReinforcementState(state.name, state.cmds, state.gameEngine) {}
+
+void AssignReinforcementState::onStateEnter() {
+    std::cout << "Entered gamestate '" << name << "'." << std::endl; 
+    //the ammount of reinforcements a player will have
+    int reinforcementCount = 0;
+    //displays the countries and their units to the console
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries with these army counts: " << std::endl;
+        for (Territory* territory : player.getTerritories()) {
+            std::cout << territory->getName() << " with " << territory->getUnits() << std::endl;
+        }
+    }
+    //Iterates through the players to let them add units to their country
+    int choice;
+    bool fullContinent = true;
+    for (Player player : playerList) {
+        if (player.getTerritories().size() == 0) { continue; }
+        reinforcementCount = (player.getTerritories().size())/3;
+        //checks to see for full continents (right now just NA)
+        for (Territory* territory : NA.getTerritories()) {
+            bool inContinent = false;
+            for (Territory* territoryPlayer : player.getTerritories()) {
+                if (territory->getId() == territoryPlayer->getId()) { inContinent = true; }
+            }
+            if (inContinent == false) { fullContinent = false; }
+
+        }
+        if (fullContinent == true) { reinforcementCount = reinforcementCount + NA.getArmyValue(); }
+        if (reinforcementCount < 3) reinforcementCount = 3;
+        player.setReinforcementPool(player.getReinforcementPool() + reinforcementCount);
+    }
+}
+
+/**
+ * Method executed upon exiting the state. Is meant to be overitten to implement the functionality specific to each game state.
+ **/
+void AssignReinforcementState::onStateExit() {
+    std::cout << "Exited gamestate '" << name << "'." << std::endl;
+}
+
+void IssueOrdersState::onStateEnter() {
+    for(Player player: playerList){
+        player.getPlayersBeingNegotiatedWith().clear();
+    }
+
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries to attack: " << std::endl;
+        for (Territory* territory : player.toAttack()) {
+            std::cout << territory->getName() << std::endl;
+        }
+    }
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries to defend: " << std::endl;
+        for (Territory* territory : player.toDefend()) {
+            std::cout << territory->getName() << std::endl;
+        }
+    }
+    for (Player player : playerList) {
+        player.issueOrder();
+    }
+}
+void IssueOrdersState::onStateExit() {
+    std::cout << "Exited gamestate '" << name << "'." << std::endl;
+}
+
+void ExecuteOrdersState::onStateEnter() {
+    for (Player player : playerList) {
+
+        for (int i = 0; i < player.getOrdersList()->size(); i++) {
+            player.getOrdersList()->get(i)->execute();
+        }
+    }
+}
+void ExecuteOrdersState::onStateExit() {
+    std::cout << "Exited gamestate '" << name << "'." << std::endl;
+    vector <int> indeces;
+    int index = 0;
+    for (Player player : playerList) {
+        if (player.getTerritories().size() == 0) {
+            std::cout << "Player " << player.getName() << " has no territories and has been eliminated from the game" << std::endl;
+            indeces.push_back(index);
+        }
+        index++;
+    }
+    int tempSize = indeces.size();
+    for (int i = 0; i < tempSize; i++) {
+        playerList.erase(playerList.begin() + indeces.back());
+        indeces.pop_back();
+    }
+    if (playerList.size() == 1) {
+        std::cout << "Player " << playerList.at(0).getName() << " has won the game!" << std::endl;
+        exit(0);
+    }
+}
 
 // IssueOrdersState class definition
 

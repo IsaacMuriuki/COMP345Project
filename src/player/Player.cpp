@@ -22,7 +22,8 @@ Player::Player(string name)
     this->territories = vector<Territory *>();
     this->ordersList = new OrdersList();
     this->handOfCards = new Hand();
-    this-> reinforcementPool = 0;
+    this->reinforcementPool = 0;
+    this->isNeutral = false;
 }
 
 /**
@@ -42,6 +43,16 @@ Player::Player(string name, vector<Territory*> territories, OrdersList* ordersLi
     this->ordersList = new OrdersList(*ordersList);
     this->handOfCards = new Hand(*handOfCards);
     this->reinforcementPool = 0;
+    this->isNeutral = false;
+}
+
+Player::Player(string name, bool isNeutral, vector<Territory*> territories, OrdersList* ordersList, Hand* handOfCards){
+    this->name = name;
+    this->territories = territories;
+    this->ordersList = new OrdersList(*ordersList);
+    this->handOfCards = new Hand(*handOfCards);
+    this->reinforcementPool = 0;
+    this->isNeutral = isNeutral;
 }
 
 // Destructor
@@ -73,6 +84,8 @@ Player::Player(const Player &player)
     this->ordersList = new OrdersList(*player.ordersList);
     this->handOfCards = new Hand(*player.handOfCards);
     this->playersBeingNegotiatedWith = player.playersBeingNegotiatedWith;
+    this->reinforcementPool = player.reinforcementPool;
+    this->isNeutral = player.isNeutral;
 }
 
 /**
@@ -91,6 +104,7 @@ Player& Player::operator=(const Player& player){
         this->ordersList = new OrdersList(*player.ordersList);
         this->handOfCards = new Hand(*player.handOfCards);
         this->playersBeingNegotiatedWith = player.playersBeingNegotiatedWith;
+        this->isNeutral = player.isNeutral;
     }
     return *this;
 }
@@ -106,7 +120,9 @@ std::ostream &operator<<(std::ostream &strm, const Player &player)
 {
     strm << "\nPlayer Data:\n";
 
-    strm << "Name : " << player.name << "\n\n";
+    strm << "Name : " << player.name <<"\n\n";
+
+    if(player.isNeutral) strm << "NEUTRAL PLAYER" << "\n";
 
     strm << "Territories: \n";
     for (int i = 0; i < player.territories.size(); ++i)
@@ -126,9 +142,7 @@ std::ostream &operator<<(std::ostream &strm, const Player &player)
             strm << *player.ordersList->get(i) << "\n";
         }
     }
-    /**
-     * will need to change this once hand is a vector
-     */
+
     strm << "\nCards \n";
     for (int i = 0; i < player.handOfCards->size(); ++i)
     {
@@ -138,6 +152,7 @@ std::ostream &operator<<(std::ostream &strm, const Player &player)
     return strm;
 }
 
+<<<<<<< HEAD
 // Asked to return an arbitrary list of territories for this, so I just return the first half of the players territories
 vector<Territory *> Player::toDefend()
 {
@@ -160,11 +175,30 @@ vector<Territory *> Player::toAttack()
     for (int i = half; i < territories.size(); ++i)
     {
         secondHalf.push_back(territories[i]);
+=======
+// Returns the territories that the player controls
+vector<Territory*> Player::toDefend(){
+    return territories;
+}
+
+// Asked to return an arbitrary list of territories for this, so I just return the second half of the players territories
+vector<Territory*> Player::toAttack() {
+    vector<Territory*> attackableTerritories;
+    for (Territory* territory : territories) {
+        for (Territory* adjacentTerritory : territory->getAdjacentTerritories()) {
+            if (std::find(territories.begin(), territories.end(), adjacentTerritory) == territories.end()) {
+                if (std::find(attackableTerritories.begin(), attackableTerritories.end(), adjacentTerritory) == attackableTerritories.end()) {
+                    attackableTerritories.push_back(adjacentTerritory);
+                }
+            }
+        }
+>>>>>>> 79c0564da09cdab0614fb7443a85369e80a548cf
     }
-    return secondHalf;
+    return attackableTerritories;
 }
 
 // Asks the user for input on which order to create, and creates the corresponding order objects and adds it to the player's ordersList
+<<<<<<< HEAD
 void Player::issueOrder()
 {
     string orders = "List of possible orders to be made: \n 1. Deploy\n 2. Advance\n 3. Bomb\n 4. Blockade\n 5. Airlift\n 6. Negotiate\n 7. Stop issuing orders\n ";
@@ -187,75 +221,112 @@ void Player::issueOrder()
             }
             else
                 break;
-        }
-
-        switch (orderNumber) {
-            case 1: {
-                int numberOfDeployments;
-                std::cout << "Enter how many troops(?) you want to deploy: ";
-                while (true) {
-                    std::cin >> numberOfDeployments;
-                    if (!cin || numberOfDeployments < 0) {
-                        cout << "Enter a non-negative number: " << endl;
-                        cin.clear();
-                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                        continue;
-                    } else break;
-                }
-
-                std::cout << "Creating a deployment order" << std::endl;
-                //Deploy *deploy = new Deploy(numberOfDeployments);
-                //ordersList->add(deploy);
-                break;
-            }
-            case 2: {
-                int numberOfAdvancements;
-                std::cout << "Enter how many troops(?) you want to advance: ";
-                while (true) {
-                    std::cin >> numberOfAdvancements;
-                    if (!cin || numberOfAdvancements < 0) {
-                        cout << "Enter a non-negative number: " << endl;
-                        cin.clear();
-                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                        continue;
-                    } else break;
-                }
-
-                std::cout << "Creating an advance order" << std::endl;
-                //Advance *advance = new Advance(numberOfAdvancements);
-                //ordersList->add(advance);
-                break;
-            }
-            case 3: {
-                std::cout << "Creating a bomb order" << std::endl;
-                Bomb *bomb = new Bomb();
-                ordersList->add(bomb);
-                break;
-            }
-            case 4: {
-                std::cout << "Creating a blockade order" << std::endl;
-                Blockade *blockade = new Blockade();
-                ordersList->add(blockade);
-                break;
-            }
-            case 5: {
-                std::cout << "Creating an airlift order" << std::endl;
-                Airlift *airlift = new Airlift();
-                ordersList->add(airlift);
-                break;
-            }
-            case 6: {
-                std::cout << "Creating a negotiate order" << std::endl;
-                Negotiate *negotiate = new Negotiate();
-                ordersList->add(negotiate);
-                break;
-            }
-            case 7: {
-                std::cout << "Done Creating Orders\n" << std::endl;
-                break;
-            }
-        }
+=======
+void Player::issueOrder() {
+    int choiceDefend;
+    int choiceAttack;
+    int choiceCard;
+    if (this->getTerritories().size() == 0) {
+        std::cout << "This player no longer has countries and will be eliminated" << std::endl;
+        return;
     }
+    std::cout << this->getReinforcementPool() << "  " << this->getName() << std::endl;
+    if (this->getReinforcementPool() > 0) {
+        cout << "Player " << this->getName() << " still has has reinforcments and must deploy them" << std::endl;
+
+        int numberOfDeployments;
+        std::cout << "Enter how many troops(?) you want to deploy: ";
+        while (true) {
+            std::cin >> numberOfDeployments;
+            if (!cin || numberOfDeployments < 0) {
+                cout << "Enter a non-negative number: " << endl;
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                continue;
+            }
+            else break;
+>>>>>>> 79c0564da09cdab0614fb7443a85369e80a548cf
+        }
+
+        std::cout << "Creating a deployment order" << std::endl;
+
+        
+        std::cout << "Player " << this->getName() << " has the following countries to reinforce: " << std::endl;
+        for (Territory* territory : this->getTerritories()) {
+            std::cout << territory->getName() << std::endl;
+        }
+        std::cout << "Choose by typing the index" << std::endl;
+        std::cin >> choiceDefend;
+
+        Deploy* deploy = new Deploy(numberOfDeployments, this, this->getTerritories()[choiceDefend]);
+        ordersList->add(deploy);
+        return;
+    }
+    if (this->toAttack().size() == 0) {
+        std::cout << "No countries to attack" << std::endl;
+        return;
+    }
+    int numberOfAdvancements;
+    std::cout << "Enter how many troops(?) you want to advance: ";
+    while (true) {
+        std::cin >> numberOfAdvancements;
+        if (!cin || numberOfAdvancements < 0) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
+        }
+        else break;
+    }
+    std::cout << "Player " << this->getName() << " has the following countries to attack: " << std::endl;
+    for (Territory* territory : this->toAttack()) {
+        std::cout << territory->getName() << std::endl;
+    }
+    std::cout << "Choose by typing the index" << std::endl;
+    std::cin >> choiceAttack;
+
+    std::cout << "Player " << this->getName() << " has the following countries to take an army from: " << std::endl;
+    for (Territory* territory : this->getTerritories()) {
+        std::cout << territory->getName() << std::endl;
+    }
+    std::cout << "Choose by typing the index" << std::endl;
+    std::cin >> choiceDefend;
+
+    std::cout << "Creating an advance order" << std::endl;
+    Advance* advance = new Advance(this, numberOfAdvancements, this->getTerritories().at(choiceDefend), this->toAttack().at(choiceAttack));
+    ordersList->add(advance);
+
+    cout << "These are the cards in " << this->getName() << "'s hand:";
+    for (int i = 0; i < 5; i++){
+        cout << " " << this->handOfCards->getHand(i);
+    }
+    std::cout << std::endl;
+    cout << "Choose a card based on its index or 9 for none ";
+    cin >> choiceCard;
+    if (choiceCard == 9) {
+        std::cout << "No card played" << std::endl;
+        return;
+    }
+    if (this->handOfCards->getHand(choiceCard).getCardType() == bomb) {
+        std::cout << "Creating a bomb order" << std::endl;
+        Bomb* bomb = new Bomb();
+        ordersList->add(bomb);
+    }
+    if (this->handOfCards->getHand(choiceCard).getCardType() == blockade) {
+        std::cout << "Creating a blockade order" << std::endl;
+        Blockade* blockade = new Blockade();
+        ordersList->add(blockade);
+    }
+    if (this->handOfCards->getHand(choiceCard).getCardType() == diplomacy) {
+        std::cout << "Creating a diplomacy order" << std::endl;
+        Negotiate* negotiate = new Negotiate();
+        ordersList->add(negotiate);
+    }
+    if (this->handOfCards->getHand(choiceCard).getCardType() == airlift) {
+        std::cout << "Creating a airlift order" << std::endl;
+        Airlift* airlift = new Airlift();
+        ordersList->add(airlift);
+    }
+
 }
 
 /**
@@ -283,6 +354,11 @@ void Player::setTerritories(vector<Territory *> territories) { this->territories
 
 void Player::setOrders(OrdersList *ordersList) { this->ordersList = new OrdersList(*ordersList); }
 
+void Player::setReinforcementPool(int amount)
+{
+    this->reinforcementPool = amount;
+}
+
 void Player::addToReinforcementPool(int num) { this->reinforcementPool+=num;}
 
 void Player::removeFromReinforcementPool(int num) {this->reinforcementPool-=num;}
@@ -291,8 +367,11 @@ int Player::getReinforcementPool() const {return reinforcementPool;}
 
 void Player::setHandOfCards(Hand* handOfCards) { this->handOfCards = new Hand(*handOfCards);}
 
+void Player::setName(string Name) { this->name = Name; }
+
 string Player::getName()  { return this->name;}
 
-vector<Player *> Player::getPlayersBeingNegotiatedWith() const {return playersBeingNegotiatedWith; }
+int Player::getReinforcementPool() { return this->reinforcementPool; }
+vector<Player *> Player::getPlayersBeingNegotiatedWith() {return playersBeingNegotiatedWith; }
 
 void Player::addToPlayersBeingNegotiatedWith(Player *player) {playersBeingNegotiatedWith.push_back(player);}

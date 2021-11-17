@@ -25,13 +25,16 @@ void orderExecutionDriver() {
     Deck* deck = new Deck();
     Hand* hand = new Hand(deck);
     Hand* hand1 = new Hand(deck);
+    Hand* hand2 = new Hand(deck);
 
     vector<Territory*> territories = brasilMap->getTerritories();
     vector<Territory*> player1Territories;
     vector<Territory*> player2Territories;
+    vector<Territory*> neutralPlayerTerritories;
 
     Player* player1 = new Player("player 1", player1Territories, new OrdersList, hand);
     Player* player2 = new Player("player 2", player2Territories, new OrdersList, hand1);
+    Player* neutral = new Player("neutral player", true, neutralPlayerTerritories, new OrdersList, hand2);
 
     for (int i = 0; i < territories.size(); ++i) {
         if(i % 2 == 0){
@@ -90,76 +93,15 @@ void orderExecutionDriver() {
     advance->execute();
 
     cout << endl << "\n************* BLOCKADE ORDER *************\n";
-    Blockade* blockade = new Blockade(player1, player1->getTerritories()[0]);
+    Blockade* blockade = new Blockade(player1, neutral, player1->getTerritories()[0]);
     player1->addOrder(blockade);
     Territory* t = player1->getTerritories()[0];
     cout << "Number of armies in " << t->getName() << " before blockade order : " << t->getUnits() << ". Owner : " << t->getOwner()->getName() << endl;
     blockade->execute();
     cout << "Number of armies in " << t->getName() << " after blockade order : " << t->getUnits() << ". Owner : " << t->getOwner()->getName() << endl;
 
-
-    cout << endl << "\n************* AIRLIFT ORDER *************\n";
-    cout << endl << "\n************* BOMB ORDER *************\n";
-}
-
-void playerDriver(){
-    Territory* t1 = new Territory(1, "Kenya", new Continent(1, "Africa", 2));
-    Territory* t2 = new Territory(2, "Somalia", new Continent(2, "Africa", 2));
-    Territory* t3 = new Territory(3, "South Africa", new Continent(3, "Africa", 3));
-    Territory* t4 = new Territory(4, "Netherlands", new Continent(4, "Europe", 4));
-    Territory* t5 = new Territory(5, "Belgium", new Continent(5, "Europe", 5));
-    Territory* t6 = new Territory(6, "England", new Continent(6, "Europe", 5));
-
-    vector<Territory*> territories;
-    territories.push_back(t1); territories.push_back(t2); territories.push_back(t3); territories.push_back(t4); territories.push_back(t5); territories.push_back(t6);
-
-    OrdersList* ordersList = new OrdersList();
-    Hand* handOfCards = new Hand();
-
-    // Creating new Player object
-    Player *player = new Player("Isaac", territories, ordersList, handOfCards);
-
-    // Player info output
-    std::cout << *player << std::endl;
-
-    // Player's toDefend() method which returns the first half of their territories
-    vector<Territory *> toDefendResult = player->toDefend();
-
-    std::cout << "\nResult of calling toDefend() on player: (first half of their territories)" << std::endl;
-    for (auto *territory : toDefendResult)
-    {
-        std::cout << *territory << std::endl;
-    }
-
-    // Player's toAttack() method which returns the first half of their territories
-    vector<Territory *> toAttackResult = player->toAttack();
-
-    std::cout << "\nResult of calling toAttack() on player: (second half of their territories)" << std::endl;
-    for (auto *territory : toAttackResult)
-    {
-        std::cout << *territory << std::endl;
-    }
-
-    // Player's issueOrder()
-    player->issueOrder();
-
-    std::cout << "Orders issued : " << std::endl;
-    for (int i = 0; i < player->getOrdersList()->size(); ++i)
-    {
-        std::cout << *player->getOrdersList()->get(i) << endl;
-    }
-
-    // Player info output
-    std::cout << "\nPlayer data after orders created: " << std::endl;
-    std::cout << *player << std::endl;
-
-    delete t1;
-    delete t2;
-    delete t3;
-    delete t4;
-    delete t5;
-    delete t6;
-    delete player;
+//    cout << endl << "\n************* AIRLIFT ORDER *************\n";
+//    cout << endl << "\n************* BOMB ORDER *************\n";
 }
 
 void mapDriver()
@@ -200,51 +142,205 @@ void mapDriver()
     }
 }
 
-void cardsDriver()
-{
-    //String values of Card Types
-    //bomb, reinforcement, blockade, airlift, diplomacy, unassigned
-    string cardTypesText[] =
-            {
-                    "bomb",
-                    "reinforcement",
-                    "blockade",
-                    "airlift",
-                    "diplomacy",
-                    "unassigned"
-            };
-    //Creating a deck and a hand
-    Deck deck;
-    Hand hand;
-    CardType temp = unassigned;
-    //Drawing the cards from the deck into the hand and playing the cards
-    cout << "The hand is created and has no cards in yet" << endl;
 
+void territoryValuesDriver() {
+    Continent NA = Continent(0, "NA", 4);
+    Territory CANADA = Territory(0, "CANADA", &NA);
+    Territory US = Territory(1, "US", &NA);
+    Territory MEXICO = Territory(2, "MEXICO", &NA);
+    std::vector<Player> playerList;
 
-    cout << "Cards are being drawn at random to the hand" << endl;
-    for (int i = 0; i < 5; i++)
-    {
+    CANADA.addAdjacentTerritory(&US);
+    US.addAdjacentTerritory(&CANADA);
+    US.addAdjacentTerritory(&MEXICO);
+    MEXICO.addAdjacentTerritory(&US);
+
+    NA.addTerritory(&US);
+    NA.addTerritory(&CANADA);
+    NA.addTerritory(&MEXICO);
+
+    Deck deck = Deck();
+    Hand hand1 = Hand();
+    Hand hand2 = Hand();
+    CardType temp;
+    for (int i = 0; i < 5; i++) {
         temp = deck.draw();
-        hand.setHand(i, temp);
+        hand1.setHand(i, temp);
+        temp = deck.draw();
+        hand2.setHand(i, temp);
     }
 
-    for (int i = 0; i < 5; i++)
-    {
-        //Using an array of strings to print out the text value of the cards
-        temp = hand.getHand(i).play();
-        deck.reshuffleIntoDeck(temp);
-        cout << cardTypesText[temp];
-        cout << endl;
+    playerList.push_back(Player());
+    playerList.push_back(Player());
+    playerList[0].setHandOfCards(&hand1);
+    playerList[1].setHandOfCards(&hand2);
+    playerList[1].addTerritory(&CANADA);
+    playerList[0].setName("Ted");
+    playerList[1].addTerritory(&US);
+    playerList[1].addTerritory(&MEXICO);
+    playerList[1].setName("Hillary");
+
+    //the ammount of reinforcements a player will have
+    int reinforcementCount = 0;
+    //displays the countries and their units to the console
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries with these army counts: " << std::endl;
+        for (Territory* territory : player.getTerritories()) {
+            std::cout << territory->getName() << " with " << territory->getUnits() << std::endl;
+        }
     }
+    //Iterates through the players to let them add units to their country
+    bool fullContinent = true;
+    for (Player player : playerList) {
+        if (player.getTerritories().size() == 0) { continue; }
+        fullContinent = true;
+        reinforcementCount = (player.getTerritories().size()) / 3;
+        //checks to see for full continents (right now just NA)
+        for (Territory* territory : NA.getTerritories()) {
+            bool inContinent = false;
+            for (Territory* territoryPlayer : player.getTerritories()) {
+                if (territory->getId() == territoryPlayer->getId()) { inContinent = true; }
+            }
+            if (inContinent == false) { fullContinent = false; }
+        }
+        if (fullContinent == true) { reinforcementCount = reinforcementCount + NA.getArmyValue(); }
+        if (reinforcementCount < 3) { reinforcementCount = 3; }
+        std::cout << " Player " << player.getName() << " has " << reinforcementCount << " reinforcements." << std::endl;
+    }
+
+    Continent EU = Continent(1, "EU", 6);
+    Territory FRANCE = Territory(5, "FRANCE", &EU);
+    Territory POLAND = Territory(6, "POLAND", &EU);
+    Territory SPAIN = Territory(7, "SPAIN", &EU);
+    Territory GERMANY = Territory(8, "GERMANY", &EU);
+
+    FRANCE.addAdjacentTerritory(&POLAND);
+    POLAND.addAdjacentTerritory(&FRANCE);
+    POLAND.addAdjacentTerritory(&GERMANY);
+    GERMANY.addAdjacentTerritory(&POLAND);
+    SPAIN.addAdjacentTerritory(&GERMANY);
+    GERMANY.addAdjacentTerritory(&SPAIN);
+
+    EU.addTerritory(&POLAND);
+    EU.addTerritory(&FRANCE);
+    EU.addTerritory(&GERMANY);
+    EU.addTerritory(&SPAIN);
+
+
+    playerList[0].addTerritory(&POLAND);
+    playerList[0].addTerritory(&FRANCE);
+    playerList[0].addTerritory(&SPAIN);
+    playerList[0].addTerritory(&GERMANY);
+
+
+    //the ammount of reinforcements a player will have
+    reinforcementCount = 0;
+    //displays the countries and their units to the console
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries with these army counts: " << std::endl;
+        for (Territory* territory : player.getTerritories()) {
+            std::cout << territory->getName() << " with " << territory->getUnits() << std::endl;
+        }
+    }
+    //Iterates through the players to let them add units to their country
+    bool fullContinentNA = true;
+    bool fullContinentEU = true;
+    for (Player player : playerList) {
+        if (player.getTerritories().size() == 0) { continue; }
+        fullContinentNA = true;
+        fullContinentEU = true;
+        reinforcementCount = (player.getTerritories().size()) / 3;
+        //checks to see for full continents
+        for (Territory* territory : NA.getTerritories()) {
+            bool inContinent = false;
+            for (Territory* territoryPlayer : player.getTerritories()) {
+                if (territory->getId() == territoryPlayer->getId()) { inContinent = true; }
+            }
+            if (inContinent == false) { fullContinentNA = false; }
+        }
+        
+        for (Territory* territory : EU.getTerritories()) {
+            bool inContinent = false;
+            for (Territory* territoryPlayer : player.getTerritories()) {
+                if (territory->getId() == territoryPlayer->getId()) { inContinent = true; }
+            }
+            if (inContinent == false) { fullContinentEU = false; }
+
+        }
+        if (fullContinentEU == true) { reinforcementCount = reinforcementCount + EU.getArmyValue(); }
+        if (fullContinentNA == true) { reinforcementCount = reinforcementCount + NA.getArmyValue(); }
+        if (reinforcementCount < 3) { reinforcementCount = 3; }
+        std::cout << " Player " << player.getName() << " has " << reinforcementCount << " reinforcements." << std::endl;
+
+    }
+
+    Territory PORTUGAL = Territory(9, "PORTUGAL", &EU);
+    Territory UK = Territory(10, "UK", &EU);
+    Territory TEMP = Territory(11, "TEMP", &EU);
+    SPAIN.addAdjacentTerritory(&PORTUGAL);
+    PORTUGAL.addAdjacentTerritory(&SPAIN);
+    EU.addTerritory(&PORTUGAL);
+    EU.addTerritory(&UK);
+    EU.addTerritory(&TEMP);
+    playerList[1].addTerritory(&PORTUGAL);
+    playerList[0].addTerritory(&UK);
+    playerList[0].addTerritory(&TEMP);
+    //the ammount of reinforcements a player will have
+    reinforcementCount = 0;
+    //displays the countries and their units to the console
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries with these army counts: " << std::endl;
+        for (Territory* territory : player.getTerritories()) {
+            std::cout << territory->getName() << " with " << territory->getUnits() << std::endl;
+        }
+    }
+    for (Player player : playerList) {
+        if (player.getTerritories().size() == 0) { continue; }
+        fullContinentNA = true;
+        fullContinentEU = true;
+        reinforcementCount = (player.getTerritories().size()) / 3;
+        //checks to see for full continents
+        for (Territory* territory : NA.getTerritories()) {
+            bool inContinent = false;
+            for (Territory* territoryPlayer : player.getTerritories()) {
+                if (territory->getId() == territoryPlayer->getId()) { inContinent = true; }
+            }
+            if (inContinent == false) { fullContinentNA = false; }
+        }
+
+        for (Territory* territory : EU.getTerritories()) {
+            bool inContinent = false;
+            for (Territory* territoryPlayer : player.getTerritories()) {
+                if (territory->getId() == territoryPlayer->getId()) { inContinent = true; }
+            }
+            if (inContinent == false) { fullContinentEU = false; }
+
+        }
+        if (fullContinentEU == true) { reinforcementCount = reinforcementCount + EU.getArmyValue(); }
+        if (fullContinentNA == true) { reinforcementCount = reinforcementCount + NA.getArmyValue(); }
+        if (reinforcementCount < 3) { reinforcementCount = 3; }
+        std::cout << " Player " << player.getName() << " has " << reinforcementCount << " reinforcements." << std::endl;
+
+    }
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries to attack: " << std::endl;
+        for (Territory* territory : player.toAttack()) {
+            std::cout << territory->getName() << std::endl;
+        }
+    }
+    for (Player player : playerList) {
+        std::cout << "Player " << player.getName() << " has the following countries to defend: " << std::endl;
+        for (Territory* territory : player.toDefend()) {
+            std::cout << territory->getName() << std::endl;
+        }
+    }
+
 }
 
-
-void gameEngineDriver()
-{
+void gameEngineDriver(){
     GameEngine gameEngine;
     gameEngine.Run();
 }
-
 
 void commandsDriver(){
     cout << "Menu - COMP 345 Project - Part 1 - Team DN7" << endl;

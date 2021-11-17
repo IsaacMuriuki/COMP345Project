@@ -4,6 +4,10 @@
 #include "CommandProcessor.h"
 #include "LoggingObserver.h"
 #include "map.h"
+#include "Player.h"
+#include "map.h"
+#include "Orders.h"
+#include "OrdersList.h"
 
 #include <iostream>
 #include <stdio.h>
@@ -15,6 +19,7 @@
 #include <sstream>
 #include < filesystem>
 namespace fs = std::filesystem;
+
 
 class Command;
 class CommandProcessor;
@@ -78,6 +83,8 @@ public:
     AssignReinforcementState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     AssignReinforcementState(const AssignReinforcementState &state);
     ~AssignReinforcementState();
+    virtual void onStateEnter();
+    virtual void onStateExit();
 };
 
 class IssueOrdersState : public GameState
@@ -86,6 +93,8 @@ public:
     IssueOrdersState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     IssueOrdersState(const IssueOrdersState &state);
     ~IssueOrdersState();
+    virtual void onStateEnter();
+    virtual void onStateExit();
 };
 
 class ExecuteOrdersState : public GameState
@@ -94,6 +103,8 @@ public:
     ExecuteOrdersState(std::string _name, std::vector<std::string> _cmds, GameEngine *_gameEngine);
     ExecuteOrdersState(const ExecuteOrdersState &state);
     ~ExecuteOrdersState();
+    virtual void onStateEnter();
+    virtual void onStateExit();
 };
 
 class WinState : public GameState
@@ -153,6 +164,7 @@ public:
     void Run();
     friend std::ostream &operator<<(std::ostream &os, const GameEngine &engine);
     bool isRunning();
+
     GameState *getCurrentState();
     std::map<std::string, GameState *> getCmds();
     Map *getMap();
@@ -163,6 +175,7 @@ public:
     void startupPhase();
     void SetCmdProcessor(CommandProcessor* _cmdProcessor);
     string stringToLog();
+
 };
 
 #endif

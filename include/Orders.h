@@ -302,7 +302,7 @@ protected:
 class Blockade : public Order {
 public:
     Blockade();
-    Blockade(Player* player, Territory* targetTerritory);
+    Blockade(Player* player, Player* neutralPlayer, Territory* targetTerritory);
     ~Blockade();
     Blockade& operator=(Blockade&& order);
     Blockade(const Blockade& order);
@@ -318,7 +318,7 @@ public:
 
 private:
     Territory* targetTerritory;
-
+    Player* neutralPlayer;
 protected:
     /**
      * Gets the description of the order.

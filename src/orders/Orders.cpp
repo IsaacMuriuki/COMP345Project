@@ -547,18 +547,20 @@ Blockade::Blockade() {
     this->orderID = ID;
 }
 
-Blockade::Blockade(Player *player, Territory *targetTerritory) : Order(player), targetTerritory(targetTerritory){this->orderID = ID;}
+Blockade::Blockade(Player *player, Player* neutralPlayer, Territory *targetTerritory) : Order(player), neutralPlayer(neutralPlayer), targetTerritory(targetTerritory){this->orderID = ID;}
 
 
 Blockade::~Blockade(){
     player = nullptr;
     targetTerritory = nullptr;
+    neutralPlayer = nullptr;
 }
 
 Blockade& Blockade::operator=(Blockade&& order) {
     if (this != &order) {
         player = order.player;
         targetTerritory = order.targetTerritory;
+        neutralPlayer = order.neutralPlayer;
     }
     return *this;
 }
@@ -583,10 +585,10 @@ void Blockade::execute() {
             effectsApplied = ss.str();
             targetTerritory->setUnits(targetTerritory->getUnits() * 2);
 
-//            if(/* neutral player does not exist */){
-//                /* Create neutral player */
-//            }
-//            targetTerritory->setOwner(/* Created Neutral Player */);
+            // Transferring ownership of the territory to neutral player
+            targetTerritory->getOwner()->removeTerritory(targetTerritory);
+            targetTerritory->setOwner(neutralPlayer);
+            neutralPlayer->addTerritory(targetTerritory);
         }
 
         // Notifies observer of the effect of the order executed.
