@@ -25,3 +25,9 @@
 2021-11-16 21:52:47: Order Executed: Advance order success: The target territory Amazonas has been defeated and is now owned by Player player 1. Advancing 11 surviving attacking units from Acre to Amazonas
 2021-11-16 21:53:20: Game Engine: map loaded state
 2021-11-16 21:53:47: Game Engine: map validated state
+2021-11-17 02:32:44: Order Issued: Deploy
+2021-11-17 02:32:44: Order Issued: Deploy
+2021-11-17 02:32:44: Order Executed: Execute Deploy Order: 5 units moved from player 1's reinforcement pool to Acre (units: 15).
+2021-11-17 02:32:44: Order Issued: Advance
+2021-11-17 02:32:44: Order Executed: Advance order success: The target territory Amazonas has been defeated and is now owned by Player player 1. Advancing 11 surviving attacking units from Acre to Amazonas
+2021-11-17 02:32:44: Game Engine new state: start state

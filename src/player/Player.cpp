@@ -9,6 +9,8 @@ Player::Player()
     this->territories = vector<Territory *>();
     this->ordersList = new OrdersList();
     this->handOfCards = new Hand();
+    this->reinforcementPool = 0;
+    this->isNeutral = false;
 }
 
 /**
@@ -152,30 +154,6 @@ std::ostream &operator<<(std::ostream &strm, const Player &player)
     return strm;
 }
 
-<<<<<<< HEAD
-// Asked to return an arbitrary list of territories for this, so I just return the first half of the players territories
-vector<Territory *> Player::toDefend()
-{
-    vector<Territory *> firstHalf;
-    int half = territories.size() / 2;
-
-    for (int i = 0; i < half; ++i)
-    {
-        firstHalf.push_back(territories[i]);
-    }
-    return firstHalf;
-}
-
-// Asked to return an arbitrary list of territories for this, so I just return the second half of the players territories
-vector<Territory *> Player::toAttack()
-{
-    vector<Territory *> secondHalf;
-    int half = territories.size() / 2;
-
-    for (int i = half; i < territories.size(); ++i)
-    {
-        secondHalf.push_back(territories[i]);
-=======
 // Returns the territories that the player controls
 vector<Territory*> Player::toDefend(){
     return territories;
@@ -192,36 +170,11 @@ vector<Territory*> Player::toAttack() {
                 }
             }
         }
->>>>>>> 79c0564da09cdab0614fb7443a85369e80a548cf
     }
     return attackableTerritories;
 }
 
 // Asks the user for input on which order to create, and creates the corresponding order objects and adds it to the player's ordersList
-<<<<<<< HEAD
-void Player::issueOrder()
-{
-    string orders = "List of possible orders to be made: \n 1. Deploy\n 2. Advance\n 3. Bomb\n 4. Blockade\n 5. Airlift\n 6. Negotiate\n 7. Stop issuing orders\n ";
-    int orderNumber = 0;
-
-    while (orderNumber != 7)
-    {
-        std::cout << orders << std::endl;
-        std::cout << "Enter the number of the next order you want to execute:" << std::endl;
-        // Asking player for which order and validates choice
-        while (true)
-        {
-            std::cin >> orderNumber;
-            if (!std::cin || orderNumber < 1 || orderNumber > 7)
-            {
-                std::cout << "Wrong Choice. Enter again " << endl;
-                std::cin.clear();
-                std::cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                continue;
-            }
-            else
-                break;
-=======
 void Player::issueOrder() {
     int choiceDefend;
     int choiceAttack;
@@ -245,7 +198,6 @@ void Player::issueOrder() {
                 continue;
             }
             else break;
->>>>>>> 79c0564da09cdab0614fb7443a85369e80a548cf
         }
 
         std::cout << "Creating a deployment order" << std::endl;

@@ -154,7 +154,7 @@ void GameEngine::SetCommands()
  **/
 void GameEngine::Run(){
 
-    //startupPhase();
+    ////startupPhase();
 
     //Sets the startState as the current state
     SetState(startState, nullptr);
@@ -246,7 +246,7 @@ void GameEngine::startupPhase()
     bool gameStarted = false;
     
     //Sets the startState as the current state
-    //SetState(startState);
+    //// SetState(startState);
     PrintMapFiles();
 
     //Program loops until reaching the end command is executed
@@ -318,7 +318,7 @@ void GameEngine::startupPhase()
         }
 
         //Validates the command and execute the appropriate state transition
-        //ExecuteCmd(cmd);
+        //// ExecuteCmd(cmd);
     }
 }
 
