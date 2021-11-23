@@ -49,7 +49,6 @@ int main() {
                 std::cout << "Please double check your selection." << std::endl;
         }
     }
-    //test
 
     return 0;
 }
