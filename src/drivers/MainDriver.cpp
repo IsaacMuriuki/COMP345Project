@@ -15,14 +15,11 @@ int main() {
         std::cout << std::endl;
         if (options.find(option) != options.npos) {
             std::cout << "Enter a driver to execute." << std::endl;
-            std::cout << "A- Map (Chris + Henry)" << std::endl;
-            std::cout << "B- Order Execution (Isaac)" << std::endl;
-            std::cout << "C- Commands (Salaheddine)" << std::endl;
-            std::cout << "D- Commands Driver" << std::endl;
-            std::cout << "E- Territory Reinforcements" << std::endl;
-            std::cout << "F- Command Processor" << std::endl;
-            std::cout << "G- Game Log Observer" << std::endl;
-            std::cout << "H- Stop the program" << std::endl;
+            std::cout << "A- Order Execution (Isaac)" << std::endl;
+            std::cout << "B- Commands (Salaheddine)" << std::endl;
+            std::cout << "C- Territory Values" << std::endl;
+            std::cout << "D- Game Log Observer" << std::endl;
+            std::cout << "E- Stop the program" << std::endl;
         }
 
         std::cout << "Enter your option: ";
@@ -32,28 +29,20 @@ int main() {
 
         switch (option) {
             case 'A':
-                mapDriver();
+                 orderExecutionDriver();
                 break;
             case 'B':{
-                orderExecutionDriver();
+               commandsDriver();
                 break;
             }
             case 'C': {
-                commandsDriver();
+                territoryValuesDriver();
                 break;
             }
             case 'D':
-                commandsDriver();
-                break;
-            case 'E':
-                territoryValuesDriver();
-                break;
-            case 'F':
-                break;
-            case 'G':
                 logObserverDriver();
                 break;
-            case 'H':
+            case 'E':
                 return EXIT_SUCCESS;
                 break;
             default:
